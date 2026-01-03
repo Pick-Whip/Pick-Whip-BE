@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    # 메모리(RAM)에서 동작하는 가짜 DB 주소
+    url: jdbc:h2:mem:testdb;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    # 테스트 시작할 때 테이블 만들고, 끝나면 삭제
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # MySQL 문법을 흉내내도록 설정
+    database-platform: org.hibernate.dialect.H2Dialect
