@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TempRestController {
 
-    private final TestQueryService testQueryService;
+  private final TestQueryService testQueryService;
 
-    @GetMapping("/exception")
-    public ApiResponse<TestResDTO.Exception> exception(
-            @RequestParam Long flag
-    ) {
+  @GetMapping("/exception")
+  public ApiResponse<TestResDTO.Exception> exception(@RequestParam Long flag) {
 
-        testQueryService.checkFlag(flag);
+    testQueryService.checkFlag(flag);
 
-        GeneralSuccessCode code = GeneralSuccessCode.OK;
-        return ApiResponse.of(code, TestConverter.toExceptionDTO("This is Test!"));
-    }
+    GeneralSuccessCode code = GeneralSuccessCode.OK;
+    return ApiResponse.of(code, TestConverter.toExceptionDTO("This is Test!"));
+  }
 }

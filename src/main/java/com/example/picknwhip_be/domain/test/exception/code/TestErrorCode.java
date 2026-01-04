@@ -8,11 +8,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum TestErrorCode implements BaseErrorCode {
+  TEST_EXCEPTION(HttpStatus.BAD_REQUEST, "TEST400_1", "테스트 입니다"),
+  ;
 
-    TEST_EXCEPTION(HttpStatus.BAD_REQUEST, "TEST400_1","테스트 입니다"),
-    ;
-
-    private final HttpStatus status;
-    private final String code;
-    private final String message;
+  private final HttpStatus status;
+  private final String code;
+  private final String message;
 }
