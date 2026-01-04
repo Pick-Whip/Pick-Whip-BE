@@ -8,5 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GeneralException extends RuntimeException {
 
-    private final BaseErrorCode code;
+  private final BaseErrorCode code;
 }
