@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: optional:env[.env]
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -15,3 +18,10 @@ spring:
 
   application:
     name: picknwhip_be
+
+springdoc:
+  server-url: ${BASE_URL:http://localhost:8080}
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
