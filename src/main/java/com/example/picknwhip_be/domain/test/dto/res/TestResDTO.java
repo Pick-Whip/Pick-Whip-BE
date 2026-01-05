@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public class TestResDTO {
 
-  @Builder
+     @Builder
   @Getter
   public static class Exception {
     private String testString;
