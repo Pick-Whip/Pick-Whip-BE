@@ -64,6 +64,7 @@ tasks.register('updateGitHooks', Copy) {
 	} else {
 		Runtime.getRuntime().exec("chmod -R +x .git/hooks/")
 	}
+
 }
 
 tasks.named('compileJava') {
