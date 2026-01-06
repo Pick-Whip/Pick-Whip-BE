@@ -47,8 +47,6 @@ spotless {
 	java {
 		// Google Java Format 적용
 		googleJavaFormat()
-
-		// 아래 설정은 선택사항입니다 (사용하지 않는 import 제거 등)
 		removeUnusedImports()
 		trimTrailingWhitespace()
 		endWithNewline()
@@ -56,11 +54,11 @@ spotless {
 }
 
 
+//git hook 설정(spotlessApply 자동화)
 tasks.register('updateGitHooks', Copy) {
-	from new File(rootProject.rootDir, '.github/scripts/pre-commit')
+	from new File(rootProject.rootDir, '.github/hooks/pre-commit')
 
-	into { new File(rootProject.rootDir, '.git/scripts') }
-
+	into { new File(rootProject.rootDir, '.git/hooks') }
 	fileMode 0775
 }
 
