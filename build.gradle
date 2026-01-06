@@ -55,19 +55,16 @@ spotless {
 	}
 }
 
-//pre-commit 추가
-tasks.register('updateGitHooks', Copy) {
-	from new File(rootProject.rootDir, 'scripts/pre-commit')
-	into { new File(rootProject.rootDir, '.git/hooks') }
-	if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-		Runtime.getRuntime().exec("cmd /c chmod -R +x .git/hooks/")
-	} else {
-		Runtime.getRuntime().exec("chmod -R +x .git/hooks/")
-	}
 
+tasks.register('updateGitHooks', Copy) {
+	from new File(rootProject.rootDir, '.github/scripts/pre-commit')
+
+	into { new File(rootProject.rootDir, '.git/scripts') }
+
+	fileMode 0775
 }
 
 tasks.named('compileJava') {
-	dependsOn 'spotlessApply'
-	dependsOn 'updateGitHooks'
+	dependsOn 'spotlessApply'  // 컴파일 시 포맷팅 자동 적용
+	dependsOn 'updateGitHooks' // 컴파일 시 훅 파일 최신화
 }
