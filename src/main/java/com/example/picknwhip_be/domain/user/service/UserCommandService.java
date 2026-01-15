@@ -8,4 +8,6 @@ public interface UserCommandService {
       Long kakaoId, String email, String name, String phone, String profileImageUrl);
 
   User updateProfile(Long userId, UserRequestDTO.UpdateProfileDTO request);
+
+  void withdrawMember(Long userId, UserRequestDTO.WithdrawalDTO request);
 }

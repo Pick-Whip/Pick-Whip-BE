@@ -40,4 +40,13 @@ public class UserRestController {
     User user = userCommandService.updateProfile(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, UserConverter.toUpdateProfileResultDTO(user));
   }
+
+  @Operation(summary = "회원 탈퇴 API", description = "로그인된 사용자를 탈퇴 처리합니다.")
+  @PostMapping("/withdraw")
+  public ApiResponse<String> withdrawMember(@RequestBody UserRequestDTO.WithdrawalDTO request) {
+    // TODO: SecurityContext 연동 필요
+    Long userId = 1L;
+    userCommandService.withdrawMember(userId, request);
+    return ApiResponse.of(GeneralSuccessCode.OK, "탈퇴가 정상적으로 처리되었습니다.");
+  }
 }

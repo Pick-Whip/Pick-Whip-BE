@@ -3,9 +3,14 @@ package com.example.picknwhip_be.domain.user.service;
 import com.example.picknwhip_be.domain.user.dto.req.UserRequestDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.entity.UserStatus;
+import com.example.picknwhip_be.domain.user.entity.UserWithdrawal;
+import com.example.picknwhip_be.domain.user.entity.WithdrawalReasonItem;
 import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
+import com.example.picknwhip_be.domain.user.repository.UserWithdrawalRepository;
+import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandServiceImpl implements UserCommandService {
 
   private final UserRepository userRepository;
+  private final UserWithdrawalRepository userWithdrawalRepository;
+  private final WithdrawalReasonItemRepository reasonItemRepository;
 
   // 프로필 사진 기본 이미지
   // private static final String DEFAULT_PROFILE_IMAGE = "//";
@@ -72,5 +79,36 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     user.updateProfile(request.getNickname(), request.getPhone(), request.getProfileImageUrl());
     return user;
+  }
+
+  @Override
+  @Transactional
+  public void withdrawMember(Long userId, UserRequestDTO.WithdrawalDTO request) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+    // 탈퇴 기록 생성
+    UserWithdrawal withdrawal =
+        UserWithdrawal.builder().user(user).feedback(request.getFeedback()).build();
+    userWithdrawalRepository.save(withdrawal);
+
+    // 선택한 모든 사유 저장
+    if (request.getReasons() != null) {
+      List<WithdrawalReasonItem> items =
+          request.getReasons().stream()
+              .map(
+                  reason ->
+                      WithdrawalReasonItem.builder()
+                          .userWithdrawal(withdrawal)
+                          .reasonType(reason)
+                          .build())
+              .toList();
+      reasonItemRepository.saveAll(items);
+    }
+
+    // 사용자 상태 변경 (Soft Delete)
+    user.withdraw();
   }
 }

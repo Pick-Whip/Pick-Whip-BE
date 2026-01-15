@@ -66,4 +66,10 @@ public class User extends BaseEntity {
     this.phone = phone;
     this.profileImageUrl = profileImageUrl;
   }
+
+  // 탈퇴
+  public void withdraw() {
+    this.status = UserStatus.WITHDRAWN;
+    this.deletedAt = java.time.LocalDateTime.now();
+  }
 }
