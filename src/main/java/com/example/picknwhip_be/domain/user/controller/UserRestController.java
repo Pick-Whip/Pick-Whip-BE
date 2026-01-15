@@ -9,7 +9,6 @@ import com.example.picknwhip_be.domain.user.service.UserQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,19 +22,21 @@ public class UserRestController {
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
 
-  @Operation(summary = "사용자 정보 조회 API", description = "사용자 ID를 통해 프로필 정보를 조회합니다.")
-  @GetMapping("/{userId}")
-  public ApiResponse<UserResponseDTO.UserProfileDTO> getMemberProfile(
-      @PathVariable @Parameter(description = "사용자 ID") Long userId) {
+  @Operation(summary = "내 정보 조회 API", description = "로그인된 사용자의 프로필 정보를 조회합니다.")
+  @GetMapping("/me")
+  public ApiResponse<UserResponseDTO.UserProfileDTO> getMemberProfile() {
+    // TODO: 실제 로그인 구현 후 SecurityContext에서 ID를 가져와야 함. 현재는 임시로 1L 사용.
+    Long userId = 1L;
     User user = userQueryService.getUser(userId);
     return ApiResponse.of(GeneralSuccessCode.OK, UserConverter.toUserProfileDTO(user));
   }
 
-  @Operation(summary = "사용자 정보 수정 API", description = "사용자의 닉네임, 전화번호, 프로필 이미지를 수정합니다.")
-  @PatchMapping("/{userId}")
+  @Operation(summary = "내 정보 수정 API", description = "로그인된 사용자의 정보를 수정합니다.")
+  @PatchMapping("/me")
   public ApiResponse<UserResponseDTO.UpdateProfileResultDTO> updateMemberProfile(
-      @PathVariable @Parameter(description = "사용자 ID") Long userId,
       @RequestBody UserRequestDTO.UpdateProfileDTO request) {
+    // TODO: SecurityContext 연동 필요
+    Long userId = 1L;
     User user = userCommandService.updateProfile(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, UserConverter.toUpdateProfileResultDTO(user));
   }
