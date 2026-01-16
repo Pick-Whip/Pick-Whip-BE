@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
