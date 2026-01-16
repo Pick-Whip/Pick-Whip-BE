@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 //          name = "uk_review_like_review_user",
 //          columnNames = {"review_id", "user_id"})
 //    }
-    )
+)
 @EntityListeners(AuditingEntityListener.class)
 public class ReviewLike extends BaseEntity {
 
