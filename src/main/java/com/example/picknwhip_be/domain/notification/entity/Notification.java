@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.notification.enums.NotificationType;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
@@ -12,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "notification")
-@EntityListeners(AuditingEntityListener.class)
 public class Notification extends BaseEntity {
 
   @Id
@@ -27,10 +25,10 @@ public class Notification extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private NotificationType type;
 
-  @Column(name = "title", length = 512, nullable = false)
+  @Column(name = "title", length = 200, nullable = false)
   private String title;
 
-  @Column(name = "content", nullable = false)
+  @Column(name = "content", length = 200, nullable = false)
   private String content;
 
   @Column(name = "is_read", nullable = false)

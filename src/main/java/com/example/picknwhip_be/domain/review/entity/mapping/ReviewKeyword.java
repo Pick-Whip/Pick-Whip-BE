@@ -3,7 +3,6 @@ package com.example.picknwhip_be.domain.review.entity.mapping;
 import com.example.picknwhip_be.domain.review.enums.KeywordCategory;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
@@ -17,7 +16,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           name = "uk_review_keyword_category_keyword",
           columnNames = {"category", "keyword"})
     })
-@EntityListeners(AuditingEntityListener.class)
 public class ReviewKeyword {
 
   @Id

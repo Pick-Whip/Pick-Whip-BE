@@ -1,16 +1,12 @@
 package com.example.picknwhip_be.domain.review.entity;
 
-import com.example.picknwhip_be.domain.review.entity.mapping.ReviewImage;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
-import com.example.picknwhip_be.domain.review.entity.mapping.ReviewReply;
-import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
@@ -18,7 +14,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "review")
-@EntityListeners(AuditingEntityListener.class)
 public class Review extends BaseEntity {
 
   @Id
@@ -51,18 +46,11 @@ public class Review extends BaseEntity {
   private LocalDateTime deletedAt;
 
   @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
-  private List<ReviewImage> images = new ArrayList<>();
-
-  @OneToOne(mappedBy = "review")
-  private ReviewReply reply;
-
-  @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
-  private List<ReviewSelectedKeyword> keywords = new ArrayList<>();
-
-  @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
   private List<ReviewLike> likes = new ArrayList<>();
 
   public void softDelete(LocalDateTime now) {
-    this.deletedAt = now;
+    if (this.deletedAt == null) {
+      this.deletedAt = now;
+    }
   }
 }

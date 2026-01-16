@@ -3,9 +3,9 @@ package com.example.picknwhip_be.domain.review.entity.mapping;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -19,7 +19,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           name = "uk_review_reply_review",
           columnNames = {"review_id"})
     })
-@EntityListeners(AuditingEntityListener.class)
 public class ReviewReply extends BaseEntity {
 
   @Id
@@ -37,9 +36,12 @@ public class ReviewReply extends BaseEntity {
   @Column(name = "content", length = 500, nullable = false)
   private String content;
 
+  @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
   public void softDelete(LocalDateTime now) {
-    this.deletedAt = now;
+    if (this.deletedAt == null) {
+      this.deletedAt = now;
+    }
   }
 }
