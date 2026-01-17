@@ -42,6 +42,7 @@ public class User extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
+  @Builder.Default
   private UserStatus status = UserStatus.ACTIVE;
 
   private LocalDateTime deletedAt;
