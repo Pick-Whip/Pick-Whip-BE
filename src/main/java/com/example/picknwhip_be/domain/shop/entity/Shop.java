@@ -24,7 +24,7 @@ public class Shop {
   @JoinColumn(name = "owner_id")
   private User owner;
 
-  @Column(nullable = false)
+  @Column(name = "shop_name", nullable = false)
   private String shopName;
 
   @Column(nullable = false)
@@ -43,28 +43,35 @@ public class Shop {
   private String registrationImageUrl;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "verification_status")
   @Builder.Default
   private VerificationStatus verificationStatus = VerificationStatus.NOT_SUBMITTED;
 
-  @Column(columnDefinition = "TEXT")
+  @Column(name = "pickup_time_guide", columnDefinition = "TEXT")
   private String pickupTimeGuide;
 
-  @Column(columnDefinition = "TEXT")
+  @Column(name = "day_order_guide",columnDefinition = "TEXT")
   private String dayOrderGuide;
 
-  @Column(columnDefinition = "TEXT")
+  @Column(name = "parking_guide",columnDefinition = "TEXT")
   private String parkingGuide;
 
-  @Column(columnDefinition = "TEXT")
+  @Column(name = "payment_guide",columnDefinition = "TEXT")
   private String paymentNotice;
+
   private Integer prepayment; // 선결제 금액
-  @Column(columnDefinition = "TEXT")
+
+  @Column(name = "precaution_notice",columnDefinition = "TEXT")
   private String precautionNotice;
 
+  @Column(name = "chat_nickname")
   private String chatNickname;
+
+  @Column(name = "chat_profile_image_url")
   private String chatProfileImageUrl;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "status")
   @Builder.Default
   private ShopStatus status = ShopStatus.HIDDEN;
 

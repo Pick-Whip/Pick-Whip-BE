@@ -22,15 +22,16 @@ public class CustomOption {
   private Shop shop;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(name = "category", nullable = false)
   private OptionCategory category;
 
-  @Column(nullable = false)
+  @Column(name = "option_name",nullable = false)
   private String optionName;
 
-  private int additionalPrice;
+  @Column(name = "additional_price")
+  private int additionalPrice=0;
 
-  @Column(length = 7)
+  @Column(name = "color_rgb_code", length = 7)
   private String colorRgbCode;
 
   public CustomOption(Shop shop, OptionCategory category, String optionName, int additionalPrice) {
