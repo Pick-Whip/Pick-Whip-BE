@@ -13,13 +13,13 @@ public class DesignGallery {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private String id;
+  private Long id;
 
   //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
   //    @JoinColumn(name = "shop_id", nullable = false)
   //    private Shops shops;
 
-  @Column(name = "designn_name", nullable = false)
+  @Column(name = "design_name", nullable = false)
   private String designName;
 
   @Column(name = "base_price", nullable = false)

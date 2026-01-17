@@ -47,7 +47,8 @@ public class Orders extends BaseEntity {
   @Column(name = "lettering_text", nullable = false, length = 30)
   private String letteringText;
 
-  @Column(name = "lettering_line_count", nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Column(name = "lettering_line_count")
   private LetteringLineCount letteringLineCount;
 
   @Column(name = "lettering_alignment", nullable = false)
@@ -62,6 +63,7 @@ public class Orders extends BaseEntity {
   @Column(name = "payment_method", nullable = false)
   private String paymentMethod;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "payment_status", nullable = false)
   private PaymentStatus paymentStatus;
 

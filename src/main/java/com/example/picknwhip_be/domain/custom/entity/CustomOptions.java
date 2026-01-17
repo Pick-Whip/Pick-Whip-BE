@@ -26,7 +26,7 @@ public class CustomOptions {
   @Column(name = "option_name")
   private String optionName;
 
-  @Column(name = "additional_price")
+  @Column(name = "additional_price", nullable = false)
   private int additionalPrice;
 
   @Column(name = "color_rgb_code", nullable = false, length = 7)

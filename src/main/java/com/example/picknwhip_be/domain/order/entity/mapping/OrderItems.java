@@ -16,7 +16,7 @@ public class OrderItems {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "order_id", nullable = false)
@@ -26,6 +26,7 @@ public class OrderItems {
   @JoinColumn(name = "custom_id", nullable = false)
   private CustomOptions customOptions;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "option_category", nullable = false)
   private OptionCategory optionCategory;
 

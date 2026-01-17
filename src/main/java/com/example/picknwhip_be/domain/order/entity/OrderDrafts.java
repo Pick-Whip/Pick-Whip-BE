@@ -42,6 +42,7 @@ public class OrderDrafts extends BaseEntity {
   @Column(name = "lettering_text", length = 30)
   private String letteringText;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "lettering_line_count")
   private LetteringLineCount letteringLineCount;
 
