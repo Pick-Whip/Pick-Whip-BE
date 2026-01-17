@@ -35,6 +35,11 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15'
+
+	runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
@@ -45,10 +50,22 @@ spotless {
 	java {
 		// Google Java Format 적용
 		googleJavaFormat()
-
-		// 아래 설정은 선택사항입니다 (사용하지 않는 import 제거 등)
 		removeUnusedImports()
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
+}
+
+
+//git hook 설정(spotlessApply 자동화)
+tasks.register('updateGitHooks', Copy) {
+	from new File(rootProject.rootDir, '.github/hooks/pre-commit')
+
+	into { new File(rootProject.rootDir, '.git/hooks') }
+	fileMode 0775
+}
+
+tasks.named('compileJava') {
+	dependsOn 'spotlessApply'  // 컴파일 시 포맷팅 자동 적용
+	dependsOn 'updateGitHooks' // 컴파일 시 훅 파일 최신화
 }
