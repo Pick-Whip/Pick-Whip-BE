@@ -1,18 +1,15 @@
 name: Java CI with Gradle
 
 on:
-  # 1. develop 브랜치로 '머지(Push)' 되었을 때 -> 배포 진행
   push:
     branches: [ "develop" ]
-  # 2. develop 브랜치로 'PR'을 보냈을 때 -> 테스트만 진행
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop", "release" ]
 
 permissions:
   contents: read
 
 jobs:
-  # 빌드 및 테스트 (PR, Push 둘 다 실행됨)
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +28,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew test
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
