@@ -1,0 +1,56 @@
+package com.example.picknwhip_be.domain.review.entity;
+
+import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
+import com.example.picknwhip_be.global.entity.BaseEntity;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.*;
+
+@Entity
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Table(name = "review")
+public class Review extends BaseEntity {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  //    @OneToOne(fetch = FetchType.LAZY, optional = false)
+  //    @JoinColumn(name = "order_id", nullable = false, unique = true)
+  //    private Order order;
+
+  //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  //    @JoinColumn(name = "user_id", nullable = false)
+  //    private User user;
+
+  //    @ManyToOne(fetch = FetchType.LAZY)
+  //    @JoinColumn(name = "shop_id", nullable = false)
+  //    private Shops shops;
+
+  //    @ManyToOne(fetch = FetchType.LAZY)
+  //    @JoinColumn(name = "design_id")
+  //    private DesignGallery design;
+
+  @Column(name = "rating", nullable = false)
+  private Integer rating;
+
+  @Column(name = "content", length = 500, nullable = false)
+  private String content;
+
+  @Column(name = "deleted_at")
+  private LocalDateTime deletedAt;
+
+  @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
+  private List<ReviewLike> likes = new ArrayList<>();
+
+  public void softDelete(LocalDateTime now) {
+    if (this.deletedAt == null) {
+      this.deletedAt = now;
+    }
+  }
+}
