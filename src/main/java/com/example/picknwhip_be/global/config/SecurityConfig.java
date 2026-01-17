@@ -23,6 +23,7 @@ public class SecurityConfig {
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                     .permitAll()
                     // 그 외의 모든 요청은 일단 허용 (나중에 로그인이 완성되면 인증 필요로 변경)
+                    // TODO: 배포 전 반드시 authenticated()로 변경할 것
                     .anyRequest()
                     .permitAll());
 

@@ -19,6 +19,9 @@ public class UserQueryServiceImpl implements UserQueryService {
   public User getUser(Long userId) {
     return userRepository
         .findById(userId)
+        .filter(
+            user ->
+                user.getStatus() == com.example.picknwhip_be.domain.user.entity.UserStatus.ACTIVE)
         .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
   }
 }

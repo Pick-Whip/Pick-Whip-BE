@@ -24,7 +24,7 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final UserWithdrawalRepository userWithdrawalRepository;
   private final WithdrawalReasonItemRepository reasonItemRepository;
 
-  // 프로필 사진 기본 이미지
+  // TODO: 프로필 사진 기본 이미지 설정 구현
   // private static final String DEFAULT_PROFILE_IMAGE = "//";
 
   @Override
@@ -54,13 +54,14 @@ public class UserCommandServiceImpl implements UserCommandService {
   // 랜덤 닉네임 생성
   private String generateRandomNickname() {
     String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"};
-    int randomNumber = (int) (Math.random() * 900) + 100;
-    String nickname = adjectives[(int) (Math.random() * adjectives.length)] + randomNumber;
-
+    java.util.concurrent.ThreadLocalRandom random =
+        java.util.concurrent.ThreadLocalRandom.current();
+    String nickname;
     // 중복 체크
-    if (userRepository.existsByNickname(nickname)) {
-      return generateRandomNickname();
-    }
+    do {
+      int randomNumber = random.nextInt(100, 1000);
+      nickname = adjectives[random.nextInt(adjectives.length)] + randomNumber;
+    } while (userRepository.existsByNickname(nickname));
     return nickname;
   }
 
@@ -89,12 +90,16 @@ public class UserCommandServiceImpl implements UserCommandService {
             .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
+    // 이미 탈퇴한 사용자인지 검증
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
+      throw new UserException(UserErrorCode.ALREADY_WITHDRAWN);
+    }
     // 탈퇴 기록 생성
     UserWithdrawal withdrawal =
         UserWithdrawal.builder().user(user).feedback(request.getFeedback()).build();
     userWithdrawalRepository.save(withdrawal);
 
-    // 선택한 모든 사유 저장
+    // 선택한 사유 저장
     if (request.getReasons() != null) {
       List<WithdrawalReasonItem> items =
           request.getReasons().stream()
@@ -108,7 +113,7 @@ public class UserCommandServiceImpl implements UserCommandService {
       reasonItemRepository.saveAll(items);
     }
 
-    // 사용자 상태 변경 (Soft Delete)
-    user.withdraw();
+    // 직접 상태를 변경하는 대신 Repository의 delete를 호출
+    userRepository.delete(user);
   }
 }

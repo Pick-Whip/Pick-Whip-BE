@@ -4,6 +4,8 @@ import com.example.picknwhip_be.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
@@ -11,6 +13,9 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
+@SQLDelete(
+    sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP, status = 'WITHDRAWN' WHERE user_id = ?")
+@Where(clause = "deleted_at is NULL")
 public class User extends BaseEntity {
 
   @Id
@@ -62,14 +67,14 @@ public class User extends BaseEntity {
 
   // 마이페이지 수정
   public void updateProfile(String nickname, String phone, String profileImageUrl) {
-    this.nickname = nickname;
-    this.phone = phone;
-    this.profileImageUrl = profileImageUrl;
-  }
-
-  // 탈퇴
-  public void withdraw() {
-    this.status = UserStatus.WITHDRAWN;
-    this.deletedAt = java.time.LocalDateTime.now();
+    if (nickname != null) {
+      this.nickname = nickname;
+    }
+    if (phone != null) {
+      this.phone = phone;
+    }
+    if (profileImageUrl != null) {
+      this.profileImageUrl = profileImageUrl;
+    }
   }
 }
