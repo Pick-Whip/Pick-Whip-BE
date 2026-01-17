@@ -70,3 +70,16 @@ tasks.named('compileJava') {
 	dependsOn 'spotlessApply'  // 컴파일 시 포맷팅 자동 적용
 	dependsOn 'updateGitHooks' // 컴파일 시 훅 파일 최신화
 }
+
+// 기본 test는 mysql 태그 제외 + mysqlTest 태스크 추가
+tasks.test {
+    useJUnitPlatform {
+        excludeTags "mysql"
+    }
+}
+
+tasks.register("mysqlTest", Test) {
+    useJUnitPlatform {
+        includeTags "mysql"
+    }
+}
