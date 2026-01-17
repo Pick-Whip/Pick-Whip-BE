@@ -25,11 +25,11 @@ public class CustomOption {
   @Column(name = "category", nullable = false)
   private OptionCategory category;
 
-  @Column(name = "option_name",nullable = false)
+  @Column(name = "option_name", nullable = false)
   private String optionName;
 
   @Column(name = "additional_price")
-  private int additionalPrice=0;
+  private int additionalPrice = 0;
 
   @Column(name = "color_rgb_code", length = 7)
   private String colorRgbCode;

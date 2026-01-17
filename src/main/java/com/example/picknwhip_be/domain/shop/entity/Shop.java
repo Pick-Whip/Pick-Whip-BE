@@ -50,18 +50,18 @@ public class Shop {
   @Column(name = "pickup_time_guide", columnDefinition = "TEXT")
   private String pickupTimeGuide;
 
-  @Column(name = "day_order_guide",columnDefinition = "TEXT")
+  @Column(name = "day_order_guide", columnDefinition = "TEXT")
   private String dayOrderGuide;
 
-  @Column(name = "parking_guide",columnDefinition = "TEXT")
+  @Column(name = "parking_guide", columnDefinition = "TEXT")
   private String parkingGuide;
 
-  @Column(name = "payment_guide",columnDefinition = "TEXT")
+  @Column(name = "payment_guide", columnDefinition = "TEXT")
   private String paymentNotice;
 
   private Integer prepayment; // 선결제 금액
 
-  @Column(name = "precaution_notice",columnDefinition = "TEXT")
+  @Column(name = "precaution_notice", columnDefinition = "TEXT")
   private String precautionNotice;
 
   @Column(name = "chat_nickname")

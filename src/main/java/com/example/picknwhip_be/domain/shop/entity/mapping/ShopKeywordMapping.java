@@ -13,14 +13,15 @@ import lombok.*;
 @Builder
 public class ShopKeywordMapping {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
-    private Shop shop;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shop_id")
+  private Shop shop;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword_id")
-    private ShopAppealKeyword keyword;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "keyword_id")
+  private ShopAppealKeyword keyword;
 }

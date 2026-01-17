@@ -12,14 +12,15 @@ import lombok.*;
 @Builder
 public class ShopAppealKeyword {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "keyword_id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "keyword_id")
+  private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "keyword_type")
-    private KeywordType keywordType;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "keyword_type")
+  private KeywordType keywordType;
 
-    @Column(name = "keyword_text", nullable = false)
-    private String keywordText;
+  @Column(name = "keyword_text", nullable = false)
+  private String keywordText;
 }
