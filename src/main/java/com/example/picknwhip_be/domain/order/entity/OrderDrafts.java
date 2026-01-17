@@ -46,6 +46,7 @@ public class OrderDrafts extends BaseEntity {
   @Column(name = "lettering_line_count")
   private LetteringLineCount letteringLineCount;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "lettering_alignment")
   private LetteringAlignment letteringAlignment;
 

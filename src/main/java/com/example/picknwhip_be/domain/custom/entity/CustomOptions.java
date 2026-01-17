@@ -20,6 +20,7 @@ public class CustomOptions {
   //    @JoinColumn(name = "shop_id", nullable = false)
   //    private Shops shops;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "category", nullable = false)
   private OptionCategory category;
 

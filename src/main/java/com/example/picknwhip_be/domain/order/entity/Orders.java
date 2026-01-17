@@ -20,7 +20,7 @@ public class Orders extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
   //    @JoinColumn(name = "user_id", nullable = false)
@@ -38,6 +38,7 @@ public class Orders extends BaseEntity {
   @JoinColumn(name = "design_id", nullable = false)
   private DesignGallery designGallery;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private Status status;
 
@@ -51,6 +52,7 @@ public class Orders extends BaseEntity {
   @Column(name = "lettering_line_count")
   private LetteringLineCount letteringLineCount;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "lettering_alignment", nullable = false)
   private LetteringAlignment letteringAlignment;
 
