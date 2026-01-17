@@ -55,17 +55,3 @@ spotless {
 		endWithNewline()
 	}
 }
-
-
-//git hook 설정(spotlessApply 자동화)
-tasks.register('updateGitHooks', Copy) {
-	from new File(rootProject.rootDir, '.github/hooks/pre-commit')
-
-	into { new File(rootProject.rootDir, '.git/hooks') }
-	fileMode 0775
-}
-
-tasks.named('compileJava') {
-	dependsOn 'spotlessApply'  // 컴파일 시 포맷팅 자동 적용
-	dependsOn 'updateGitHooks' // 컴파일 시 훅 파일 최신화
-}
