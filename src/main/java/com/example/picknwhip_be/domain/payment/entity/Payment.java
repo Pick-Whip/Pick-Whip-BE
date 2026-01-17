@@ -28,15 +28,15 @@ public class Payment {
   private String paymentKey; // PG사 고유 키
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "paymenent_method")
+  @Column(name = "payment_method")
   private PaymentMethod paymentMethod;
 
   @Column(name = "total_amount", nullable = false)
-  private int totalAmount;
+  private long totalAmount;
 
   @Column(name = "discount_amount")
   @Builder.Default
-  private int discountAmount = 0; // 쿠폰 할인액
+  private long discountAmount = 0; // 쿠폰 할인액
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status")

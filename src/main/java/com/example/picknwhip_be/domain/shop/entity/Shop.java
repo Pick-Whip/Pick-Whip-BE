@@ -21,7 +21,7 @@ public class Shop {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "owner_id")
+  @JoinColumn(name = "owner_id", nullable = false)
   private User owner;
 
   @Column(name = "shop_name", nullable = false)
@@ -56,7 +56,7 @@ public class Shop {
   @Column(name = "parking_guide", columnDefinition = "TEXT")
   private String parkingGuide;
 
-  @Column(name = "payment_guide", columnDefinition = "TEXT")
+  @Column(name = "payment_notice", columnDefinition = "TEXT")
   private String paymentNotice;
 
   private Integer prepayment; // 선결제 금액

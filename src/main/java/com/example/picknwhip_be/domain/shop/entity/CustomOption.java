@@ -2,14 +2,14 @@ package com.example.picknwhip_be.domain.shop.entity;
 
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "custom_options")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class CustomOption {
 
   @Id

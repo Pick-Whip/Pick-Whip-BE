@@ -15,7 +15,7 @@ public class ShopAppealKeyword {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "keyword_id")
-  private Integer id;
+  private Long id;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "keyword_type")
