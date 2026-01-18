@@ -50,7 +50,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     // 무한 루프를 방지하기 위해 최대 시도 횟수를 제한
     for (int attempt = 0; attempt < MAX_NICKNAME_GENERATION_ATTEMPTS; attempt++) {
-      int randomNumber = random.nextInt(100_000, 1_000_000); // 범위를 넓혀 중복 확률 감소
+      int randomNumber = random.nextInt(100, 1000);
       String nickname = adjectives[random.nextInt(adjectives.length)] + randomNumber;
 
       if (!userRepository.existsByNickname(nickname)) {
