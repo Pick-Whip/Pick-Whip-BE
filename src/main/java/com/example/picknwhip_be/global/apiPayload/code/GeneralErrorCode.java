@@ -15,6 +15,9 @@ public enum GeneralErrorCode implements BaseErrorCode {
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER404_1", "사용자를 찾을 수 없습니다."),
   NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER400_1", "이미 존재하는 닉네임입니다."),
   ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "USER409_1", "이미 탈퇴한 사용자입니다."),
+  CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT404_1", "존재하지 않는 채팅방입니다."),
+  CHAT_NOT_PARTICIPANT(HttpStatus.FORBIDDEN, "CHAT403_1", "해당 채팅방의 참여자가 아닙니다."),
+  INVALID_MESSAGE_TYPE(HttpStatus.BAD_REQUEST, "CHAT400_1", "잘못된 메시지 형식입니다."),
   ;
 
   private final HttpStatus status;
