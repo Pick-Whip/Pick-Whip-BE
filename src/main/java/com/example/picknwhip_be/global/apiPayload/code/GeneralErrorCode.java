@@ -12,7 +12,9 @@ public enum GeneralErrorCode implements BaseErrorCode {
   FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH403_1", "요청이 거부되었습니다."),
   NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON404_1", "요청한 리소스를 찾을 수 없습니다."),
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500_1", "예기치 않은 서버 에러가 발생했습니다."),
-  ;
+  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER404_1", "사용자를 찾을 수 없습니다."),
+  NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER400_1", "이미 존재하는 닉네임입니다."),
+  ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "USER409_1", "이미 탈퇴한 사용자입니다."),
   ;
 
   private final HttpStatus status;
