@@ -2,13 +2,19 @@ package com.example.picknwhip_be.domain.shop.entity;
 
 import com.example.picknwhip_be.domain.shop.entity.enums.ShopStatus;
 import com.example.picknwhip_be.domain.shop.entity.enums.VerificationStatus;
+import com.example.picknwhip_be.domain.shop.entity.mapping.ShopKeywordMapping;
 import com.example.picknwhip_be.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "shops")
+@Table(name = "shops", indexes = {
+        @Index(name = "idx_shop_location", columnList = "location", unique = false)
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -47,6 +53,12 @@ public class Shop {
   @Builder.Default
   private VerificationStatus verificationStatus = VerificationStatus.NOT_SUBMITTED;
 
+  @Column(name = "average_rating")
+  private Double averageRating;
+
+  @Column(name = "min_price")
+  private Integer minPrice;
+
   @Column(name = "pickup_time_guide", columnDefinition = "TEXT")
   private String pickupTimeGuide;
 
@@ -74,6 +86,10 @@ public class Shop {
   @Column(name = "status")
   @Builder.Default
   private ShopStatus status = ShopStatus.HIDDEN;
+
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<ShopKeywordMapping> keywordMappings = new ArrayList<>();
 
   public Shop(User owner, String shopName, String phone, Point location) {
     this.owner = owner;
