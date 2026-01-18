@@ -61,7 +61,10 @@ public class ChatCommandServiceImpl implements ChatCommandService {
       throw new GeneralException(GeneralErrorCode.CHAT_NOT_PARTICIPANT);
     }
 
-    User sender = userRepository.findById(senderId).get();
+    User sender =
+        userRepository
+            .findById(senderId)
+            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
     ChatMessage message = ChatConverter.toChatMessage(room, sender, dto);
 
     ChatMessage saved = chatMessageRepository.save(message);

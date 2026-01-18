@@ -43,6 +43,8 @@ public class ChatController {
     ChatResponseDTO.UnreadCountUpdateDTO unreadUpdate =
         ChatConverter.toUnreadCountUpdateDTO(roomId, unreadCount);
 
+    messagingTemplate.convertAndSend("/topic/users/" + receiverId + "/unread", unreadUpdate);
+
     if (senderId.equals(customerId)) {
       // 발신자가 고객인 경우 -> 사장님에게 알림 전송
       messagingTemplate.convertAndSend("/topic/shops/" + shopId, "새로운 문의 메시지가 도착했습니다.");

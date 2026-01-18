@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,11 +12,21 @@ import org.springframework.data.repository.query.Param;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
   List<ChatMessage> findByChatRoomOrderByCreatedAtAsc(ChatRoom chatRoom);
 
-  // 마지막 메시지 1건 조회
-  Optional<ChatMessage> findTopByChatRoomOrderByCreatedAtDesc(ChatRoom chatRoom);
+  // 채팅방 ID 목록으로 각 방의 마지막 메시지들을 한꺼번에 조회
+  @Query(
+      "SELECT m FROM ChatMessage m WHERE m.chatId IN "
+          + "(SELECT MAX(m2.chatId) FROM ChatMessage m2 WHERE m2.chatRoom.chatRoomId IN :roomIds GROUP BY m2.chatRoom.chatRoomId)")
+  List<ChatMessage> findLastMessagesByRoomIds(@Param("roomIds") List<Long> roomIds);
 
-  // 읽지 않은 메시지 개수 조회
-  Long countByChatRoomAndIsReadFalseAndSenderNot(ChatRoom chatRoom, User sender);
+  // 채팅방 ID 목록으로 각 방의 안 읽은 메시지 개수를 그룹화하여 조회
+  @Query(
+      "SELECT m.chatRoom.chatRoomId, COUNT(m) FROM ChatMessage m "
+          + "WHERE m.chatRoom.chatRoomId IN :roomIds AND m.isRead = false AND m.sender != :user "
+          + "GROUP BY m.chatRoom.chatRoomId")
+  List<Object[]> countUnreadMessagesByRoomIds(
+      @Param("roomIds") List<Long> roomIds, @Param("user") User user);
+
+  Long countByChatRoom_ChatRoomIdAndIsReadFalseAndSender_UserIdNot(Long chatRoomId, Long userId);
 
   @Modifying
   @Query(

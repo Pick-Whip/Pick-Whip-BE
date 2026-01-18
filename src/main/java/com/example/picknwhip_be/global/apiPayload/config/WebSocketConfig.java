@@ -10,6 +10,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
+    // TODO: 프론트엔드 애플리케이션 실제 도메인만 허용하도록 설정하기
     registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
   }
 

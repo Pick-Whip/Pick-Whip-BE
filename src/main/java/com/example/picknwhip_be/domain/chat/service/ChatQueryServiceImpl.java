@@ -10,8 +10,11 @@ import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,7 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     ChatRoom room =
         chatRoomRepository
             .findById(roomId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND));
 
     return chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room).stream()
         .map(ChatConverter::toMessageInfo)
@@ -44,29 +47,37 @@ public class ChatQueryServiceImpl implements ChatQueryService {
             .findById(userId)
             .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
 
-    // 유저가 참여 중인 채팅방 조회
+    // 유저가 참여 중인 채팅방 목록 조회
     List<ChatRoom> rooms = chatRoomRepository.findAllByCustomerOrShopOwner(user);
+    if (rooms.isEmpty()) {
+      return ChatConverter.toChatRoomListDTO(Collections.emptyList());
+    }
 
-    // 각 방별로 요약 정보 생성
+    // 채팅방 ID 리스트 추출
+    List<Long> roomIds = rooms.stream().map(ChatRoom::getChatRoomId).toList();
+
+    // 마지막 메시지들을 한꺼번에 조회하여 Map<RoomID, ChatMessage>으로 변환
+    Map<Long, ChatMessage> lastMessageMap =
+        chatMessageRepository.findLastMessagesByRoomIds(roomIds).stream()
+            .collect(Collectors.toMap(m -> m.getChatRoom().getChatRoomId(), m -> m));
+
+    // 안 읽은 개수들을 한꺼번에 조회하여 Map<RoomID, Long>으로 변환
+    Map<Long, Long> unreadCountMap =
+        chatMessageRepository.countUnreadMessagesByRoomIds(roomIds, user).stream()
+            .collect(Collectors.toMap(obj -> (Long) obj[0], obj -> (Long) obj[1]));
+
+    // 메모리에서 데이터 조합하여 DTO 생성
     List<ChatResponseDTO.ChatRoomSummaryDTO> summaryList =
         rooms.stream()
             .map(
                 room -> {
-                  // 마지막 메시지 조회
-                  ChatMessage lastMessage =
-                      chatMessageRepository
-                          .findTopByChatRoomOrderByCreatedAtDesc(room)
-                          .orElse(null);
-
-                  // 안읽은 메시지 카운트 (본인이 보낸 건 제외)
-                  Long unreadCount =
-                      chatMessageRepository.countByChatRoomAndIsReadFalseAndSenderNot(room, user);
-
+                  ChatMessage lastMessage = lastMessageMap.get(room.getChatRoomId());
+                  Long unreadCount = unreadCountMap.getOrDefault(room.getChatRoomId(), 0L);
                   return ChatConverter.toChatRoomSummaryDTO(room, lastMessage, unreadCount);
                 })
             .sorted(
                 Comparator.comparing(ChatResponseDTO.ChatRoomSummaryDTO::getLastMessageTime)
-                    .reversed()) // 최신순 정렬
+                    .reversed())
             .toList();
 
     return ChatConverter.toChatRoomListDTO(summaryList);
@@ -74,15 +85,13 @@ public class ChatQueryServiceImpl implements ChatQueryService {
 
   @Override
   public Long getUnreadCount(Long roomId, Long userId) {
-    ChatRoom room =
-        chatRoomRepository
-            .findById(roomId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND));
-    User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+    // 채팅방 존재 여부 체크
+    if (!chatRoomRepository.existsById(roomId)) {
+      throw new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND);
+    }
 
-    return chatMessageRepository.countByChatRoomAndIsReadFalseAndSenderNot(room, user);
+    // User ID로 카운트 쿼리 실행
+    return chatMessageRepository.countByChatRoom_ChatRoomIdAndIsReadFalseAndSender_UserIdNot(
+        roomId, userId);
   }
 }
