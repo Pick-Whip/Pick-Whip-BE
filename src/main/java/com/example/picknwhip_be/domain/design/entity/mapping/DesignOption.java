@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.design.entity.mapping;
 
-import com.example.picknwhip_be.domain.custom.entity.CustomOptions;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.shop.entity.CustomOption;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "design_options")
-public class DesignOptions {
+public class DesignOption {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +23,5 @@ public class DesignOptions {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "custom_id", nullable = false)
-  private CustomOptions customOptions;
+  private CustomOption customOption;
 }
