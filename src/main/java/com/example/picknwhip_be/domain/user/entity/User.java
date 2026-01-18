@@ -28,13 +28,13 @@ public class User extends BaseEntity {
   @Column(unique = true, nullable = false)
   private String email; // 카카오에서 가져옴
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String name;
 
   @Column(unique = true, nullable = false)
   private String nickname;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String phone;
 
   @Column(columnDefinition = "TEXT")
@@ -48,22 +48,19 @@ public class User extends BaseEntity {
   private LocalDateTime deletedAt;
 
   // 카카오 최초 로그인 시 계정 생성
-  public static User createKakaoUser(
-      Long kakaoId,
-      String email,
-      String name,
-      String nickname,
-      String phone,
-      String profileImageUrl) {
+  public static User createKakaoUser(Long kakaoId, String email, String nickname) {
     return User.builder()
         .kakaoId(kakaoId)
         .email(email)
-        .name(name)
         .nickname(nickname)
-        .phone(phone)
-        .profileImageUrl(profileImageUrl)
         .status(UserStatus.ACTIVE)
         .build();
+  }
+
+  // 카카오 로그인 후 추가 정보 입력
+  public void updateExtraInfo(String name, String phone) {
+    this.name = name;
+    this.phone = phone;
   }
 
   // 마이페이지 수정

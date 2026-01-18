@@ -37,9 +37,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             () -> {
               // 가입된 적이 없으면 랜덤 닉네임 생성 후 등록
               String randomNickname = generateRandomNickname();
-              User newUser =
-                  User.createKakaoUser(
-                      kakaoId, email, name, randomNickname, phone, profileImageUrl);
+              User newUser = User.createKakaoUser(kakaoId, email, randomNickname);
               return userRepository.save(newUser);
             });
   }
@@ -68,6 +66,16 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     throw new GeneralException(GeneralErrorCode.NICKNAME_ALREADY_EXISTS);
+  }
+
+  @Override
+  public void updateExtraInfo(Long userId, UserRequestDTO.ExtraInfoDTO request) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+
+    user.updateExtraInfo(request.getName(), request.getPhone());
   }
 
   @Override

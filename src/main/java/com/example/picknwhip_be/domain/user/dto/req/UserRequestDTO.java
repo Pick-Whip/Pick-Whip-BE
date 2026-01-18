@@ -20,6 +20,14 @@ public class UserRequestDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class ExtraInfoDTO {
+    private String name;
+    private String phone;
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class WithdrawalDTO {
     private List<WithdrawalReason> reasons;
     private String feedback;

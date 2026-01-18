@@ -22,6 +22,15 @@ public class UserRestController {
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
 
+  @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호를 입력받아 업데이트합니다.")
+  @PostMapping("/extra/info")
+  public ApiResponse<String> createExtraInfo(@RequestBody UserRequestDTO.ExtraInfoDTO request) {
+    // TODO: JWT 완성 후 SecurityContext에서 추출하도록 변경 필요
+    Long userId = 1L;
+    userCommandService.updateExtraInfo(userId, request);
+    return ApiResponse.of(GeneralSuccessCode.OK, "정보 저장이 완료되었습니다.");
+  }
+
   @Operation(summary = "내 정보 조회 API", description = "로그인된 사용자의 프로필 정보를 조회합니다.")
   @GetMapping("/me")
   public ApiResponse<UserResponseDTO.UserProfileDTO> getMemberProfile() {
