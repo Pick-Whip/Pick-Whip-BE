@@ -7,6 +7,8 @@ public interface UserCommandService {
   User joinOrCreateUser(
       Long kakaoId, String email, String name, String phone, String profileImageUrl);
 
+  void updateExtraInfo(Long userId, UserRequestDTO.ExtraInfoDTO request);
+
   User updateProfile(Long userId, UserRequestDTO.UpdateProfileDTO request);
 
   void withdrawMember(Long userId, UserRequestDTO.WithdrawalDTO request);
