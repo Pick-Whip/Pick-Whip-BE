@@ -41,6 +41,9 @@ dependencies {
     // Spatial 기능 추가 (Point 타입 사용을 위해)
     implementation 'org.hibernate.orm:hibernate-spatial'
 	runtimeOnly 'com.h2database:h2'
+	// 로그인 관련 기능
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {
