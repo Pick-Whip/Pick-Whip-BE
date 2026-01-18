@@ -11,7 +11,6 @@ public class ShopPreviewResponseDto {
   private String shopName;
   private String shopImageUrl;
   private Double averageRating;
-  private Integer reviewCount;
   private Integer minPrice;
   private Integer distance;
   private List<String> tags;
