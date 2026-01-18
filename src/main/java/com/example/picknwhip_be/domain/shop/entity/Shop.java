@@ -8,13 +8,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "shops", indexes = {
-        @Index(name = "idx_shop_location", columnList = "location", unique = false)
-})
+@Table(name = "shops")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -86,6 +85,9 @@ public class Shop {
   @Column(name = "status")
   @Builder.Default
   private ShopStatus status = ShopStatus.HIDDEN;
+
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
   @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
   @Builder.Default
