@@ -20,4 +20,7 @@ public class CustomController {
       @RequestBody CustomReqDTO.CustomCreateDTO dto) {
     return ApiResponse.of(GeneralSuccessCode.CREATED, customService.saveCustom(dto));
   }
+
+  @PostMapping("/drafts")
+  public ApiResponse<CustomResDTO.CustomCreateDTO> postDrafts()
 }
