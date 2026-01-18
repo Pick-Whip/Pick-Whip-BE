@@ -38,7 +38,8 @@ dependencies {
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15'
-
+    // Spatial 기능 추가 (Point 타입 사용을 위해)
+    implementation 'org.hibernate.orm:hibernate-spatial'
 	runtimeOnly 'com.h2database:h2'
 }
 
@@ -54,4 +55,17 @@ spotless {
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
+}
+
+// 기본 test는 mysql 태그 제외 + mysqlTest 태스크 추가
+tasks.test {
+    useJUnitPlatform {
+        excludeTags "mysql"
+    }
+}
+
+tasks.register("mysqlTest", Test) {
+    useJUnitPlatform {
+        includeTags "mysql"
+    }
 }
