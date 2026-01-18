@@ -15,7 +15,11 @@ public class KakaoUserInfo implements OAuth2UserInfo {
     if (id instanceof Number) {
       return ((Number) id).longValue();
     }
-    return Long.parseLong(String.valueOf(id));
+    try {
+      return Long.parseLong(String.valueOf(id));
+    } catch (NumberFormatException ex) {
+      throw new IllegalStateException("Invalid Kakao id: " + id, ex);
+    }
   }
 
   @Override

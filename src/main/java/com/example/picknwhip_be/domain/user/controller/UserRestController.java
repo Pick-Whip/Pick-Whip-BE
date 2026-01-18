@@ -10,6 +10,7 @@ import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,8 @@ public class UserRestController {
 
   @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호를 입력받아 업데이트합니다.")
   @PostMapping("/extra/info")
-  public ApiResponse<String> createExtraInfo(@RequestBody UserRequestDTO.ExtraInfoDTO request) {
+  public ApiResponse<String> createExtraInfo(
+      @Valid @RequestBody UserRequestDTO.ExtraInfoDTO request) {
     // TODO: JWT 완성 후 SecurityContext에서 추출하도록 변경 필요
     Long userId = 1L;
     userCommandService.updateExtraInfo(userId, request);
