@@ -25,27 +25,35 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
              s.shop_image_url as shopImageUrl,
              IFNULL(s.average_rating, 0.0) as averageRating,
              IFNULL(s.min_price, 0) as minPrice,
-             FLOOR(ST_Distance_Sphere(
+             FLOOR(
+               ST_Distance_Sphere(
                  s.location,
                  ST_SRID(POINT(:lon, :lat), 4326)
-             )) as distance,
-             GROUP_CONCAT(DISTINCT k.keyword_text SEPARATOR ',') as tags
+               )
+             ) as distance,
+             COALESCE(JSON_ARRAYAGG(kt.keyword_text), JSON_ARRAY()) as tags
       FROM shops s
-      LEFT JOIN shop_keyword_mapping m ON s.shop_id = m.shop_id
-      LEFT JOIN shop_appeal_keywords k ON m.keyword_id = k.keyword_id
+      LEFT JOIN (
+          SELECT DISTINCT m.shop_id, k.keyword_text
+          FROM shop_keyword_mapping m
+          JOIN shop_appeal_keywords k ON m.keyword_id = k.keyword_id
+      ) kt ON s.shop_id = kt.shop_id
       WHERE s.status = 'ACTIVE'
-        -- 1차: 바운딩 박스(MBR)로 후보 압축 (Spatial Index 타기 좋음)
-        AND MBRContains(
-            ST_MakeEnvelope(:minLon, :minLat, :maxLon, :maxLat, 4326),
-            s.location
+        AND ST_SRID(s.location) = 4326
+        AND MBRWithin(
+          s.location,
+          ST_SRID(
+            ST_MakeEnvelope(POINT(:minLon, :minLat), POINT(:maxLon, :maxLat)),
+            4326
+          )
         )
-        -- 2차: 정확한 원형 반경 필터
         AND ST_Distance_Sphere(
-            s.location,
-            ST_SRID(POINT(:lon, :lat), 4326)
-        ) <= :radius
+              s.location,
+              ST_SRID(POINT(:lon, :lat), 4326)
+            ) <= :radius
       GROUP BY s.shop_id
       ORDER BY distance ASC
+      LIMIT :limit
       """, nativeQuery = true)
     List<ShopPreviewInfo> findNearbyShops(
             @Param("lat") double lat,
@@ -54,6 +62,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
             @Param("maxLat") double maxLat,
             @Param("minLon") double minLon,
             @Param("maxLon") double maxLon,
-            @Param("radius") double radius
+            @Param("radius") double radius,
+            @Param("limit") int limit
     );
 }

@@ -2,20 +2,37 @@ package com.example.picknwhip_be.domain.shop.converter;
 
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class ShopConverter {
 
+    private final ObjectMapper objectMapper;
+
     public ShopPreviewResponseDto toPreviewDto(ShopRepository.ShopPreviewInfo info) {
-        // GROUP_CONCAT으로 가져온 "태그1,태그2" 문자열을 리스트로 변환
+
         List<String> tagList = Collections.emptyList();
-        if (info.getTags() != null && !info.getTags().isBlank()) {
-            tagList = Arrays.asList(info.getTags().split(","));
+        String rawTags = info.getTags();
+
+        if (rawTags != null && !rawTags.isBlank()) {
+            try {
+                tagList = objectMapper.readValue(rawTags, new TypeReference<List<String>>() {});
+                tagList = tagList.stream()
+                        .filter(Objects::nonNull)
+                        .map(String::trim)
+                        .filter(s -> !s.isBlank())
+                        .toList();
+            } catch (Exception ignored) {
+                tagList = Collections.emptyList();
+            }
         }
 
         return ShopPreviewResponseDto.builder()

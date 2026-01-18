@@ -2,7 +2,7 @@ package com.example.picknwhip_be.domain.shop.controller;
 
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
-import io.swagger.v3.oas.annotations.Operation; // Swagger 쓴다면
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,8 @@ public class ShopController {
     public ResponseEntity<List<ShopPreviewResponseDto>> getNearbyShops(
             @RequestParam double lat,
             @RequestParam double lon,
-            @RequestParam(defaultValue = "1000") double radius // 기본값 1000m (1km)
+            @RequestParam(defaultValue = "1000") double radius
     ) {
-        List<ShopPreviewResponseDto> response = shopService.getNearbyShops(lat, lon, radius);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(shopService.getNearbyShops(lat, lon, radius));
     }
 }
