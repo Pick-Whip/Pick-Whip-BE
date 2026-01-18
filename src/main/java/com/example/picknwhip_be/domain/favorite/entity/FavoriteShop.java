@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.shop.entity.mapping;
+package com.example.picknwhip_be.domain.favorite.entity;
 
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.user.entity.User;
