@@ -5,12 +5,11 @@ import com.example.picknwhip_be.domain.shop.entity.enums.VerificationStatus;
 import com.example.picknwhip_be.domain.shop.entity.mapping.ShopKeywordMapping;
 import com.example.picknwhip_be.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
-import org.locationtech.jts.geom.Point;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Table(name = "shops")

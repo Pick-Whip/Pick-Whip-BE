@@ -1,25 +1,32 @@
 package com.example.picknwhip_be.domain.shop.repository;
 
 import com.example.picknwhip_be.domain.shop.entity.Shop;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
-    interface ShopPreviewInfo {
-        Long getShopId();
-        String getShopName();
-        String getShopImageUrl();
-        Double getAverageRating();
-        Integer getMinPrice();
-        Integer getDistance();
-        String getTags();
-    }
+  interface ShopPreviewInfo {
+    Long getShopId();
 
-    @Query(value = """
+    String getShopName();
+
+    String getShopImageUrl();
+
+    Double getAverageRating();
+
+    Integer getMinPrice();
+
+    Integer getDistance();
+
+    String getTags();
+  }
+
+  @Query(
+      value =
+          """
       SELECT s.shop_id as shopId,
              s.shop_name as shopName,
              s.shop_image_url as shopImageUrl,
@@ -54,15 +61,15 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
       GROUP BY s.shop_id
       ORDER BY distance ASC
       LIMIT :limit
-      """, nativeQuery = true)
-    List<ShopPreviewInfo> findNearbyShops(
-            @Param("lat") double lat,
-            @Param("lon") double lon,
-            @Param("minLat") double minLat,
-            @Param("maxLat") double maxLat,
-            @Param("minLon") double minLon,
-            @Param("maxLon") double maxLon,
-            @Param("radius") double radius,
-            @Param("limit") int limit
-    );
+      """,
+      nativeQuery = true)
+  List<ShopPreviewInfo> findNearbyShops(
+      @Param("lat") double lat,
+      @Param("lon") double lon,
+      @Param("minLat") double minLat,
+      @Param("maxLat") double maxLat,
+      @Param("minLon") double minLon,
+      @Param("maxLon") double maxLon,
+      @Param("radius") double radius,
+      @Param("limit") int limit);
 }
