@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.global.apiPayload.handler;
 
+import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +24,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
       throws IOException {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-    // Number 방식 추출
-    Object idAttr = oAuth2User.getAttributes().get("id");
-    Long kakaoId =
-        (idAttr instanceof Number)
-            ? ((Number) idAttr).longValue()
-            : Long.parseLong(String.valueOf(idAttr));
+    KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
+    Long kakaoId = kakaoUserInfo.getKakaoId();
 
     User user =
         userRepository
