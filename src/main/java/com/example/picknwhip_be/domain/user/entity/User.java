@@ -68,7 +68,7 @@ public class User extends BaseEntity {
 
   // 마이페이지 수정
   public void updateProfile(String nickname, String phone, String profileImageUrl) {
-    if (nickname != null) {
+    if (nickname != null && !nickname.isBlank()) {
       this.nickname = nickname;
     }
     if (phone != null) {

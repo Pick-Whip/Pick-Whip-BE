@@ -2,7 +2,6 @@ package com.example.picknwhip_be.domain.user.service;
 
 import com.example.picknwhip_be.domain.user.dto.req.UserRequestDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
-import com.example.picknwhip_be.domain.user.entity.UserStatus;
 import com.example.picknwhip_be.domain.user.entity.UserWithdrawal;
 import com.example.picknwhip_be.domain.user.entity.WithdrawalReasonItem;
 import com.example.picknwhip_be.domain.user.exception.UserException;
@@ -23,6 +22,7 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final UserRepository userRepository;
   private final UserWithdrawalRepository userWithdrawalRepository;
   private final WithdrawalReasonItemRepository reasonItemRepository;
+  private static final int MAX_NICKNAME_GENERATION_ATTEMPTS = 20;
 
   // TODO: 프로필 사진 기본 이미지 설정 구현
   // private static final String DEFAULT_PROFILE_IMAGE = "//";
@@ -38,15 +38,8 @@ public class UserCommandServiceImpl implements UserCommandService {
               // 가입된 적이 없으면 랜덤 닉네임 생성 후 등록
               String randomNickname = generateRandomNickname();
               User newUser =
-                  User.builder()
-                      .kakaoId(kakaoId)
-                      .email(email)
-                      .name(name)
-                      .nickname(randomNickname)
-                      .phone(phone)
-                      .profileImageUrl(profileImageUrl) // 기본 이미지 등록 시 DEFAULT_PROFILE_IMAGE로 수정 필요
-                      .status(UserStatus.ACTIVE)
-                      .build();
+                  User.createKakaoUser(
+                      kakaoId, email, name, randomNickname, phone, profileImageUrl);
               return userRepository.save(newUser);
             });
   }
@@ -56,13 +49,25 @@ public class UserCommandServiceImpl implements UserCommandService {
     String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"};
     java.util.concurrent.ThreadLocalRandom random =
         java.util.concurrent.ThreadLocalRandom.current();
-    String nickname;
-    // 중복 체크
-    do {
-      int randomNumber = random.nextInt(100, 1000);
-      nickname = adjectives[random.nextInt(adjectives.length)] + randomNumber;
-    } while (userRepository.existsByNickname(nickname));
-    return nickname;
+
+    // 무한 루프를 방지하기 위해 최대 시도 횟수를 제한
+    for (int attempt = 0; attempt < MAX_NICKNAME_GENERATION_ATTEMPTS; attempt++) {
+      int randomNumber = random.nextInt(100_000, 1_000_000); // 범위를 넓혀 중복 확률 감소
+      String nickname = adjectives[random.nextInt(adjectives.length)] + randomNumber;
+
+      if (!userRepository.existsByNickname(nickname)) {
+        return nickname;
+      }
+    }
+
+    // 그래도 중복이면 UUID 기반으로 fallback (한 번만 DB 체크)
+    String fallbackNickname =
+        "user_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+    if (!userRepository.existsByNickname(fallbackNickname)) {
+      return fallbackNickname;
+    }
+
+    throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
   }
 
   @Override
@@ -72,13 +77,16 @@ public class UserCommandServiceImpl implements UserCommandService {
             .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-    // 닉네임 중복 확인
-    if (!user.getNickname().equals(request.getNickname())
-        && userRepository.existsByNickname(request.getNickname())) {
-      throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
+    // 닉네임 중복 확인 (닉네임 변경 요청이 있을 때만)
+    String newNickname = request.getNickname();
+    if (newNickname != null && !newNickname.isBlank()) {
+      // 현재 닉네임과 다른 값으로 변경하려는 경우에만 중복 체크
+      if (!newNickname.equals(user.getNickname()) && userRepository.existsByNickname(newNickname)) {
+        throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
+      }
     }
 
-    user.updateProfile(request.getNickname(), request.getPhone(), request.getProfileImageUrl());
+    user.updateProfile(newNickname, request.getPhone(), request.getProfileImageUrl());
     return user;
   }
 
@@ -90,10 +98,6 @@ public class UserCommandServiceImpl implements UserCommandService {
             .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-    // 이미 탈퇴한 사용자인지 검증
-    if (user.getStatus() == UserStatus.WITHDRAWN) {
-      throw new UserException(UserErrorCode.ALREADY_WITHDRAWN);
-    }
     // 탈퇴 기록 생성
     UserWithdrawal withdrawal =
         UserWithdrawal.builder().user(user).feedback(request.getFeedback()).build();
