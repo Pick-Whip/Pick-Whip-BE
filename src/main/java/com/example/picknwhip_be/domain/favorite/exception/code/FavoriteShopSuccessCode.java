@@ -8,11 +8,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum FavoriteShopSuccessCode implements BaseSuccessCode {
-    FAVORITE_CREATED(HttpStatus.OK, "FAVORITE200_1", "마이픽에 등록되었습니다."),
-    FAVORITE_DELETED(HttpStatus.OK, "FAVORITE200_2", "마이픽 등록이 취소되었습니다.");
+  FAVORITE_CREATED(HttpStatus.OK, "FAVORITE200_1", "마이픽에 등록되었습니다."),
+  FAVORITE_DELETED(HttpStatus.OK, "FAVORITE200_2", "마이픽 등록이 취소되었습니다.");
 
-    private final HttpStatus status;
-    private final String code;
-    private final String message;
+  private final HttpStatus status;
+  private final String code;
+  private final String message;
 }
-
