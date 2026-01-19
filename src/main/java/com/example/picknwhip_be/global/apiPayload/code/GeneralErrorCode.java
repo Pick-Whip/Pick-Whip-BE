@@ -23,6 +23,10 @@ public enum GeneralErrorCode implements BaseErrorCode {
   INVALID_COORDINATE(HttpStatus.BAD_REQUEST, "SHOP400_2", "좌표(lat/lon) 값이 올바르지 않습니다."),
   SHOP_NEARBY_QUERY_FAILED(
       HttpStatus.INTERNAL_SERVER_ERROR, "SHOP500_3", "주변 가게 조회 중 서버 오류가 발생했습니다."),
+  DUPLICATE_REPORT(HttpStatus.BAD_REQUEST, "REPORT400_1", "이미 해당 대상을 신고하셨습니다."),
+  INVALID_REPORT_TARGET(HttpStatus.BAD_REQUEST, "REPORT400_2", "본인의 게시글이나 자신은 신고할 수 없습니다."),
+  TARGET_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT404_1", "신고하려는 대상을 찾을 수 없습니다."),
+  REPORT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "REPORT500_1", "신고 처리 중 서버 오류가 발생했습니다."),
   ;
 
   private final HttpStatus status;
