@@ -22,6 +22,6 @@ public class DesignOption {
   private DesignGallery designGallery;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "custom_id", nullable = false)
+  @JoinColumn(name = "custom_option_id", nullable = false)
   private CustomOption customOption;
 }
