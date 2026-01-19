@@ -3,6 +3,8 @@ package com.example.picknwhip_be.domain.chat.dto.res;
 import com.example.picknwhip_be.domain.chat.entity.MessageType;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,5 +62,15 @@ public class ChatResponseDTO {
   public static class UnreadCountUpdateDTO {
     private Long roomId;
     private Long unreadCount;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class MessageListDTO {
+    private List<MessageInfo> messageList;
+    private Long nextCursor;
+    private boolean hasNext;
   }
 }

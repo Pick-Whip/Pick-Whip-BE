@@ -19,7 +19,7 @@ public class ChatController {
   private final ChatCommandService chatCommandService;
   private final ChatQueryService chatQueryService;
 
-  @MessageMapping("/chats/{roomId}/messages")
+  @MessageMapping("api/chats/{roomId}/messages")
   public void sendMessage(@DestinationVariable Long roomId, ChatRequestDTO.SendMessageDTO dto) {
     // TODO: SecurityContext 연동 (임시 1L)
     Long senderId = 1L;

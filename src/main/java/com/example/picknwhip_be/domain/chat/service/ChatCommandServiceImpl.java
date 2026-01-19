@@ -5,6 +5,8 @@ import com.example.picknwhip_be.domain.chat.dto.req.ChatRequestDTO;
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
+import com.example.picknwhip_be.domain.chat.exception.ChatException;
+import com.example.picknwhip_be.domain.chat.exception.code.ChatErrorCode;
 import com.example.picknwhip_be.domain.chat.repository.ChatMessageRepository;
 import com.example.picknwhip_be.domain.chat.repository.ChatRoomRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
@@ -53,12 +55,12 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     ChatRoom room =
         chatRoomRepository
             .findById(roomId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND));
+            .orElseThrow(() -> new ChatException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
 
     // 권한 체크
     if (!room.getCustomer().getUserId().equals(senderId)
         && !room.getShop().getOwner().getUserId().equals(senderId)) {
-      throw new GeneralException(GeneralErrorCode.CHAT_NOT_PARTICIPANT);
+      throw new ChatException(ChatErrorCode.CHAT_NOT_PARTICIPANT);
     }
 
     User sender =

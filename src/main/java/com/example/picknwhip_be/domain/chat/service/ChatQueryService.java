@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ChatQueryService {
   // 채팅방의 모든 메시지 내역 조회
-  List<ChatResponseDTO.MessageInfo> findMessages(Long roomId);
+  ChatResponseDTO.MessageListDTO getMessages(Long roomId, Long cursor, Integer size);
 
   // 채팅방 목록 조회
   ChatResponseDTO.ChatRoomListDTO getChatRoomList(Long userId);

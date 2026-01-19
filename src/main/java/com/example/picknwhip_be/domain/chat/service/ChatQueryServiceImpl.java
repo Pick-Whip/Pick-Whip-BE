@@ -4,6 +4,8 @@ import com.example.picknwhip_be.domain.chat.converter.ChatConverter;
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
+import com.example.picknwhip_be.domain.chat.exception.ChatException;
+import com.example.picknwhip_be.domain.chat.exception.code.ChatErrorCode;
 import com.example.picknwhip_be.domain.chat.repository.ChatMessageRepository;
 import com.example.picknwhip_be.domain.chat.repository.ChatRoomRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +32,28 @@ public class ChatQueryServiceImpl implements ChatQueryService {
   private final ChatMessageRepository chatMessageRepository;
 
   @Override
-  public List<ChatResponseDTO.MessageInfo> findMessages(Long roomId) {
-    ChatRoom room =
-        chatRoomRepository
-            .findById(roomId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND));
+  public ChatResponseDTO.MessageListDTO getMessages(Long roomId, Long cursor, Integer size) {
+    // 요청한 size보다 1개 더 조회하여 다음 페이지 여부 확인
+    PageRequest pageRequest = PageRequest.of(0, size + 1);
+    List<ChatMessage> messages = chatMessageRepository.findMessagesWithCursor(roomId, cursor, pageRequest);
 
-    return chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room).stream()
-        .map(ChatConverter::toMessageInfo)
-        .toList();
+    boolean hasNext = messages.size() > size;
+    if (hasNext) {
+      messages = messages.subList(0, size); // 실제 필요한 개수만큼 자름
+    }
+
+    List<ChatResponseDTO.MessageInfo> messageInfos = messages.stream()
+            .map(ChatConverter::toMessageInfo)
+            .toList();
+
+    // 다음 커서는 현재 리스트의 가장 마지막 메시지 ID
+    Long nextCursor = messages.isEmpty() ? null : messages.get(messages.size() - 1).getChatId();
+
+    return ChatResponseDTO.MessageListDTO.builder()
+            .messageList(messageInfos)
+            .nextCursor(nextCursor)
+            .hasNext(hasNext)
+            .build();
   }
 
   @Override
@@ -87,11 +103,12 @@ public class ChatQueryServiceImpl implements ChatQueryService {
   public Long getUnreadCount(Long roomId, Long userId) {
     // 채팅방 존재 여부 체크
     if (!chatRoomRepository.existsById(roomId)) {
-      throw new GeneralException(GeneralErrorCode.CHAT_ROOM_NOT_FOUND);
+      throw new ChatException(ChatErrorCode.CHAT_ROOM_NOT_FOUND);
     }
 
     // User ID로 카운트 쿼리 실행
     return chatMessageRepository.countByChatRoom_ChatRoomIdAndIsReadFalseAndSender_UserIdNot(
         roomId, userId);
   }
+
 }
