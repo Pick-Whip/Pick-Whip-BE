@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,14 +28,15 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
       @Param("roomIds") List<Long> roomIds, @Param("user") User user);
 
   // 커서 페이징: 특정 ID(cursor)보다 작은 메시지들을 최신순으로 조회
-  @Query("SELECT m FROM ChatMessage m " +
-          "JOIN FETCH m.sender " +
-          "WHERE m.chatRoom.chatRoomId = :roomId " +
-          "AND (:cursor IS NULL OR m.chatId < :cursor) " + // 커서가 null이면 가장 최신부터
+  @Query(
+      "SELECT m FROM ChatMessage m "
+          + "JOIN FETCH m.sender "
+          + "WHERE m.chatRoom.chatRoomId = :roomId "
+          + "AND (:cursor IS NULL OR m.chatId < :cursor) "
+          + // 커서가 null이면 가장 최신부터
           "ORDER BY m.chatId DESC")
-  List<ChatMessage> findMessagesWithCursor(@Param("roomId") Long roomId,
-                                           @Param("cursor") Long cursor,
-                                           Pageable pageable);
+  List<ChatMessage> findMessagesWithCursor(
+      @Param("roomId") Long roomId, @Param("cursor") Long cursor, Pageable pageable);
 
   Long countByChatRoom_ChatRoomIdAndIsReadFalseAndSender_UserIdNot(Long chatRoomId, Long userId);
 

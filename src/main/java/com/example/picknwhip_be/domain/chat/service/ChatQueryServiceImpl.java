@@ -35,25 +35,25 @@ public class ChatQueryServiceImpl implements ChatQueryService {
   public ChatResponseDTO.MessageListDTO getMessages(Long roomId, Long cursor, Integer size) {
     // 요청한 size보다 1개 더 조회하여 다음 페이지 여부 확인
     PageRequest pageRequest = PageRequest.of(0, size + 1);
-    List<ChatMessage> messages = chatMessageRepository.findMessagesWithCursor(roomId, cursor, pageRequest);
+    List<ChatMessage> messages =
+        chatMessageRepository.findMessagesWithCursor(roomId, cursor, pageRequest);
 
     boolean hasNext = messages.size() > size;
     if (hasNext) {
       messages = messages.subList(0, size); // 실제 필요한 개수만큼 자름
     }
 
-    List<ChatResponseDTO.MessageInfo> messageInfos = messages.stream()
-            .map(ChatConverter::toMessageInfo)
-            .toList();
+    List<ChatResponseDTO.MessageInfo> messageInfos =
+        messages.stream().map(ChatConverter::toMessageInfo).toList();
 
     // 다음 커서는 현재 리스트의 가장 마지막 메시지 ID
     Long nextCursor = messages.isEmpty() ? null : messages.get(messages.size() - 1).getChatId();
 
     return ChatResponseDTO.MessageListDTO.builder()
-            .messageList(messageInfos)
-            .nextCursor(nextCursor)
-            .hasNext(hasNext)
-            .build();
+        .messageList(messageInfos)
+        .nextCursor(nextCursor)
+        .hasNext(hasNext)
+        .build();
   }
 
   @Override
@@ -110,5 +110,4 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     return chatMessageRepository.countByChatRoom_ChatRoomIdAndIsReadFalseAndSender_UserIdNot(
         roomId, userId);
   }
-
 }

@@ -1,7 +1,6 @@
 package com.example.picknwhip_be.domain.chat.service;
 
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
-import java.util.List;
 
 public interface ChatQueryService {
   // 채팅방의 모든 메시지 내역 조회

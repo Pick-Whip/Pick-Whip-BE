@@ -8,7 +8,6 @@ import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,21 +28,20 @@ public class ChatRestController {
   }
 
   @Operation(
-          summary = "채팅 메시지 내역 조회 (페이징) API",
-          description = "커서 기반 페이징을 사용하여 메시지 내역을 조회합니다. 특정 채팅방의 메시지를 과거 순으로 불러오며, 상대방이 보낸 메시지는 읽음 처리됩니다."
-  )
+      summary = "채팅 메시지 내역 조회 (페이징) API",
+      description =
+          "커서 기반 페이징을 사용하여 메시지 내역을 조회합니다. 특정 채팅방의 메시지를 과거 순으로 불러오며, 상대방이 보낸 메시지는 읽음 처리됩니다.")
   @GetMapping("/{roomId}/messages")
   public ApiResponse<ChatResponseDTO.MessageListDTO> getMessages(
-          @PathVariable Long roomId,
-          @RequestParam(required = false) Long cursor, // 이전 페이지의 마지막 메시지 ID
-          @RequestParam(defaultValue = "10") Integer size // 한 번에 가져올 메시지 개수
-  ) {
+      @PathVariable Long roomId,
+      @RequestParam(required = false) Long cursor, // 이전 페이지의 마지막 메시지 ID
+      @RequestParam(defaultValue = "10") Integer size // 한 번에 가져올 메시지 개수
+      ) {
     Long userId = 1L; // TODO: Security 연동
     chatCommandService.updateMarkAsRead(roomId, userId);
-    return ApiResponse.of(GeneralSuccessCode.OK, chatQueryService.getMessages(roomId, cursor, size));
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, chatQueryService.getMessages(roomId, cursor, size));
   }
-
-
 
   // TODO: S3 이미지 업로드 로직 구현 필요
   // @Operation(summary = "채팅 이미지 업로드 API", description = "채팅 중 전송할 이미지를 업로드하고 S3 URL을 반환받습니다.")
@@ -59,5 +57,4 @@ public class ChatRestController {
     Long userId = 1L; // TODO: Security 연동
     return ApiResponse.of(GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId));
   }
-
 }
