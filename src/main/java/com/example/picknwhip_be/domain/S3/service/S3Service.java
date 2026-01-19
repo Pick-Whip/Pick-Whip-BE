@@ -53,16 +53,15 @@ public class S3Service {
       throw new S3CustomException(S3ErrorCode.TOO_MANY_FILES);
     }
 
-    List<S3ResDTO.PresignResponseDTO> result = new ArrayList<>();
-    for (String fileName : fileNames) {
-      validateFileName(fileName);
-
-      String keyName = buildKey("review", fileName);
-      String url = presignPutUrl(keyName);
-
-      result.add(new S3ResDTO.PresignResponseDTO(keyName, url));
-    }
-    return result;
+    return fileNames.stream()
+        .map(
+            fileName -> {
+              validateFileName(fileName);
+              String keyName = buildKey("review", fileName);
+              String url = presignPutUrl(keyName);
+              return new S3ResDTO.PresignResponseDTO(keyName, url);
+            })
+        .toList();
   }
 
   // keyName을 받아서 조회 가능한 Presigned URL을 발급
