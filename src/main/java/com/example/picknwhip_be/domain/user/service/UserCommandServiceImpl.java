@@ -4,6 +4,8 @@ import com.example.picknwhip_be.domain.user.dto.req.UserRequestDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.entity.UserWithdrawal;
 import com.example.picknwhip_be.domain.user.entity.WithdrawalReasonItem;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.repository.UserWithdrawalRepository;
 import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepository;
@@ -75,7 +77,7 @@ public class UserCommandServiceImpl implements UserCommandService {
       return fallbackNickname;
     }
 
-    throw new GeneralException(GeneralErrorCode.NICKNAME_ALREADY_EXISTS);
+    throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
   }
 
   @Override
@@ -83,7 +85,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     user.updateExtraInfo(request.getName(), request.getPhone());
   }
@@ -93,14 +95,14 @@ public class UserCommandServiceImpl implements UserCommandService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     // 닉네임 중복 확인 (닉네임 변경 요청이 있을 때만)
     String newNickname = request.getNickname();
     if (newNickname != null && !newNickname.isBlank()) {
       // 현재 닉네임과 다른 값으로 변경하려는 경우에만 중복 체크
       if (!newNickname.equals(user.getNickname()) && userRepository.existsByNickname(newNickname)) {
-        throw new GeneralException(GeneralErrorCode.NICKNAME_ALREADY_EXISTS);
+        throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
       }
     }
 
@@ -114,7 +116,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     // 탈퇴 기록 생성
     UserWithdrawal withdrawal =
@@ -144,7 +146,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     OAuth2AuthorizedClient client =
         authorizedClientService.loadAuthorizedClient("kakao", user.getKakaoId().toString());
