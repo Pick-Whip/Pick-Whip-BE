@@ -1,10 +1,8 @@
-package com.example.picknwhip_be.domain.order.entity;
+package com.example.picknwhip_be.domain.custom.entity;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
-import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
-import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import com.example.picknwhip_be.domain.user.entity.User;
@@ -18,8 +16,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Table(name = "orders")
-public class Order extends BaseEntity {
+@Table(name = "orders_drafts")
+public class OrderDraft extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,15 +35,11 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "shop_cake_size_id", nullable = false)
   private ShopCakeSize shopCakeSize;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "design_id")
   private DesignGallery designGallery;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false)
-  private Status status;
-
-  @Column(name = "pickup_datetime", nullable = false)
+  @Column(name = "pickup_datetime")
   private LocalDateTime pickupDatetime;
 
   @Column(name = "lettering_text", length = 30)
@@ -64,20 +58,4 @@ public class Order extends BaseEntity {
 
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
-
-  @Column(name = "payment_method", nullable = false)
-  private String paymentMethod;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "payment_status", nullable = false)
-  private PaymentStatus paymentStatus;
-
-  @Column(name = "total_price", nullable = false)
-  private int totalPrice;
-
-  @Column(name = "deposit_amount")
-  private int depositAmount;
-
-  @Column(name = "rejection_reason")
-  private String rejectionReason;
 }

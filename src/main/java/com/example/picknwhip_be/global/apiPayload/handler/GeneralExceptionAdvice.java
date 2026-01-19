@@ -5,6 +5,7 @@ import com.example.picknwhip_be.global.apiPayload.code.BaseErrorCode;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +19,15 @@ public class GeneralExceptionAdvice {
 
     return ResponseEntity.status(ex.getCode().getStatus())
         .body(ApiResponse.onFailure(ex.getCode(), null));
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ApiResponse<Object>> handleDbException(DataIntegrityViolationException ex) {
+    log.error("DB Error: {}", ex.getMessage());
+
+    BaseErrorCode code = GeneralErrorCode.BAD_REQUEST;
+    return ResponseEntity.status(code.getStatus())
+        .body(ApiResponse.onFailure(code, "데이터 처리 중 오류가 발생했습니다. (참조 ID 등을 확인하세요)"));
   }
 
   @ExceptionHandler(Exception.class)
