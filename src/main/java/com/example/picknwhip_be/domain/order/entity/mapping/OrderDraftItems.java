@@ -1,6 +1,7 @@
-package com.example.picknwhip_be.domain.custom.entity;
+package com.example.picknwhip_be.domain.order.entity.mapping;
 
-import com.example.picknwhip_be.domain.shop.entity.CustomOption;
+import com.example.picknwhip_be.domain.custom.entity.CustomOptions;
+import com.example.picknwhip_be.domain.order.entity.OrderDrafts;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "order_draft_items")
-public class OrderDraftItem {
+public class OrderDraftItems {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +19,9 @@ public class OrderDraftItem {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "draft_id", nullable = false)
-  private OrderDraft orderDraft;
+  private OrderDrafts orderDrafts;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "custom_option_id", nullable = false)
-  private CustomOption customOption;
-
-  @Column(name = "position_x")
-  private Double positionX;
-
-  @Column(name = "position_y")
-  private Double positionY;
+  @JoinColumn(name = "custom_id", nullable = false)
+  private CustomOptions customOptions;
 }

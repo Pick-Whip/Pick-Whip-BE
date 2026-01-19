@@ -6,5 +6,5 @@ import lombok.Builder;
 public class CustomResDTO {
 
   @Builder
-  public record CustomCreateDTO(Long CustomId, LocalDateTime createAt) {}
+  public record CustomCreateDTO(Long customId, LocalDateTime createAt) {}
 }

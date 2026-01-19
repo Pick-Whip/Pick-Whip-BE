@@ -51,6 +51,10 @@ public class CustomServiceImpl implements CustomService {
             .findById(dto.shopCakeSizeId())
             .orElseThrow(() -> new ShopException(ShopErrorCode.CAKE_SIZE_NOT_FOUND));
 
+    if (size.getShop() == null || !size.getShop().getId().equals(shop.getId())) {
+      throw new ShopException(ShopErrorCode.CAKE_SIZE_NOT_FOUND);
+    }
+
     OrderDraft draft =
         OrderDraft.builder()
             .user(user)
