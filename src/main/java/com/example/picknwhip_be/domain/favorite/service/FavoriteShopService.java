@@ -9,9 +9,9 @@ import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepositor
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository; // 유저 리포지토리 필요
-import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
-import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class FavoriteShopService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
         shopRepository
@@ -51,7 +51,7 @@ public class FavoriteShopService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
         shopRepository
