@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.S3.dto.res.S3ResDTO;
 import com.example.picknwhip_be.domain.S3.exception.S3CustomException;
 import com.example.picknwhip_be.domain.S3.exception.code.S3ErrorCode;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
