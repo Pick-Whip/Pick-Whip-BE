@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.order.entity;
 
-import com.example.picknwhip_be.domain.order.entity.enums.OptionCategory;
 import com.example.picknwhip_be.domain.shop.entity.CustomOption;
+import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,11 +19,11 @@ public class OrderItem {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "order_id", nullable = false)
-  private Order orders;
+  private Order order;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "custom_id", nullable = false)
-  private CustomOption customOptions;
+  private CustomOption customOption;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "option_category", nullable = false)
@@ -35,7 +35,7 @@ public class OrderItem {
   @Column(name = "unit_price", nullable = false)
   private int unitPrice;
 
-  @Column(name = "color_rgb_code", nullable = false, length = 7)
+  @Column(name = "color_rgb_code", length = 7)
   private String colorRgbCode;
 
   @Column(name = "position_x")

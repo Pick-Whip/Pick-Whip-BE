@@ -35,7 +35,7 @@ public class OrderDraft extends BaseEntity {
   @JoinColumn(name = "shop_cake_size_id", nullable = false)
   private ShopCakeSize shopCakeSize;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "design_id")
   private DesignGallery designGallery;
 

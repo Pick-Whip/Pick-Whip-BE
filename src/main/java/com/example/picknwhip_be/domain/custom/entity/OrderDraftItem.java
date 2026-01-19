@@ -21,7 +21,7 @@ public class OrderDraftItem {
   private OrderDraft orderDraft;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "custom_id", nullable = false)
+  @JoinColumn(name = "custom_option_id", nullable = false)
   private CustomOption customOption;
 
   @Column(name = "position_x")

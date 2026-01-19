@@ -48,7 +48,7 @@ public class Order extends BaseEntity {
   @Column(name = "pickup_datetime", nullable = false)
   private LocalDateTime pickupDatetime;
 
-  @Column(name = "lettering_text", nullable = false, length = 30)
+  @Column(name = "lettering_text", length = 30)
   private String letteringText;
 
   @Enumerated(EnumType.STRING)
@@ -56,7 +56,7 @@ public class Order extends BaseEntity {
   private LetteringLineCount letteringLineCount;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "lettering_alignment", nullable = false)
+  @Column(name = "lettering_alignment")
   private LetteringAlignment letteringAlignment;
 
   @Column(name = "additional_request")
