@@ -16,5 +16,5 @@ public class S3ReqDTO {
       @Schema(description = "이미지 파일명 리스트", example = "[\"1.jpg\", \"2.jpg\"]")
           @NotEmpty
           @Size(max = 5)
-          List<String> fileNames) {}
+          List<@NotBlank String> fileNames) {}
 }

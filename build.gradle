@@ -42,7 +42,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 
     // AWS SDK v2 (S3)
-    implementation platform('software.amazon.awssdk:bom:2.25.70')
+    implementation platform('software.amazon.awssdk:bom:2.41.10')
     implementation 'software.amazon.awssdk:s3'
 }
 

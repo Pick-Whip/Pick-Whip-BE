@@ -19,6 +19,7 @@ public class S3Config {
         .build();
   }
 
+  // 추후 이미지 삭제, 존재 확인 등 S3 직접 조작 기능 추가 시 사용 예정
   @Bean
   public S3Client s3Client(@Value("${aws.region:ap-northeast-2}") String region) {
     return S3Client.builder()

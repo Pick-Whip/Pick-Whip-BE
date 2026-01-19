@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.S3.service;
 
 import com.example.picknwhip_be.domain.S3.dto.res.S3ResDTO;
-import com.example.picknwhip_be.domain.S3.exception.S3Exception;
+import com.example.picknwhip_be.domain.S3.exception.S3CustomException;
 import com.example.picknwhip_be.domain.S3.exception.code.S3ErrorCode;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -45,8 +46,11 @@ public class S3Service {
   public List<S3ResDTO.PresignResponseDTO> createReviewUploadUrls(List<String> fileNames) {
     validateBucketConfigured();
 
+    if (fileNames == null) {
+      throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
+    }
     if (fileNames.size() > 5) {
-      throw new S3Exception(S3ErrorCode.TOO_MANY_FILES);
+      throw new S3CustomException(S3ErrorCode.TOO_MANY_FILES);
     }
 
     List<S3ResDTO.PresignResponseDTO> result = new ArrayList<>();
@@ -77,11 +81,11 @@ public class S3Service {
       return presigned.url().toString();
 
     } catch (S3Exception e) {
-      throw new S3Exception(S3ErrorCode.S3_OPERATION_FAILED);
+      throw new S3CustomException(S3ErrorCode.S3_OPERATION_FAILED);
     } catch (SdkClientException e) {
-      throw new S3Exception(S3ErrorCode.AWS_SDK_CLIENT_ERROR);
+      throw new S3CustomException(S3ErrorCode.AWS_SDK_CLIENT_ERROR);
     } catch (Exception e) {
-      throw new S3Exception(S3ErrorCode.PRESIGNED_URL_GENERATION_FAILED);
+      throw new S3CustomException(S3ErrorCode.PRESIGNED_URL_GENERATION_FAILED);
     }
   }
 
@@ -98,31 +102,31 @@ public class S3Service {
       return presigned.url().toString();
 
     } catch (S3Exception e) {
-      throw new S3Exception(S3ErrorCode.S3_OPERATION_FAILED);
+      throw new S3CustomException(S3ErrorCode.S3_OPERATION_FAILED);
 
     } catch (SdkClientException e) {
-      throw new S3Exception(S3ErrorCode.AWS_SDK_CLIENT_ERROR);
+      throw new S3CustomException(S3ErrorCode.AWS_SDK_CLIENT_ERROR);
 
     } catch (Exception e) {
-      throw new S3Exception(S3ErrorCode.PRESIGNED_URL_GENERATION_FAILED);
+      throw new S3CustomException(S3ErrorCode.PRESIGNED_URL_GENERATION_FAILED);
     }
   }
 
   private void validateBucketConfigured() {
     if (!StringUtils.hasText(bucket)) {
-      throw new S3Exception(S3ErrorCode.S3_BUCKET_NOT_CONFIGURED);
+      throw new S3CustomException(S3ErrorCode.S3_BUCKET_NOT_CONFIGURED);
     }
   }
 
   private void validateFileName(String fileName) {
     if (!StringUtils.hasText(fileName)) {
-      throw new S3Exception(S3ErrorCode.INVALID_FILE_NAME);
+      throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
     }
   }
 
   private void validateKeyName(String keyName) {
     if (!StringUtils.hasText(keyName)) {
-      throw new S3Exception(S3ErrorCode.INVALID_FILE_NAME);
+      throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
     }
   }
 
@@ -148,7 +152,7 @@ public class S3Service {
     }
 
     if (!StringUtils.hasText(filename)) {
-      throw new S3Exception(S3ErrorCode.INVALID_FILE_NAME);
+      throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
     }
     return filename;
   }
