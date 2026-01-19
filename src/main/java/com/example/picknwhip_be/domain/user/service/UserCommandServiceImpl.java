@@ -11,12 +11,12 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -139,12 +139,14 @@ public class UserCommandServiceImpl implements UserCommandService {
   @Override
   public void logout(Long userId) {
     // DB에서 유저의 kakaoId를 가져옴
-    User user = userRepository.findById(userId)
+    User user =
+        userRepository
+            .findById(userId)
             .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
 
     // 서버 세션에 저장된 카카오 전용 클라이언트 정보를 kakao_id로 매핑했으므로 이를 사용함
-    OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
-            "kakao", user.getKakaoId().toString());
+    OAuth2AuthorizedClient client =
+        authorizedClientService.loadAuthorizedClient("kakao", user.getKakaoId().toString());
 
     if (client != null && client.getAccessToken() != null) {
       String accessToken = client.getAccessToken().getTokenValue();
