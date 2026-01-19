@@ -11,8 +11,13 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,8 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final UserRepository userRepository;
   private final UserWithdrawalRepository userWithdrawalRepository;
   private final WithdrawalReasonItemRepository reasonItemRepository;
+  private final OAuth2AuthorizedClientService authorizedClientService;
+  private final RestTemplate restTemplate = new RestTemplate();
   private static final int MAX_NICKNAME_GENERATION_ATTEMPTS = 20;
 
   // TODO: 프로필 사진 기본 이미지 설정 구현
@@ -127,5 +134,32 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     // 직접 상태를 변경하는 대신 Repository의 delete를 호출
     userRepository.delete(user);
+  }
+
+  @Override
+  public void logout(Long userId) {
+    // DB에서 유저의 kakaoId를 가져옴
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+
+    // 서버 세션에 저장된 카카오 전용 클라이언트 정보를 kakao_id로 매핑했으므로 이를 사용함
+    OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
+            "kakao", user.getKakaoId().toString());
+
+    if (client != null && client.getAccessToken() != null) {
+      String accessToken = client.getAccessToken().getTokenValue();
+
+      // 카카오 로그아웃 API 호출
+      HttpHeaders headers = new HttpHeaders();
+      headers.set("Authorization", "Bearer " + accessToken);
+      HttpEntity<String> entity = new HttpEntity<>(headers);
+
+      try {
+        restTemplate.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
+        // 서버 내 보관 중인 클라이언트 정보 삭제
+        authorizedClientService.removeAuthorizedClient("kakao", user.getKakaoId().toString());
+      } catch (Exception e) {
+      }
+    }
   }
 }
