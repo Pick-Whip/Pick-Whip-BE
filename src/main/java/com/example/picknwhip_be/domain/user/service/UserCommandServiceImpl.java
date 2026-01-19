@@ -11,9 +11,17 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,6 +30,8 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final UserRepository userRepository;
   private final UserWithdrawalRepository userWithdrawalRepository;
   private final WithdrawalReasonItemRepository reasonItemRepository;
+  private final OAuth2AuthorizedClientService authorizedClientService;
+  private final RestTemplate restTemplate = new RestTemplate();
   private static final int MAX_NICKNAME_GENERATION_ATTEMPTS = 20;
 
   // TODO: 프로필 사진 기본 이미지 설정 구현
@@ -127,5 +137,39 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     // 직접 상태를 변경하는 대신 Repository의 delete를 호출
     userRepository.delete(user);
+  }
+
+  @Override
+  public void logout(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+
+    OAuth2AuthorizedClient client =
+        authorizedClientService.loadAuthorizedClient("kakao", user.getKakaoId().toString());
+
+    if (client != null && client.getAccessToken() != null) {
+      String accessToken = client.getAccessToken().getTokenValue();
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.set("Authorization", "Bearer " + accessToken);
+      HttpEntity<String> entity = new HttpEntity<>(headers);
+
+      try {
+        // 카카오 로그아웃 REST API 호출
+        restTemplate.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
+
+        // 성공 시 서버 내 인증 정보 삭제
+        authorizedClientService.removeAuthorizedClient("kakao", user.getKakaoId().toString());
+        log.info("카카오 로그아웃 성공. userId: {}", userId);
+
+      } catch (RestClientException e) {
+        log.error("카카오 로그아웃 API 호출 실패. userId: {}, 에러: {}", userId, e.getMessage());
+        throw new GeneralException(GeneralErrorCode.INTERNAL_SERVER_ERROR);
+      }
+    } else {
+      log.warn("로그아웃을 시도했으나 세션에 카카오 토큰이 존재하지 않습니다. userId: {}", userId);
+    }
   }
 }
