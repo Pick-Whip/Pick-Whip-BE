@@ -2,9 +2,9 @@ package com.example.picknwhip_be.domain.shop.service;
 
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
-import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
-import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import com.example.picknwhip_be.global.apiPayload.util.GeoUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,12 @@ public class ShopService {
 
     // 좌표 검증
     if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
-      throw new GeneralException(GeneralErrorCode.INVALID_COORDINATE);
+      throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
     }
 
     // radius 검증 (3000 초과면 예외)
     if (radius < 0.0 || radius > MAX_RADIUS_M) {
-      throw new GeneralException(GeneralErrorCode.INVALID_RADIUS);
+      throw new ShopException(ShopErrorCode.INVALID_RADIUS);
     }
 
     GeoUtils.BoundingBox box = GeoUtils.normalize(GeoUtils.boundingBox(lat, lon, radius));
@@ -51,7 +51,7 @@ public class ShopService {
           .map(shopConverter::toPreviewDto)
           .toList();
     } catch (Exception e) {
-      throw new GeneralException(GeneralErrorCode.SHOP_NEARBY_QUERY_FAILED);
+      throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
     }
   }
 }

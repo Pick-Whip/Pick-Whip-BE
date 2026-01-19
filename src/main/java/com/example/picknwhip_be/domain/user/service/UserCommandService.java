@@ -12,4 +12,6 @@ public interface UserCommandService {
   User updateProfile(Long userId, UserRequestDTO.UpdateProfileDTO request);
 
   void withdrawMember(Long userId, UserRequestDTO.WithdrawalDTO request);
+
+  void logout(Long userId);
 }
