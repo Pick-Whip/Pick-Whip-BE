@@ -48,9 +48,7 @@ public class FavoriteShopService {
   /** 마이픽 가게 취소 */
   public FavoriteShopResponse removeFavoriteShop(Long userId, Long shopId) {
     User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(() -> new GeneralException(USER_NOT_FOUND));
+        userRepository.findById(userId).orElseThrow(() -> new GeneralException(USER_NOT_FOUND));
 
     Shop shop =
         shopRepository
