@@ -4,15 +4,13 @@ import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponse;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteShopSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
-import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/shops")
+@RequestMapping("/api/shops")
 @RequiredArgsConstructor
 @Tag(name = "Favorite Shop", description = "마이픽(가게 찜) 관련 API")
 public class FavoriteShopController {
