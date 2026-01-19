@@ -45,3 +45,9 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     enabled: ${SWAGGER_ENABLED:true}
+
+cloud:
+  aws:
+    region: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${S3_BUCKET}
