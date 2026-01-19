@@ -3,11 +3,11 @@ package com.example.picknwhip_be.domain.report.service;
 import com.example.picknwhip_be.domain.report.converter.ReportConverter;
 import com.example.picknwhip_be.domain.report.dto.req.ReportRequestDTO;
 import com.example.picknwhip_be.domain.report.entity.Report;
+import com.example.picknwhip_be.domain.report.exception.ReportException;
+import com.example.picknwhip_be.domain.report.exception.code.ReportErrorCode;
 import com.example.picknwhip_be.domain.report.repository.ReportRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.service.UserQueryService;
-import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
-import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ public class ReportCommandServiceImpl implements ReportCommandService {
     // 중복 신고 방지: 동일 신고자 + 동일 대상 조합으로 신고가 존재하면 예외
     if (reportRepository.existsByReporterAndTargetIdAndTargetType(
         reporter, request.getTargetId(), request.getTargetType())) {
-      throw new GeneralException(GeneralErrorCode.DUPLICATE_REPORT);
+      throw new ReportException(ReportErrorCode.DUPLICATE_REPORT);
     }
 
     /*

@@ -12,6 +12,8 @@ import com.example.picknwhip_be.domain.chat.repository.ChatRoomRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
@@ -33,7 +35,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     User customer =
         userRepository
             .findById(customerId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     Shop shop =
         shopRepository
             .findById(dto.getShopId())
@@ -66,7 +68,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     User sender =
         userRepository
             .findById(senderId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     ChatMessage message = ChatConverter.toChatMessage(room, sender, dto);
 
     ChatMessage saved = chatMessageRepository.save(message);
