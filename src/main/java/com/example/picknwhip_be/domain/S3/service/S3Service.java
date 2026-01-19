@@ -27,7 +27,7 @@ public class S3Service {
 
   private final S3Presigner s3Presigner;
 
-  @Value("${s3.bucket}")
+  @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
   // 단일 이미지 업로드용(프로필 사진) presigned URL을 발급

@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 public class S3Config {
 
   @Bean
-  public S3Presigner s3Presigner(@Value("${aws.region:ap-northeast-2}") String region) {
+  public S3Presigner s3Presigner(@Value("${cloud.aws.region:ap-northeast-2}") String region) {
     return S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(DefaultCredentialsProvider.create())
@@ -21,7 +21,7 @@ public class S3Config {
 
   // 추후 이미지 삭제, 존재 확인 등 S3 직접 조작 기능 추가 시 사용 예정
   @Bean
-  public S3Client s3Client(@Value("${aws.region:ap-northeast-2}") String region) {
+  public S3Client s3Client(@Value("${cloud.aws.region:ap-northeast-2}") String region) {
     return S3Client.builder()
         .region(Region.of(region))
         .credentialsProvider(DefaultCredentialsProvider.create())
