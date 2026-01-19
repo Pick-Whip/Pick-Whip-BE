@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CustomServiceImpl implements CustomService {
+public class CustomCommandServiceImpl implements CustomCommandService {
 
   private final OrderDraftRepository orderDraftRepository;
   private final OrderDraftItemRepository orderDraftItemRepository;
@@ -84,7 +84,7 @@ public class CustomServiceImpl implements CustomService {
     }
 
     if (dto.toppings() != null) {
-      for (CustomReqDTO.CustomCreateDTO.ToppingRequest toppingReq : dto.toppings()) {
+      for (CustomReqDTO.CustomCreateDTO.Toppings toppingReq : dto.toppings()) {
         CustomOption option =
             customOptionRepository
                 .findById(toppingReq.optionId())

@@ -21,8 +21,8 @@ public class CustomReqDTO {
       String referenceImageUrl,
       String paymentMethod,
       List<Long> customOptionIds,
-      List<ToppingRequest> toppings) {
+      List<Toppings> toppings) {
 
-    public record ToppingRequest(Long optionId, Double x, Double y) {}
+    public record Toppings(Long optionId, Double x, Double y) {}
   }
 }

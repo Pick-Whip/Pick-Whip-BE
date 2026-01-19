@@ -9,6 +9,8 @@ import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -58,4 +60,7 @@ public class OrderDraft extends BaseEntity {
 
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
+
+  @OneToMany(mappedBy = "draft", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<OrderDraftItem> items = new ArrayList<>();
 }
