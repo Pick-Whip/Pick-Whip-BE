@@ -14,7 +14,7 @@ public class CustomOption {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "custom_id")
+  @Column(name = "id")
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)

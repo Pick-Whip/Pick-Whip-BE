@@ -1,0 +1,16 @@
+package com.example.picknwhip_be.domain.chat.service;
+
+import com.example.picknwhip_be.domain.chat.dto.req.ChatRequestDTO;
+import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
+import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
+
+public interface ChatCommandService {
+  // 채팅방 생성, 기본 방 조회
+  ChatResponseDTO.RoomInfo saveOrCreateRoom(ChatRequestDTO.CreateRoom dto, Long customerId);
+
+  // 채팅 메시지 저장 및 권한 검증
+  ChatMessage saveMessage(Long roomId, ChatRequestDTO.SendMessageDTO dto, Long senderId);
+
+  // 채팅방 메시지 읽음 처리
+  void updateMarkAsRead(Long roomId, Long userId);
+}

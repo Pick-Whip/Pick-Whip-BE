@@ -46,6 +46,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	// 카카오 로그인
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	// WebSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {

@@ -5,9 +5,6 @@ import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
-import com.example.picknwhip_be.domain.shop.entity.Shop;
-import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
-import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -19,26 +16,26 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "orders")
-public class Order extends BaseEntity {
+public class Orders extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  //    @JoinColumn(name = "user_id", nullable = false)
+  //    private Users users;
+
+  //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  //    @JoinColumn(name = "shop_id", nullable = false)
+  //    private Shops shops;
+
+  //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  //    @JoinColumn(name = "shop_cake_size_id", nullable = false)
+  //    private Shops shops;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "shop_id", nullable = false)
-  private Shop shop;
-
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "shop_cake_size_id", nullable = false)
-  private ShopCakeSize shopCakeSize;
-
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "design_id")
+  @JoinColumn(name = "design_id", nullable = false)
   private DesignGallery designGallery;
 
   @Enumerated(EnumType.STRING)
@@ -48,7 +45,7 @@ public class Order extends BaseEntity {
   @Column(name = "pickup_datetime", nullable = false)
   private LocalDateTime pickupDatetime;
 
-  @Column(name = "lettering_text", length = 30)
+  @Column(name = "lettering_text", nullable = false, length = 30)
   private String letteringText;
 
   @Enumerated(EnumType.STRING)
@@ -56,7 +53,7 @@ public class Order extends BaseEntity {
   private LetteringLineCount letteringLineCount;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "lettering_alignment")
+  @Column(name = "lettering_alignment", nullable = false)
   private LetteringAlignment letteringAlignment;
 
   @Column(name = "additional_request")
