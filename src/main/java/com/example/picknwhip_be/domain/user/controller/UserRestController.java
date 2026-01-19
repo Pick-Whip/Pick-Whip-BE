@@ -68,12 +68,15 @@ public class UserRestController {
   public ApiResponse<String> createLogout(HttpServletRequest request) {
     // TODO: SecurityContext 연동 필요 (현재는 임시 1L 사용)
     Long userId = 1L;
-    // 카카오 서버 로그아웃
-    userCommandService.logout(userId);
-    // 우리 서버 세션 무효화
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
+    try {
+      // 카카오 서버 로그아웃
+      userCommandService.logout(userId);
+    } finally {
+      // 우리 서버 세션 무효화
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      }
     }
     return ApiResponse.of(GeneralSuccessCode.OK, "로그아웃 되었습니다.");
   }

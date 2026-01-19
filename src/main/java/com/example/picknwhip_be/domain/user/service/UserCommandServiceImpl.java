@@ -11,14 +11,17 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -138,30 +141,35 @@ public class UserCommandServiceImpl implements UserCommandService {
 
   @Override
   public void logout(Long userId) {
-    // DB에서 유저의 kakaoId를 가져옴
     User user =
         userRepository
             .findById(userId)
             .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
 
-    // 서버 세션에 저장된 카카오 전용 클라이언트 정보를 kakao_id로 매핑했으므로 이를 사용함
     OAuth2AuthorizedClient client =
         authorizedClientService.loadAuthorizedClient("kakao", user.getKakaoId().toString());
 
     if (client != null && client.getAccessToken() != null) {
       String accessToken = client.getAccessToken().getTokenValue();
 
-      // 카카오 로그아웃 API 호출
       HttpHeaders headers = new HttpHeaders();
       headers.set("Authorization", "Bearer " + accessToken);
       HttpEntity<String> entity = new HttpEntity<>(headers);
 
       try {
+        // 카카오 로그아웃 REST API 호출
         restTemplate.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
-        // 서버 내 보관 중인 클라이언트 정보 삭제
+
+        // 성공 시 서버 내 인증 정보 삭제
         authorizedClientService.removeAuthorizedClient("kakao", user.getKakaoId().toString());
-      } catch (Exception e) {
+        log.info("카카오 로그아웃 성공. userId: {}", userId);
+
+      } catch (RestClientException e) {
+        log.error("카카오 로그아웃 API 호출 실패. userId: {}, 에러: {}", userId, e.getMessage());
+        throw new GeneralException(GeneralErrorCode.INTERNAL_SERVER_ERROR);
       }
+    } else {
+      log.warn("로그아웃을 시도했으나 세션에 카카오 토큰이 존재하지 않습니다. userId: {}", userId);
     }
   }
 }
