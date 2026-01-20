@@ -37,12 +37,15 @@ public class CustomQueryServiceImpl implements CustomQueryService {
               List<Long> optionIds =
                   draft.getItems().stream().map(item -> item.getCustomOption().getId()).toList();
 
+              Long progress = draft.calculateProgress();
+              String status = draft.calculateStatus();
+
               return CustomResDTO.GetDraftListDTO.builder()
                   .draftId(draft.getId())
                   .shopCakeSize(draft.getShopCakeSize().getSizeName())
                   .pickupDatetime(draft.getPickupDatetime())
-                  .progressPercentage(0L) // 수정해야됌
-                  .presentStatus("WRITING") // 수정해야됌
+                  .progressPercentage(progress)
+                  .presentStatus(status)
                   .updateAt(draft.getUpdatedAt())
                   .customOptionIds(optionIds)
                   .build();

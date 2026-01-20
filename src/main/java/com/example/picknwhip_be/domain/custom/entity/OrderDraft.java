@@ -63,4 +63,38 @@ public class OrderDraft extends BaseEntity {
 
   @OneToMany(mappedBy = "draft", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderDraftItem> items = new ArrayList<>();
+
+  public Long calculateProgress() {
+    long progress = 0;
+
+    if (this.shopCakeSize != null) {
+      progress += 25;
+    }
+    if (this.pickupDatetime != null) {
+      progress += 25;
+    }
+    if (this.items != null && !this.items.isEmpty()) {
+      progress += 25;
+    }
+    if (this.letteringText != null) {
+      progress += 25;
+    }
+
+    return progress;
+  }
+
+  public String calculateStatus() {
+
+    if (calculateProgress() == 0) {
+      return "EMPTY";
+    } else if (calculateProgress() == 25) {
+      return "STEP1";
+    } else if (calculateProgress() == 50) {
+      return "STEP2";
+    } else if (calculateProgress() == 75) {
+      return "STEP3";
+    } else {
+      return "COMPLETED";
+    }
+  }
 }
