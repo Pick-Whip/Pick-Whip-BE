@@ -22,11 +22,11 @@ public class CustomQueryServiceImpl implements CustomQueryService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<CustomResDTO.GetDraftListDTO> findDraftList() {
+  public List<CustomResDTO.GetDraftListDTO> findDraftList(Long userId) {
 
     User user =
         userRepository
-            .findById(1L)
+            .findById(userId)
             .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
 
     List<OrderDraft> orderDrafts = orderDraftRepository.findAllByUserOrderByIdDesc(user);

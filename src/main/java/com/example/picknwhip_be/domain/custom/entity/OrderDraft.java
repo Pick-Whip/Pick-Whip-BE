@@ -61,7 +61,7 @@ public class OrderDraft extends BaseEntity {
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
 
-  @OneToMany(mappedBy = "draft", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "orderDraft", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderDraftItem> items = new ArrayList<>();
 
   public Long calculateProgress() {

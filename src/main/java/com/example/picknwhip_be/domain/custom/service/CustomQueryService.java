@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface CustomQueryService {
 
-  List<CustomResDTO.GetDraftListDTO> findDraftList();
+  List<CustomResDTO.GetDraftListDTO> findDraftList(Long userId);
 }
