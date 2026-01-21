@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.chat.service;
 
+import com.example.picknwhip_be.domain.S3.dto.res.S3ResDTO;
+import com.example.picknwhip_be.domain.S3.service.S3Service;
 import com.example.picknwhip_be.domain.chat.converter.ChatConverter;
 import com.example.picknwhip_be.domain.chat.dto.req.ChatRequestDTO;
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
@@ -17,6 +19,7 @@ import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
   private final ChatMessageRepository chatMessageRepository;
   private final UserRepository userRepository;
   private final ShopRepository shopRepository;
+  private final S3Service s3Service;
 
   @Override
   public ChatResponseDTO.RoomInfo saveOrCreateRoom(ChatRequestDTO.CreateRoom dto, Long customerId) {
@@ -79,5 +83,21 @@ public class ChatCommandServiceImpl implements ChatCommandService {
   @Override
   public void updateMarkAsRead(Long roomId, Long userId) {
     chatMessageRepository.markAsReadByRoomId(roomId, userId);
+  }
+
+  @Override
+  public List<S3ResDTO.PresignResponseDTO> getChatImageUploadUrls(
+      Long roomId, Long userId, List<String> fileNames) {
+    ChatRoom room =
+        chatRoomRepository
+            .findById(roomId)
+            .orElseThrow(() -> new ChatException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
+
+    if (!room.getCustomer().getUserId().equals(userId)
+        && !room.getShop().getOwner().getUserId().equals(userId)) {
+      throw new ChatException(ChatErrorCode.CHAT_NOT_PARTICIPANT);
+    }
+
+    return s3Service.createChatUploadUrls(roomId, fileNames);
   }
 }
