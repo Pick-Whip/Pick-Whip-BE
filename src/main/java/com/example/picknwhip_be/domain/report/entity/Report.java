@@ -34,7 +34,7 @@ public class Report extends BaseEntity {
   private String content;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'PENDING'")
   @Builder.Default
   private ReportStatus status = ReportStatus.PENDING;
 
