@@ -51,14 +51,19 @@ public class ChatRestController {
 
   // S3 이미지 업로드
   @Operation(
-      summary = "채팅 이미지 업로드 URL 발급 API",
-      description = "나눠보내기를 위해 하나 또는 여러 개의 Presigned URL 리스트를 반환합니다.")
+      summary = "채팅방 이미지 전송 URL 발급 API",
+      description = "참여자 권한 확인 후 Presigned URL 리스트를 반환합니다.")
   @PostMapping("/{roomId}/images")
   public ApiResponse<List<S3ResDTO.PresignResponseDTO>> createChatImageUrls(
       @PathVariable Long roomId, @RequestBody @Valid S3ReqDTO.BatchDTO request) {
 
+    // TODO: SecurityContext 연동 필요
+    Long userId = 1L;
+
+    // 서비스 계층에서 권한 체크 및 URL 생성 수행
     List<S3ResDTO.PresignResponseDTO> result =
-        s3Service.createChatUploadUrls(roomId, request.fileNames());
+        chatCommandService.getChatImageUploadUrls(roomId, userId, request.fileNames());
+
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
