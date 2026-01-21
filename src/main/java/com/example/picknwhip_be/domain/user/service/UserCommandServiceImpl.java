@@ -106,7 +106,7 @@ public class UserCommandServiceImpl implements UserCommandService {
       }
     }
 
-    user.updateProfile(newNickname, request.getPhone(), request.getProfileImageUrl());
+    user.updateProfile(newNickname, request.getProfileImageUrl());
     return user;
   }
 
