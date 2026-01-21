@@ -16,3 +16,11 @@ spring:
         format_sql: true
     # MySQL 문법을 흉내내도록 설정
     database-platform: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+
+cloud:
+  aws:
+    s3:
+      bucket: test-bucket
