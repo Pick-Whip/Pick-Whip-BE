@@ -41,5 +41,6 @@ public class Report extends BaseEntity {
   @Column(columnDefinition = "TEXT")
   private String answer;
 
+  @Column(name = "processed_at")
   private LocalDateTime processedAt;
 }
