@@ -131,6 +131,10 @@ public class S3Service {
       throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
     }
 
+    if (fileNames.size() > 5) {
+      throw new S3CustomException(S3ErrorCode.TOO_MANY_FILES);
+    }
+
     return fileNames.stream()
         .map(
             fileName -> {

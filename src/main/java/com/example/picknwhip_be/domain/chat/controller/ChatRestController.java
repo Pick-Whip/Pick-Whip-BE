@@ -57,7 +57,6 @@ public class ChatRestController {
   public ApiResponse<List<S3ResDTO.PresignResponseDTO>> createChatImageUrls(
       @PathVariable Long roomId, @RequestBody @Valid S3ReqDTO.BatchDTO request) {
 
-    // 사진이 한 장이라도 BatchDTO(리스트 형태)를 사용하면 로직
     List<S3ResDTO.PresignResponseDTO> result =
         s3Service.createChatUploadUrls(roomId, request.fileNames());
     return ApiResponse.of(GeneralSuccessCode.OK, result);
