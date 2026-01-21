@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.report.entity;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -31,4 +32,14 @@ public class Report extends BaseEntity {
 
   @Column(nullable = false, columnDefinition = "TEXT")
   private String content;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  @Builder.Default
+  private ReportStatus status = ReportStatus.PENDING;
+
+  @Column(columnDefinition = "TEXT")
+  private String answer;
+
+  private LocalDateTime processedAt;
 }
