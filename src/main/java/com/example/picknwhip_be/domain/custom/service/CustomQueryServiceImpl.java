@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.custom.service;
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.order.repository.OrderDraftRepository;
+import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
@@ -34,8 +35,12 @@ public class CustomQueryServiceImpl implements CustomQueryService {
     return orderDrafts.stream()
         .map(
             draft -> {
-              List<Long> optionIds =
-                  draft.getItems().stream().map(item -> item.getCustomOption().getId()).toList();
+              String sheetName =
+                  draft.getItems().stream()
+                      .filter(item -> item.getCustomOption().getCategory() == OptionCategory.SHEET)
+                      .map(item -> item.getCustomOption().getOptionName())
+                      .findFirst()
+                      .orElse(null);
 
               Long progress = draft.calculateProgress();
               String status = draft.calculateStatus();
@@ -47,7 +52,7 @@ public class CustomQueryServiceImpl implements CustomQueryService {
                   .progressPercentage(progress)
                   .presentStatus(status)
                   .updateAt(draft.getUpdatedAt())
-                  .customOptionIds(optionIds)
+                  .sheetName(sheetName)
                   .build();
             })
         .toList();

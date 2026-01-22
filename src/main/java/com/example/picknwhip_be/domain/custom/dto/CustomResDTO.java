@@ -20,7 +20,7 @@ public class CustomResDTO {
     private Long draftId;
     private String shopCakeSize;
     private LocalDateTime pickupDatetime;
-    private List<Long> customOptionIds;
+    private String sheetName;
     private Long progressPercentage;
     private String presentStatus;
     private LocalDateTime updateAt;
