@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.user.dto.req;
 
 import com.example.picknwhip_be.domain.user.entity.WithdrawalReason;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,8 @@ public class UserRequestDTO {
   public static class ExtraInfoDTO {
     private String name;
     private String phone;
+
+    @Pattern(regexp = "^\\d{7}$", message = "생년월일은 숫자 7자리(YYMMDDG) 형식이어야 합니다.")
     private String birthdate;
   }
 
