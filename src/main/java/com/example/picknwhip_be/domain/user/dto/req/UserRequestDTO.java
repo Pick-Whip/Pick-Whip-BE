@@ -22,6 +22,7 @@ public class UserRequestDTO {
   public static class ExtraInfoDTO {
     private String name;
     private String phone;
+    private String birthdate;
   }
 
   @Getter
