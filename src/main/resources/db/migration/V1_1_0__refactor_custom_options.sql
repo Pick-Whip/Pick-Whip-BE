@@ -35,8 +35,8 @@ ALTER TABLE `order_items`
         FOREIGN KEY (`custom_option_id`) REFERENCES `custom_options` (`id`);
 
 -- report 테이블
-ALTER TABLE `report` ADD COLUMN `answer` text NULL;
-ALTER TABLE `report` ADD COLUMN `processed_at` datetime(6) NULL;
-ALTER TABLE `report` ADD COLUMN `status` enum('PENDING', 'COMPLETED') NULL;
+ALTER TABLE report ADD COLUMN answer text NULL;
+ALTER TABLE report ADD COLUMN processed_at datetime(6) NULL;
+ALTER TABLE report MODIFY COLUMN status enum('PENDING', 'COMPLETED') NOT NULL DEFAULT 'PENDING';
 
 SET FOREIGN_KEY_CHECKS = 1;
