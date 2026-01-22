@@ -34,4 +34,6 @@ ALTER TABLE `order_items`
     ADD CONSTRAINT `FKot639rciihur6tlkrm25cf6s0`
         FOREIGN KEY (`custom_option_id`) REFERENCES `custom_options` (`id`);
 
+ALTER TABLE `report` ADD COLUMN `answer` text NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
