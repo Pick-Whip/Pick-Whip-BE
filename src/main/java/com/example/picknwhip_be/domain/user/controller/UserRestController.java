@@ -10,6 +10,8 @@ import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User", description = "사용자 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserRestController {
 
   private final UserQueryService userQueryService;
@@ -59,5 +61,23 @@ public class UserRestController {
     Long userId = 1L;
     userCommandService.withdrawMember(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, "탈퇴가 정상적으로 처리되었습니다.");
+  }
+
+  @Operation(summary = "로그아웃 API", description = "서버 세션을 만료시키고 카카오 로그아웃을 수행합니다.")
+  @PostMapping("/logout")
+  public ApiResponse<String> createLogout(HttpServletRequest request) {
+    // TODO: SecurityContext 연동 필요 (현재는 임시 1L 사용)
+    Long userId = 1L;
+    try {
+      // 카카오 서버 로그아웃
+      userCommandService.logout(userId);
+    } finally {
+      // 우리 서버 세션 무효화
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      }
+    }
+    return ApiResponse.of(GeneralSuccessCode.OK, "로그아웃 되었습니다.");
   }
 }

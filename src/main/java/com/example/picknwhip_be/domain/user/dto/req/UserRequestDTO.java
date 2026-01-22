@@ -13,7 +13,6 @@ public class UserRequestDTO {
   @AllArgsConstructor
   public static class UpdateProfileDTO {
     private String nickname;
-    private String phone;
     private String profileImageUrl;
   }
 

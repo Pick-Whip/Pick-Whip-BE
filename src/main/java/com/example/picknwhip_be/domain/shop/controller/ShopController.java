@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/shops")
+@RequestMapping("/api/shops")
 @RequiredArgsConstructor
 @Tag(name = "Shop API", description = "가게 관련 API")
 public class ShopController {
