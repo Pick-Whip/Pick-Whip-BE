@@ -34,6 +34,9 @@ ALTER TABLE `order_items`
     ADD CONSTRAINT `FKot639rciihur6tlkrm25cf6s0`
         FOREIGN KEY (`custom_option_id`) REFERENCES `custom_options` (`id`);
 
+-- report 테이블
 ALTER TABLE `report` ADD COLUMN `answer` text NULL;
+ALTER TABLE `report` ADD COLUMN `processed_at` datetime(6) NULL;
+ALTER TABLE `report` ADD COLUMN `status` enum('PENDING', 'COMPLETED') NULL;
 
 SET FOREIGN_KEY_CHECKS = 1;
