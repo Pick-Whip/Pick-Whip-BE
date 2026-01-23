@@ -33,7 +33,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다. kakaoId: " + kakaoId));
 
     // 이름이나 전화번호가 없으면 무조건 추가 정보 입력 페이지로 리다이렉트
-    if (user.getName() == null || user.getPhone() == null) {
+    if (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null) {
       getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/signup/extra");
     } else {
       getRedirectStrategy().sendRedirect(request, response, "/");

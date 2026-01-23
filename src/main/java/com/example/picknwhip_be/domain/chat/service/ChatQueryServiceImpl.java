@@ -9,9 +9,9 @@ import com.example.picknwhip_be.domain.chat.exception.code.ChatErrorCode;
 import com.example.picknwhip_be.domain.chat.repository.ChatMessageRepository;
 import com.example.picknwhip_be.domain.chat.repository.ChatRoomRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
-import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
-import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -61,7 +61,7 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new GeneralException(GeneralErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     // 유저가 참여 중인 채팅방 목록 조회
     List<ChatRoom> rooms = chatRoomRepository.findAllByCustomerOrShopOwner(user);

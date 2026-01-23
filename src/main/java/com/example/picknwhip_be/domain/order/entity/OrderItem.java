@@ -22,7 +22,7 @@ public class OrderItem {
   private Order order;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "custom_id", nullable = false)
+  @JoinColumn(name = "custom_option_id", nullable = false)
   private CustomOption customOption;
 
   @Enumerated(EnumType.STRING)

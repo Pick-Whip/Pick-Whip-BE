@@ -61,4 +61,6 @@ jobs:
               -Dspring.datasource.username=admin \
               -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
               -Dspring.jpa.hibernate.ddl-auto=update \
+              -Daws.region=ap-northeast-2 \
+              -Daws.s3.bucket=${{ secrets.S3_BUCKET }} \
               /home/ubuntu/app/*.jar > nohup.out 2>&1 &

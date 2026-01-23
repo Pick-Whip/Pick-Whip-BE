@@ -24,7 +24,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     // 이메일만으로 우선 가입
     userCommandService.joinOrCreateUser(
-        kakaoUserInfo.getKakaoId(), kakaoUserInfo.getEmail(), null, null, null);
+        kakaoUserInfo.getKakaoId(), kakaoUserInfo.getEmail(), null, null, null, null);
 
     return new DefaultOAuth2User(
         Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
