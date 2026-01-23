@@ -84,7 +84,7 @@ public class CustomCommandServiceImpl implements CustomCommandService {
     }
 
     if (dto.toppings() != null) {
-      for (CustomReqDTO.CustomCreateDTO.Toppings toppingReq : dto.toppings()) {
+      for (CustomReqDTO.CustomCreateDTO.Topping toppingReq : dto.toppings()) {
         CustomOption option =
             customOptionRepository
                 .findById(toppingReq.optionId())

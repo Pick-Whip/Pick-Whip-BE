@@ -28,8 +28,8 @@ public class CustomReqDTO {
       String referenceImageUrl,
       String paymentMethod,
       @Schema(description = "선택한 옵션 ID 목록", example = "[1, 2]") List<Long> customOptionIds,
-      List<Toppings> toppings) {
+      List<Topping> toppings) {
 
-    public record Toppings(Long optionId, Double x, Double y) {}
+    public record Topping(Long optionId, Double x, Double y) {}
   }
 }
