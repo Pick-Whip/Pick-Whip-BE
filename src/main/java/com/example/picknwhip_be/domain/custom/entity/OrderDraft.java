@@ -77,7 +77,7 @@ public class OrderDraft extends BaseEntity {
       progress += 25;
     }
     if (this.letteringText != null) {
-      progress += 25;
+      progress += 15;
     }
 
     return progress;

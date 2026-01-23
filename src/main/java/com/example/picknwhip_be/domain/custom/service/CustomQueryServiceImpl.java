@@ -1,7 +1,10 @@
 package com.example.picknwhip_be.domain.custom.service;
 
+import com.example.picknwhip_be.domain.custom.converter.CustomConverter;
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
+import com.example.picknwhip_be.domain.custom.exception.CustomException;
+import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
 import com.example.picknwhip_be.domain.order.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import com.example.picknwhip_be.domain.user.entity.User;
@@ -56,5 +59,34 @@ public class CustomQueryServiceImpl implements CustomQueryService {
                   .build();
             })
         .toList();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public CustomResDTO.GetDraftDetailDTO findDraftDetail(Long draftId) {
+
+    OrderDraft orderDraft =
+        orderDraftRepository
+            .findById(draftId)
+            .orElseThrow(() -> new CustomException(CustomErrorCode.DRAFT_NOT_FOUND));
+
+    return CustomConverter.toDraftDetailDTO(orderDraft);
+  }
+
+  @Override
+  @Transactional
+  public CustomResDTO.DeleteDraftDTO deleteDraft(Long draftId, Long userId) {
+
+    OrderDraft orderDraft =
+        orderDraftRepository
+            .findById(draftId)
+            .orElseThrow(() -> new CustomException(CustomErrorCode.DRAFT_NOT_FOUND));
+    if (!orderDraft.getUser().getUserId().equals(userId)) {
+      throw new CustomException(CustomErrorCode.FORBIDDEN);
+    }
+
+    orderDraftRepository.delete(orderDraft);
+
+    return CustomResDTO.DeleteDraftDTO.builder().draftId(orderDraft.getId()).build();
   }
 }

@@ -2,7 +2,6 @@ package com.example.picknwhip_be.domain.custom.dto;
 
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
-import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
@@ -32,22 +31,33 @@ public class CustomResDTO {
   @AllArgsConstructor
   public static class GetDraftDetailDTO {
     private Long draftId;
-    private ShopCakeSize shopCakeSize;
+    private Long shopCakeSizeId;
     private LocalDateTime pickupDatetime;
     private String letteringText;
     private LetteringLineCount letteringLineCount;
     private LetteringAlignment letteringAlignment;
     private String additionalRequest;
     private String referenceImageUrl;
-    private String paymentMethod;
 
     private List<Long> customOptionIds;
     private List<Toppings> toppings;
   }
 
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Toppings {
     private Long optionId;
     private double x;
     private double y;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class DeleteDraftDTO {
+    private Long draftId;
   }
 }

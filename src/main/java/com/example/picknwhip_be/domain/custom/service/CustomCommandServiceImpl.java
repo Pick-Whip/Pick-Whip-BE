@@ -5,7 +5,7 @@ import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
 import com.example.picknwhip_be.domain.custom.exception.CustomException;
-import com.example.picknwhip_be.domain.custom.exception.code.CustomOptionErrorCode;
+import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
 import com.example.picknwhip_be.domain.order.repository.OrderDraftItemRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.shop.entity.CustomOption;
@@ -77,7 +77,7 @@ public class CustomCommandServiceImpl implements CustomCommandService {
         CustomOption option =
             customOptionRepository
                 .findById(optionId)
-                .orElseThrow(() -> new CustomException(CustomOptionErrorCode.OPTION_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.OPTION_NOT_FOUND));
 
         items.add(createDraftItem(savedDraft, option, null, null));
       }
@@ -88,7 +88,7 @@ public class CustomCommandServiceImpl implements CustomCommandService {
         CustomOption option =
             customOptionRepository
                 .findById(toppingReq.optionId())
-                .orElseThrow(() -> new CustomException(CustomOptionErrorCode.OPTION_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.OPTION_NOT_FOUND));
 
         items.add(createDraftItem(savedDraft, option, toppingReq.x(), toppingReq.y()));
       }
