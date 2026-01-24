@@ -5,7 +5,7 @@ import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.exception.CustomException;
 import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
-import com.example.picknwhip_be.domain.order.repository.OrderDraftRepository;
+import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.exception.UserException;
