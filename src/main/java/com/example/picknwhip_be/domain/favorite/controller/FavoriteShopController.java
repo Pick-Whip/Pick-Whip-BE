@@ -1,10 +1,12 @@
 package com.example.picknwhip_be.domain.favorite.controller;
 
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponse;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponse;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteShopSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
