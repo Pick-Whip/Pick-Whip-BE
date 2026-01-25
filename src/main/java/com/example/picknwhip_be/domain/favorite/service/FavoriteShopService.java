@@ -14,15 +14,13 @@ import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
-import com.example.picknwhip_be.domain.user.repository.UserRepository; // 유저 리포지토리 필요
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -80,30 +78,27 @@ public class FavoriteShopService {
      */
     @Transactional(readOnly = true)
     public FavoriteShopListResponse getMyPickShops(Long userId, Long cursor, int limit) {
-        // 1. 유저 검증
+        // 유저 검증
         if (!userRepository.existsById(userId)) {
             throw new UserException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        // 2. 데이터 조회 (limit + 1개 조회)
-        // PageRequest를 사용해 쿼리의 LIMIT 절을 제어합니다.
+        // 데이터 조회 (limit + 1개 조회)
         List<FavoriteShop> favoriteShops = favoriteShopRepository.findAllByUserIdAndCursor(
-                userId, cursor, Pageable.of(0, limit + 1)
+                userId, cursor, PageRequest.of(0, limit + 1)
         );
 
-        // 3. hasNext 판단
+        // hasNext 판단
         boolean hasNext = false;
         if (favoriteShops.size() > limit) {
             hasNext = true;
-            favoriteShops.remove(limit); // 확인용으로 가져온 마지막 1개 제거
+            favoriteShops.remove(limit);
         }
 
-        // 4. DTO 변환
+        //DTO 변환
         List<FavoriteShopDto> shopDtos = favoriteShops.stream()
                 .map(FavoriteShopConverter::toDto)
                 .collect(Collectors.toList());
-
-        // 5. nextCursor 계산 (리스트의 마지막 아이템 ID)
         Long nextCursor = null;
         if (!favoriteShops.isEmpty()) {
             nextCursor = favoriteShops.get(favoriteShops.size() - 1).getId();
