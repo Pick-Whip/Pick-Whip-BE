@@ -9,6 +9,8 @@ import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -58,4 +60,41 @@ public class OrderDraft extends BaseEntity {
 
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
+
+  @OneToMany(mappedBy = "orderDraft", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<OrderDraftItem> items = new ArrayList<>();
+
+  public Long calculateProgress() {
+    long progress = 0;
+
+    if (this.shopCakeSize != null) {
+      progress += 25;
+    }
+    if (this.pickupDatetime != null) {
+      progress += 25;
+    }
+    if (this.items != null && !this.items.isEmpty()) {
+      progress += 25;
+    }
+    if (this.letteringText != null) {
+      progress += 15;
+    }
+
+    return progress;
+  }
+
+  public String calculateStatus() {
+
+    if (calculateProgress() == 0) {
+      return "EMPTY";
+    } else if (calculateProgress() == 25) {
+      return "STEP1";
+    } else if (calculateProgress() == 50) {
+      return "STEP2";
+    } else if (calculateProgress() == 75) {
+      return "STEP3";
+    } else {
+      return "COMPLETED";
+    }
+  }
 }
