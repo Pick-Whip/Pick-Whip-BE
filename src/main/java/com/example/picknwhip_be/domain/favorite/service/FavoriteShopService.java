@@ -15,7 +15,6 @@ import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,11 +78,11 @@ public class FavoriteShopService {
   /** 마이픽 가게 목록 조회 (커서 페이징) */
   @Transactional(readOnly = true)
   public FavoriteShopListResponse getMyPickShops(Long userId, Long cursor, int limit) {
-      // limit 파라미터 유효성 검사 (0 이하일 경우 400 에러 발생)
+    // limit 파라미터 유효성 검사 (0 이하일 경우 400 에러 발생)
     if (limit <= 0) {
-          throw new FavoriteShopException(INVALID_PAGE_SIZE);
-      }
-      // 유저 검증
+      throw new FavoriteShopException(INVALID_PAGE_SIZE);
+    }
+    // 유저 검증
     if (!userRepository.existsById(userId)) {
       throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
