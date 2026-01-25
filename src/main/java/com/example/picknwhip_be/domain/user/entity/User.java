@@ -37,6 +37,9 @@ public class User extends BaseEntity {
   @Column(nullable = true)
   private String phone;
 
+  @Column(nullable = true, length = 7)
+  private String birthdate;
+
   @Column(columnDefinition = "TEXT")
   private String profileImageUrl;
 
@@ -58,20 +61,18 @@ public class User extends BaseEntity {
   }
 
   // 카카오 로그인 후 추가 정보 입력
-  public void updateExtraInfo(String name, String phone) {
+  public void updateExtraInfo(String name, String phone, String birthdate) {
     this.name = name;
     this.phone = phone;
+    this.birthdate = birthdate;
   }
 
   // 마이페이지 수정
-  public void updateProfile(String nickname, String phone, String profileImageUrl) {
+  public void updateProfile(String nickname, String profileImageUrl) {
     if (nickname != null && !nickname.isBlank()) {
       this.nickname = nickname;
     }
-    if (phone != null) {
-      this.phone = phone;
-    }
-    if (profileImageUrl != null) {
+    if (profileImageUrl != null && !profileImageUrl.isBlank()) {
       this.profileImageUrl = profileImageUrl;
     }
   }

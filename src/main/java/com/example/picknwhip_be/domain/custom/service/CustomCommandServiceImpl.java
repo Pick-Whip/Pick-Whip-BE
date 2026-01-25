@@ -5,9 +5,9 @@ import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
 import com.example.picknwhip_be.domain.custom.exception.CustomException;
-import com.example.picknwhip_be.domain.custom.exception.code.CustomOptionErrorCode;
+import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
+import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderDraftItemRepository;
-import com.example.picknwhip_be.domain.order.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.shop.entity.CustomOption;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CustomServiceImpl implements CustomService {
+public class CustomCommandServiceImpl implements CustomCommandService {
 
   private final OrderDraftRepository orderDraftRepository;
   private final OrderDraftItemRepository orderDraftItemRepository;
@@ -77,18 +77,18 @@ public class CustomServiceImpl implements CustomService {
         CustomOption option =
             customOptionRepository
                 .findById(optionId)
-                .orElseThrow(() -> new CustomException(CustomOptionErrorCode.OPTION_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.OPTION_NOT_FOUND));
 
         items.add(createDraftItem(savedDraft, option, null, null));
       }
     }
 
     if (dto.toppings() != null) {
-      for (CustomReqDTO.CustomCreateDTO.ToppingRequest toppingReq : dto.toppings()) {
+      for (CustomReqDTO.CustomCreateDTO.Topping toppingReq : dto.toppings()) {
         CustomOption option =
             customOptionRepository
                 .findById(toppingReq.optionId())
-                .orElseThrow(() -> new CustomException(CustomOptionErrorCode.OPTION_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.OPTION_NOT_FOUND));
 
         items.add(createDraftItem(savedDraft, option, toppingReq.x(), toppingReq.y()));
       }

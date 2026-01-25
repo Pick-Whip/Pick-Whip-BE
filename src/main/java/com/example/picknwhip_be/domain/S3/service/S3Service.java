@@ -122,6 +122,31 @@ public class S3Service {
     }
   }
 
+  // 채팅 이미지 업로드용 다중 presigned URL을 발급
+  public List<S3ResDTO.PresignResponseDTO> createChatUploadUrls(
+      Long roomId, List<String> fileNames) {
+    validateBucketConfigured();
+
+    if (fileNames == null || fileNames.isEmpty()) {
+      throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
+    }
+
+    if (fileNames.size() > 5) {
+      throw new S3CustomException(S3ErrorCode.TOO_MANY_FILES);
+    }
+
+    return fileNames.stream()
+        .map(
+            fileName -> {
+              validateFileName(fileName);
+              String folderPath = "chat/" + roomId;
+              String keyName = buildKey(folderPath, fileName);
+              String url = presignPutUrl(keyName);
+              return new S3ResDTO.PresignResponseDTO(keyName, url);
+            })
+        .toList();
+  }
+
   private void validateKeyName(String keyName) {
     if (!StringUtils.hasText(keyName)) {
       throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);

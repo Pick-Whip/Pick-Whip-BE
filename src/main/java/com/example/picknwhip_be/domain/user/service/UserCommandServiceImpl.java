@@ -41,7 +41,12 @@ public class UserCommandServiceImpl implements UserCommandService {
 
   @Override
   public User joinOrCreateUser(
-      Long kakaoId, String email, String name, String phone, String profileImageUrl) {
+      Long kakaoId,
+      String email,
+      String name,
+      String phone,
+      String birthdate,
+      String profileImageUrl) {
     // 이미 가입된 카카오 유저인지 확인
     return userRepository
         .findByKakaoId(kakaoId)
@@ -87,7 +92,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-    user.updateExtraInfo(request.getName(), request.getPhone());
+    user.updateExtraInfo(request.getName(), request.getPhone(), request.getBirthdate());
   }
 
   @Override
@@ -106,7 +111,7 @@ public class UserCommandServiceImpl implements UserCommandService {
       }
     }
 
-    user.updateProfile(newNickname, request.getPhone(), request.getProfileImageUrl());
+    user.updateProfile(newNickname, request.getProfileImageUrl());
     return user;
   }
 
