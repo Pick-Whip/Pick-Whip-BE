@@ -73,37 +73,35 @@ public class FavoriteShopService {
 
     return new FavoriteShopResponse(shopId, false);
   }
-    /**
-     * 마이픽 가게 목록 조회 (커서 페이징)
-     */
-    @Transactional(readOnly = true)
-    public FavoriteShopListResponse getMyPickShops(Long userId, Long cursor, int limit) {
-        // 유저 검증
-        if (!userRepository.existsById(userId)) {
-            throw new UserException(UserErrorCode.USER_NOT_FOUND);
-        }
 
-        // 데이터 조회 (limit + 1개 조회)
-        List<FavoriteShop> favoriteShops = favoriteShopRepository.findAllByUserIdAndCursor(
-                userId, cursor, PageRequest.of(0, limit + 1)
-        );
-
-        // hasNext 판단
-        boolean hasNext = false;
-        if (favoriteShops.size() > limit) {
-            hasNext = true;
-            favoriteShops.remove(limit);
-        }
-
-        //DTO 변환
-        List<FavoriteShopDto> shopDtos = favoriteShops.stream()
-                .map(FavoriteShopConverter::toDto)
-                .collect(Collectors.toList());
-        Long nextCursor = null;
-        if (!favoriteShops.isEmpty()) {
-            nextCursor = favoriteShops.get(favoriteShops.size() - 1).getId();
-        }
-
-        return FavoriteShopConverter.toListResponse(shopDtos, nextCursor, hasNext);
+  /** 마이픽 가게 목록 조회 (커서 페이징) */
+  @Transactional(readOnly = true)
+  public FavoriteShopListResponse getMyPickShops(Long userId, Long cursor, int limit) {
+    // 유저 검증
+    if (!userRepository.existsById(userId)) {
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
+
+    // 데이터 조회 (limit + 1개 조회)
+    List<FavoriteShop> favoriteShops =
+        favoriteShopRepository.findAllByUserIdAndCursor(
+            userId, cursor, PageRequest.of(0, limit + 1));
+
+    // hasNext 판단
+    boolean hasNext = false;
+    if (favoriteShops.size() > limit) {
+      hasNext = true;
+      favoriteShops.remove(limit);
+    }
+
+    // DTO 변환
+    List<FavoriteShopDto> shopDtos =
+        favoriteShops.stream().map(FavoriteShopConverter::toDto).collect(Collectors.toList());
+    Long nextCursor = null;
+    if (!favoriteShops.isEmpty()) {
+      nextCursor = favoriteShops.get(favoriteShops.size() - 1).getId();
+    }
+
+    return FavoriteShopConverter.toListResponse(shopDtos, nextCursor, hasNext);
+  }
 }
