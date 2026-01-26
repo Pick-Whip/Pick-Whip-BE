@@ -6,6 +6,7 @@ import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.service.ChatCommandService;
 import com.example.picknwhip_be.domain.chat.service.ChatQueryService;
+import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,9 +21,11 @@ public class ChatController {
   private final ChatQueryService chatQueryService;
 
   @MessageMapping("api/chats/{roomId}/messages")
-  public void sendMessage(@DestinationVariable Long roomId, ChatRequestDTO.SendMessageDTO dto) {
-    // TODO: SecurityContext 연동 (임시 1L)
-    Long senderId = 1L;
+  public void sendMessage(
+      @DestinationVariable Long roomId,
+      ChatRequestDTO.SendMessageDTO dto,
+      @ExtractPayload String userId) {
+    Long senderId = Long.parseLong(userId);
 
     // 메시지 저장 및 권한 체크
     ChatMessage savedMessage = chatCommandService.saveMessage(roomId, dto, senderId);

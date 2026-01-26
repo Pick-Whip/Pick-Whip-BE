@@ -17,6 +17,8 @@ import com.example.picknwhip_be.domain.shop.repository.CustomOptionRepository;
 import com.example.picknwhip_be.domain.shop.repository.ShopCakeSizeRepository;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +39,12 @@ public class CustomCommandServiceImpl implements CustomCommandService {
   private final UserRepository userRepository;
 
   @Override
-  public CustomResDTO.CustomCreateDTO saveCustom(CustomReqDTO.CustomCreateDTO dto) {
+  public CustomResDTO.CustomCreateDTO saveCustom(Long userId, CustomReqDTO.CustomCreateDTO dto) {
+
     User user =
-        userRepository.findById(1L).orElseThrow(() -> new RuntimeException("테스트용 1번 유저가 DB에 없음"));
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
         shopRepository
