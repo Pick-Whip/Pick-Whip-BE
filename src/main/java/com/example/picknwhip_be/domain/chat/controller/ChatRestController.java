@@ -12,6 +12,8 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +76,7 @@ public class ChatRestController {
   public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long cursor,
-      @RequestParam(defaultValue = "10") Integer size) {
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
     Long userId = 1L; // TODO: SecurityContext 연동
     return ApiResponse.of(
         GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId, keyword, cursor, size));
