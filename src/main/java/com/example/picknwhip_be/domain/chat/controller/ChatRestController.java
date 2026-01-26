@@ -12,6 +12,8 @@ import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -67,10 +69,16 @@ public class ChatRestController {
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
-  @Operation(summary = "내 채팅방 목록 조회 API", description = "로그인한 사용자가 참여 중인 모든 채팅방 목록을 조회합니다.")
+  @Operation(
+      summary = "내 채팅방 목록 조회 API",
+      description = "로그인한 사용자가 참여 중인 채팅방 목록을 조회합니다. 가게 이름 검색 및 커서 기반 페이징을 지원합니다.")
   @GetMapping
-  public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList() {
-    Long userId = 1L; // TODO: Security 연동
-    return ApiResponse.of(GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId));
+  public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList(
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) Long cursor,
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
+    Long userId = 1L; // TODO: SecurityContext 연동
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId, keyword, cursor, size));
   }
 }

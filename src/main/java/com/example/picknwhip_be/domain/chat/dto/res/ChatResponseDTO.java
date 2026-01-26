@@ -51,6 +51,8 @@ public class ChatResponseDTO {
   @AllArgsConstructor
   public static class ChatRoomListDTO {
     private List<ChatRoomSummaryDTO> chatRooms;
+    private Long nextCursor;
+    private boolean hasNext;
   }
 
   @Builder
