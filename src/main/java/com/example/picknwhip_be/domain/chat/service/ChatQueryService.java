@@ -7,7 +7,8 @@ public interface ChatQueryService {
   ChatResponseDTO.MessageListDTO getMessages(Long roomId, Long cursor, Integer size);
 
   // 채팅방 목록 조회
-  ChatResponseDTO.ChatRoomListDTO getChatRoomList(Long userId);
+  ChatResponseDTO.ChatRoomListDTO getChatRoomList(
+      Long userId, String keyword, Long cursor, Integer size);
 
   // 안읽은 메시지 실시간 업데이트
   Long getUnreadCount(Long roomId, Long userId);

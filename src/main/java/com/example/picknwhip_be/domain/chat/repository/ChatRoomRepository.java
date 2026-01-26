@@ -5,6 +5,7 @@ import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,17 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
   @Query("SELECT r FROM ChatRoom r WHERE r.customer = :user OR r.shop.owner = :user")
   List<ChatRoom> findAllByCustomerOrShopOwner(@Param("user") User user);
+
+  @Query(
+      "SELECT r FROM ChatRoom r "
+          + "JOIN FETCH r.shop s "
+          + "WHERE (r.customer = :user OR s.owner = :user) "
+          + "AND (:keyword IS NULL OR s.shopName LIKE %:keyword%) "
+          + "AND (:cursor IS NULL OR r.lastMessageId < :cursor) "
+          + "ORDER BY r.lastMessageId DESC")
+  List<ChatRoom> findChatRoomsWithCursor(
+      @Param("user") User user,
+      @Param("keyword") String keyword,
+      @Param("cursor") Long cursor,
+      Pageable pageable);
 }
