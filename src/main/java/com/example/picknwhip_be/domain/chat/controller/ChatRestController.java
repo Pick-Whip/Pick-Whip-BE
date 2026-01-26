@@ -31,9 +31,8 @@ public class ChatRestController {
   @Operation(summary = "채팅방 생성 또는 조회 API", description = "기존 채팅방이 있으면 조회하고, 없으면 새로 생성하여 정보를 반환합니다.")
   @PostMapping
   public ApiResponse<ChatResponseDTO.RoomInfo> createRoom(
-      @ExtractPayload String userId, @RequestBody ChatRequestDTO.CreateRoom dto) {
-    return ApiResponse.of(
-        GeneralSuccessCode.OK, chatCommandService.saveOrCreateRoom(dto, Long.parseLong(userId)));
+      @ExtractPayload Long userId, @RequestBody ChatRequestDTO.CreateRoom dto) {
+    return ApiResponse.of(GeneralSuccessCode.OK, chatCommandService.saveOrCreateRoom(dto, userId));
   }
 
   @Operation(
@@ -43,11 +42,11 @@ public class ChatRestController {
   @GetMapping("/{roomId}/messages")
   public ApiResponse<ChatResponseDTO.MessageListDTO> getMessages(
       @PathVariable Long roomId,
-      @ExtractPayload String userId,
+      @ExtractPayload Long userId,
       @RequestParam(required = false) Long cursor, // 이전 페이지의 마지막 메시지 ID
       @RequestParam(defaultValue = "10") Integer size // 한 번에 가져올 메시지 개수
       ) {
-    chatCommandService.updateMarkAsRead(roomId, Long.parseLong(userId));
+    chatCommandService.updateMarkAsRead(roomId, userId);
     return ApiResponse.of(
         GeneralSuccessCode.OK, chatQueryService.getMessages(roomId, cursor, size));
   }
@@ -59,13 +58,12 @@ public class ChatRestController {
   @PostMapping("/{roomId}/images")
   public ApiResponse<List<S3ResDTO.PresignResponseDTO>> createChatImageUrls(
       @PathVariable Long roomId,
-      @ExtractPayload String userId,
+      @ExtractPayload Long userId,
       @RequestBody @Valid S3ReqDTO.BatchDTO request) {
 
     // 서비스 계층에서 권한 체크 및 URL 생성 수행
     List<S3ResDTO.PresignResponseDTO> result =
-        chatCommandService.getChatImageUploadUrls(
-            roomId, Long.parseLong(userId), request.fileNames());
+        chatCommandService.getChatImageUploadUrls(roomId, userId, request.fileNames());
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
@@ -75,12 +73,11 @@ public class ChatRestController {
       description = "로그인한 사용자가 참여 중인 채팅방 목록을 조회합니다. 가게 이름 검색 및 커서 기반 페이징을 지원합니다.")
   @GetMapping
   public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList(
-      @ExtractPayload String userId,
+      @ExtractPayload Long userId,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long cursor,
       @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
     return ApiResponse.of(
-        GeneralSuccessCode.OK,
-        chatQueryService.getChatRoomList(Long.parseLong(userId), keyword, cursor, size));
+        GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId, keyword, cursor, size));
   }
 }

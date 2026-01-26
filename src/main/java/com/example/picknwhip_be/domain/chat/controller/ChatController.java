@@ -24,8 +24,8 @@ public class ChatController {
   public void sendMessage(
       @DestinationVariable Long roomId,
       ChatRequestDTO.SendMessageDTO dto,
-      @ExtractPayload String userId) {
-    Long senderId = Long.parseLong(userId);
+      @ExtractPayload Long userId) {
+    Long senderId = userId;
 
     // 메시지 저장 및 권한 체크
     ChatMessage savedMessage = chatCommandService.saveMessage(roomId, dto, senderId);

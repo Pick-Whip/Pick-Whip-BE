@@ -58,9 +58,18 @@ public class JwtTokenProvider {
     try {
       Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
       return true;
-    } catch (JwtException | IllegalArgumentException e) {
-      // 유효하지 않은 토큰일 경우 false 반환
-      return false;
+    } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
+    } catch (ExpiredJwtException e) {
+      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.TOKEN_EXPIRED);
+    } catch (UnsupportedJwtException e) {
+      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
+    } catch (IllegalArgumentException e) {
+      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
     }
   }
 }

@@ -22,9 +22,9 @@ public class ReportRestController {
   @Operation(summary = "신고하기 API", description = "로그인된 사용자가 신고를 접수합니다.")
   @PostMapping("")
   public ApiResponse<String> createReport(
-      @ExtractPayload String userId, @Valid @RequestBody ReportRequestDTO.CreateReportDTO request) {
+      @ExtractPayload Long userId, @Valid @RequestBody ReportRequestDTO.CreateReportDTO request) {
 
-    reportCommandService.createReport(Long.parseLong(userId), request);
+    reportCommandService.createReport(userId, request);
     return ApiResponse.of(GeneralSuccessCode.CREATED, "신고가 접수되었습니다.");
   }
 }

@@ -58,9 +58,10 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
 
 	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	implementation platform('io.jsonwebtoken:jjwt-bom:0.13.0')
+	implementation 'io.jsonwebtoken:jjwt-api'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
 }
 
 tasks.named('test') {

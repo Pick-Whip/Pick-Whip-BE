@@ -51,7 +51,7 @@ public class SecurityConfig {
                         "/oauth2/**")
                     .permitAll()
                     .requestMatchers("/api/users/extra/info")
-                    .permitAll()
+                    .authenticated()
                     .requestMatchers("/api/test/**")
                     .permitAll() // 테스트 API 허용 추가
 
