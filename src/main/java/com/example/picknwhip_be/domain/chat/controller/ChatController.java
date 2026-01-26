@@ -31,7 +31,7 @@ public class ChatController {
     ChatMessage savedMessage = chatCommandService.saveMessage(roomId, dto, senderId);
     ChatResponseDTO.MessageInfo response = ChatConverter.toMessageInfo(savedMessage);
 
-    // 채팅방 참여자들에게 메시지 실시간 브로드캐스트
+    // 채팅방 참여자들에게 메시지 브로드캐스트
     messagingTemplate.convertAndSend("/topic/chats/" + roomId, response);
 
     // 실시간 안읽은 카운트 알림 처리
