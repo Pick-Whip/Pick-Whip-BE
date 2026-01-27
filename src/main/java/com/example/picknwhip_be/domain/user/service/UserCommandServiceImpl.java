@@ -14,12 +14,14 @@ import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.HttpEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -146,6 +148,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     userRepository.delete(user);
   }
 
+  @Value("${kakao.admin-key}")
+  private String adminKey;
+
   @Override
   public void logout(Long userId) {
     User user =
@@ -153,30 +158,25 @@ public class UserCommandServiceImpl implements UserCommandService {
             .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-    OAuth2AuthorizedClient client =
-        authorizedClientService.loadAuthorizedClient("kakao", user.getKakaoId().toString());
+    HttpHeaders headers = new HttpHeaders();
 
-    if (client != null && client.getAccessToken() != null) {
-      String accessToken = client.getAccessToken().getTokenValue();
+    // KakaoAK 스키마, Admin Key를 헤더에 담음
+    headers.set("Authorization", "KakaoAK " + adminKey);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.set("Authorization", "Bearer " + accessToken);
-      HttpEntity<String> entity = new HttpEntity<>(headers);
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("target_id_type", "user_id");
+    params.add("target_id", user.getKakaoId().toString()); // 엔티티의 카카오 고유 ID 사용
 
-      try {
-        // 카카오 로그아웃 REST API 호출
-        restTemplate.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
+    HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 
-        // 성공 시 서버 내 인증 정보 삭제
-        authorizedClientService.removeAuthorizedClient("kakao", user.getKakaoId().toString());
-        log.info("카카오 로그아웃 성공. userId: {}", userId);
-
-      } catch (RestClientException e) {
-        log.error("카카오 로그아웃 API 호출 실패. userId: {}, 에러: {}", userId, e.getMessage());
-        throw new GeneralException(GeneralErrorCode.INTERNAL_SERVER_ERROR);
-      }
-    } else {
-      log.warn("로그아웃을 시도했으나 세션에 카카오 토큰이 존재하지 않습니다. userId: {}", userId);
+    try {
+      // 카카오 로그아웃 API
+      restTemplate.postForEntity("https://kapi.kakao.com/v1/user/logout", entity, String.class);
+      log.info("카카오 서버 로그아웃 완료. userId: {}", userId);
+    } catch (RestClientException e) {
+      log.error("카카오 로그아웃 API 실패: {}", e.getMessage());
+      throw new GeneralException(GeneralErrorCode.INTERNAL_SERVER_ERROR);
     }
   }
 }

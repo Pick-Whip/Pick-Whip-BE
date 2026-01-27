@@ -5,6 +5,7 @@ import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.service.CustomCommandService;
 import com.example.picknwhip_be.domain.custom.service.CustomQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
+import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,15 +29,14 @@ public class CustomController {
       description = "사용자가 선택한 옵션으로 커스텀 케이크 주문서(임시저장)를 생성합니다.")
   @PostMapping("")
   public ApiResponse<CustomResDTO.CustomCreateDTO> postCustom(
-      @Valid @RequestBody CustomReqDTO.CustomCreateDTO dto) {
-    return ApiResponse.of(GeneralSuccessCode.CREATED, customCommandService.saveCustom(dto));
+      @ExtractPayload Long userId, @Valid @RequestBody CustomReqDTO.CustomCreateDTO dto) {
+    return ApiResponse.of(GeneralSuccessCode.CREATED, customCommandService.saveCustom(userId, dto));
   }
 
   @Operation(summary = "내 임시저장 목록 조회", description = "로그인한 사용자의 임시저장된 커스텀 케이크 목록을 조회합니다.")
   @GetMapping("/drafts")
-  public ApiResponse<List<CustomResDTO.GetDraftListDTO>> getDraftList() {
+  public ApiResponse<List<CustomResDTO.GetDraftListDTO>> getDraftList(@ExtractPayload Long userId) {
 
-    Long userId = 1L; // 추후 @AuthenticationPrincipal로 교체
     List<CustomResDTO.GetDraftListDTO> result = customQueryService.findDraftList(userId);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
@@ -54,9 +54,8 @@ public class CustomController {
   @Operation(summary = "임시저장 내역 삭제", description = "특정 임시저장 주문서(draftId)를 삭제합니다.")
   @DeleteMapping("/drafts/{draftId}")
   public ApiResponse<CustomResDTO.DeleteDraftDTO> deleteDraft(
+      @ExtractPayload Long userId,
       @Parameter(description = "삭제할 임시저장 ID", required = true) @PathVariable Long draftId) {
-
-    Long userId = 1L; // 추후 @AuthenticationPrincipal로 교체
 
     CustomResDTO.DeleteDraftDTO result = customQueryService.deleteDraft(draftId, userId);
 

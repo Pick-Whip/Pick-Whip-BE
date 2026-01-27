@@ -46,6 +46,10 @@ spring:
   application:
     name: picknwhip_be
 
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity: 3600000 # 1시간 (단위: ms)
+
 springdoc:
   server-url: ${BASE_URL:http://localhost:8080}
   api-docs:
@@ -58,3 +62,6 @@ cloud:
     region: ${AWS_REGION:ap-northeast-2}
     s3:
       bucket: ${S3_BUCKET}
+
+kakao:
+  admin-key: ${KAKAO_ADMIN_KEY}
