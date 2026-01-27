@@ -122,7 +122,6 @@ VALUES (
            (SELECT user_id FROM users WHERE email = 'local.owner@picknwhip.com')
        )
     ON DUPLICATE KEY UPDATE
-                         created_at = VALUES(created_at),
                          phone = VALUES(phone),
                          shop_name = VALUES(shop_name),
                          status = VALUES(status),

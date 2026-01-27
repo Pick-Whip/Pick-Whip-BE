@@ -57,7 +57,7 @@ CREATE TABLE `custom_options` (
                                   `additional_price` int NOT NULL,
                                   `category` enum('CREAM','ICING','LETTERING','PEN','SHAPE','SHEET','TOPPING') COLLATE utf8mb4_unicode_ci NOT NULL,
                                   `color_rgb_code` varchar(7) COLLATE utf8mb4_unicode_ci NULL,
-                                  `option_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                                  `option_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                                   `shop_id` bigint DEFAULT NULL,
                                   PRIMARY KEY (`id`),
                                   KEY `FKrugbtewrcp0p4u6d935gtphmc` (`shop_id`)
