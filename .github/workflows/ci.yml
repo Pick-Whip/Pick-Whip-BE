@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -23,6 +26,40 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Guard Flyway migrations are immutable
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --prune origin "${{ github.base_ref }}"
+          BASE="origin/${{ github.base_ref }}"
+
+          echo "Base branch: $BASE"
+
+          CHANGED="$(git diff --name-status "$BASE"...HEAD -- 'src/main/resources/db/migration/**' || true)"
+
+          echo "Changed files under db/migration:"
+          echo "$CHANGED"
+
+          # 상태 코드:
+          # A: Added (허용)
+          # M: Modified (금지)
+          # D: Deleted (금지)
+          # R*: Renamed (금지)
+          # C*: Copied (금지)
+          VIOLATIONS="$(echo "$CHANGED" | awk '$1 ~ /^(M|D|R|C)/ {print $0}')"
+
+          if [ -n "$VIOLATIONS" ]; then
+            echo ""
+            echo "❌ ERROR: Existing Flyway migration files must not be modified/deleted/renamed."
+            echo "✅ Fix: Add a NEW migration file instead (e.g., V2__*.sql)."
+            echo ""
+            echo "$VIOLATIONS"
+            exit 1
+          fi
+
+          echo "✅ Flyway migration guard passed."
 
       - name: Check Lint (Spotless)
         run: ./gradlew spotlessCheck
