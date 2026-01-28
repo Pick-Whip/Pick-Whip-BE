@@ -28,9 +28,13 @@ public class ExtractPayloadArgumentResolver implements HandlerMethodArgumentReso
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     if (authentication == null || authentication.getName() == null) {
-      return null; // 또는 예외 발생
+      throw new IllegalStateException("인증 정보가 없습니다.");
     }
 
-    return Long.parseLong(authentication.getName()); // String을 Long으로 안전하게 변환
+    try {
+      return Long.parseLong(authentication.getName());
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("유효하지 않은 유저 ID 형식입니다.", e);
+    }
   }
 }
