@@ -59,8 +59,11 @@ public class UserCommandServiceImpl implements UserCommandService {
             () -> {
               // 가입된 적이 없으면 랜덤 닉네임 생성 후 등록
               NicknameInfo info = generateRandomNicknameWithInfo();
-              String defaultImageUrl = constructDefaultImageUrl(info.adjective);
-              User newUser = User.createKakaoUser(kakaoId, email, info.nickname, defaultImageUrl);
+              String resolvedImageUrl =
+                  (profileImageUrl != null && !profileImageUrl.isBlank())
+                      ? profileImageUrl
+                      : constructDefaultImageUrl(info.adjective);
+              User newUser = User.createKakaoUser(kakaoId, email, info.nickname, resolvedImageUrl);
               return userRepository.save(newUser);
             });
   }
@@ -83,8 +86,12 @@ public class UserCommandServiceImpl implements UserCommandService {
       }
     }
     // Fallback 로직
-    return new NicknameInfo(
-        "생크림", "user_" + java.util.UUID.randomUUID().toString().substring(0, 10));
+    String adj = "생크림";
+    String nickname;
+    do {
+      nickname = adj + java.util.UUID.randomUUID().toString().substring(0, 10);
+    } while (userRepository.existsByNickname(nickname));
+    return new NicknameInfo(adj, nickname);
   }
 
   // URL 생성 헬퍼
