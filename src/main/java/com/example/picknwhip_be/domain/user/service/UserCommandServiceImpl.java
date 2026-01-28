@@ -72,7 +72,7 @@ public class UserCommandServiceImpl implements UserCommandService {
   private record NicknameInfo(String adjective, String nickname) {}
 
   private NicknameInfo generateRandomNicknameWithInfo() {
-    String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"}; //
+    String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"};
     java.util.concurrent.ThreadLocalRandom random =
         java.util.concurrent.ThreadLocalRandom.current();
 
@@ -88,9 +88,13 @@ public class UserCommandServiceImpl implements UserCommandService {
     // Fallback 로직
     String adj = "생크림";
     String nickname;
-    do {
+    for (int i = 0; i < MAX_NICKNAME_GENERATION_ATTEMPTS; i++) {
       nickname = adj + java.util.UUID.randomUUID().toString().substring(0, 10);
-    } while (userRepository.existsByNickname(nickname));
+      if (!userRepository.existsByNickname(nickname)) {
+        return new NicknameInfo(adj, nickname);
+      }
+    }
+    nickname = adj + System.currentTimeMillis();
     return new NicknameInfo(adj, nickname);
   }
 
