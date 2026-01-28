@@ -38,8 +38,11 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final RestTemplate restTemplate = new RestTemplate();
   private static final int MAX_NICKNAME_GENERATION_ATTEMPTS = 20;
 
-  // TODO: 프로필 사진 기본 이미지 설정 구현
-  // private static final String DEFAULT_PROFILE_IMAGE = "//";
+  @Value("${cloud.aws.s3.bucket}")
+  private String bucket;
+
+  @Value("${cloud.aws.region:ap-northeast-2}")
+  private String region;
 
   @Override
   public User joinOrCreateUser(
@@ -55,36 +58,48 @@ public class UserCommandServiceImpl implements UserCommandService {
         .orElseGet(
             () -> {
               // 가입된 적이 없으면 랜덤 닉네임 생성 후 등록
-              String randomNickname = generateRandomNickname();
-              User newUser = User.createKakaoUser(kakaoId, email, randomNickname);
+              NicknameInfo info = generateRandomNicknameWithInfo();
+              String defaultImageUrl = constructDefaultImageUrl(info.adjective);
+              User newUser = User.createKakaoUser(kakaoId, email, info.nickname, defaultImageUrl);
               return userRepository.save(newUser);
             });
   }
 
   // 랜덤 닉네임 생성
-  private String generateRandomNickname() {
-    String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"};
+  private record NicknameInfo(String adjective, String nickname) {}
+
+  private NicknameInfo generateRandomNicknameWithInfo() {
+    String[] adjectives = {"생크림", "딸기", "바닐라", "캐러멜", "쇼콜라"}; //
     java.util.concurrent.ThreadLocalRandom random =
         java.util.concurrent.ThreadLocalRandom.current();
 
-    // 무한 루프를 방지하기 위해 최대 시도 횟수를 제한
     for (int attempt = 0; attempt < MAX_NICKNAME_GENERATION_ATTEMPTS; attempt++) {
+      String adj = adjectives[random.nextInt(adjectives.length)];
       int randomNumber = random.nextInt(100, 1000);
-      String nickname = adjectives[random.nextInt(adjectives.length)] + randomNumber;
+      String nickname = adj + randomNumber;
 
       if (!userRepository.existsByNickname(nickname)) {
-        return nickname;
+        return new NicknameInfo(adj, nickname);
       }
     }
+    // Fallback 로직
+    return new NicknameInfo(
+        "생크림", "user_" + java.util.UUID.randomUUID().toString().substring(0, 10));
+  }
 
-    // 그래도 중복이면 UUID 기반으로 fallback (한 번만 DB 체크)
-    String fallbackNickname =
-        "user_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-    if (!userRepository.existsByNickname(fallbackNickname)) {
-      return fallbackNickname;
-    }
-
-    throw new UserException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
+  // URL 생성 헬퍼
+  private String constructDefaultImageUrl(String adjective) {
+    String fileName =
+        switch (adjective) {
+          case "생크림" -> "cream.png";
+          case "딸기" -> "strawberry.png";
+          case "바닐라" -> "vanilla.png";
+          case "캐러멜" -> "caramel.png";
+          case "쇼콜라" -> "chocolate.png";
+          default -> "base.png";
+        };
+    return String.format(
+        "https://%s.s3.%s.amazonaws.com/profile/default/%s", bucket, region, fileName);
   }
 
   @Override

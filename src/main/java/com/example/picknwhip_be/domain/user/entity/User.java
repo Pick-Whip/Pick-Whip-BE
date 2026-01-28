@@ -51,11 +51,13 @@ public class User extends BaseEntity {
   private LocalDateTime deletedAt;
 
   // 카카오 최초 로그인 시 계정 생성
-  public static User createKakaoUser(Long kakaoId, String email, String nickname) {
+  public static User createKakaoUser(
+      Long kakaoId, String email, String nickname, String profileImageUrl) {
     return User.builder()
         .kakaoId(kakaoId)
         .email(email)
         .nickname(nickname)
+        .profileImageUrl(profileImageUrl)
         .status(UserStatus.ACTIVE)
         .build();
   }
