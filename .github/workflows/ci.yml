@@ -37,7 +37,7 @@ jobs:
 
           echo "Base branch: $BASE"
 
-          CHANGED="$(git diff --name-status "$BASE"...HEAD -- 'src/main/resources/db/migration/**' || true)"
+          CHANGED="$(git diff --name-status "$BASE"...HEAD -- src/main/resources/db/migration/)"
 
           echo "Changed files under db/migration:"
           echo "$CHANGED"
