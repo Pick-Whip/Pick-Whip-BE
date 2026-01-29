@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.design.entity;
 
+import com.example.picknwhip_be.domain.shop.entity.Shop;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,9 +16,9 @@ public class DesignGallery {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  //    @JoinColumn(name = "shop_id", nullable = false)
-  //    private Shops shops;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "shop_id", nullable = false)
+  private Shop shop;
 
   @Column(name = "design_name", nullable = false)
   private String designName;

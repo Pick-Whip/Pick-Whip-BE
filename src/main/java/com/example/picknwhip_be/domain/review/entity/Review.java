@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Builder
@@ -18,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "review")
+@SQLRestriction("deleted_at is null")
 public class Review extends BaseEntity {
 
   @Id
@@ -60,5 +62,9 @@ public class Review extends BaseEntity {
     if (this.deletedAt == null) {
       this.deletedAt = now;
     }
+  }
+
+  public boolean isDeleted() {
+    return this.deletedAt != null;
   }
 }
