@@ -41,9 +41,9 @@ public class FavoriteShopController {
   }
 
   @Operation(summary = "마이픽 가게 목록 조회", description = "커서 페이징을 적용하여 찜한 가게 목록을 조회합니다.")
-  @GetMapping("/favorite")
+  @GetMapping("/favorites")
   public ApiResponse<FavoriteShopListResponse> getMyPickShops(
-      @Parameter(description = "사용자 ID (토큰 적용 전 임시)", required = true) @RequestParam Long userId,
+      @ExtractPayload Long userId,
       @Parameter(description = "커서 ID (이전 페이지 마지막 favoriteId, 첫 페이지는 null)", required = false)
           @RequestParam(required = false)
           Long cursor,
