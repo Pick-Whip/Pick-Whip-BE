@@ -4,6 +4,7 @@ import com.example.picknwhip_be.domain.S3.dto.res.S3ResDTO;
 import com.example.picknwhip_be.domain.S3.exception.S3CustomException;
 import com.example.picknwhip_be.domain.S3.exception.code.S3ErrorCode;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -24,7 +24,9 @@ public class S3Service {
 
   private static final Duration UPLOAD_EXPIRES = Duration.ofMinutes(10);
   private static final Duration DOWNLOAD_EXPIRES = Duration.ofMinutes(10);
+  private static final int DELETE_OBJECTS_MAX = 1000;
 
+  private final S3Client s3Client;
   private final S3Presigner s3Presigner;
 
   @Value("${cloud.aws.s3.bucket}")
@@ -178,5 +180,57 @@ public class S3Service {
       throw new S3CustomException(S3ErrorCode.INVALID_FILE_NAME);
     }
     return filename;
+  }
+
+  // 단일 이미지 삭제
+  public void deleteObject(String s3Key) {
+    if (s3Key == null || s3Key.isBlank()) {
+      return;
+    }
+
+    try {
+      s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(s3Key).build());
+    } catch (Exception e) {
+      throw new S3CustomException(S3ErrorCode.S3_OPERATION_FAILED);
+    }
+  }
+
+  // 다중 이미지 삭제
+  public void deleteObjects(List<String> s3Keys) {
+    if (s3Keys == null || s3Keys.isEmpty()) {
+      return;
+    }
+
+    List<String> filtered = s3Keys.stream().filter(k -> k != null && !k.isBlank()).toList();
+    if (filtered.isEmpty()) {
+      return;
+    }
+
+    List<List<String>> batches = split(filtered, DELETE_OBJECTS_MAX);
+    for (List<String> batch : batches) {
+      try {
+        List<ObjectIdentifier> objects =
+            batch.stream().map(k -> ObjectIdentifier.builder().key(k).build()).toList();
+
+        s3Client.deleteObjects(
+            DeleteObjectsRequest.builder()
+                .bucket(bucket)
+                .delete(Delete.builder().objects(objects).build())
+                .build());
+      } catch (Exception e) {
+        throw new S3CustomException(S3ErrorCode.S3_OPERATION_FAILED);
+      }
+    }
+  }
+
+  private List<List<String>> split(List<String> list, int size) {
+    List<List<String>> result = new ArrayList<>();
+    int i = 0;
+    while (i < list.size()) {
+      int end = Math.min(i + size, list.size());
+      result.add(list.subList(i, end));
+      i = end;
+    }
+    return result;
   }
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
   private final ReviewCommandService reviewCommandService;
 
-  @Operation(summary = "리뷰 작성 by 슝/하승연", description = "로그인한 회원이 리뷰를 등록하는 기능입니다. ")
+  @Operation(summary = "리뷰 작성 by 슝/하승연", description = "로그인한 회원이 리뷰를 등록하는 기능입니다.")
   @PostMapping("/{orderId}")
   public ApiResponse<ReviewResDTO.WriteDTO> CreateReview(
       @PathVariable Long orderId,
@@ -28,5 +28,14 @@ public class ReviewController {
       @Parameter(hidden = true) @ExtractPayload Long userId) {
     return ApiResponse.of(
         GeneralSuccessCode.CREATED, reviewCommandService.createReview(orderId, dto, userId));
+  }
+
+  @Operation(summary = "리뷰 작성 by 슝/하승연", description = "회원이 작성한 리뷰를 삭제하는 기능입니다.")
+  @DeleteMapping("/{reviewId}")
+  public ApiResponse<Void> DeleteReview(
+      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
+
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewCommandService.deleteReview(reviewId, userId));
   }
 }

@@ -19,6 +19,8 @@ public enum ReviewErrorCode implements BaseErrorCode {
 
   ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404_1", "존재하지 않는 주문입니다."),
 
+  REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404_2", "리뷰가 존재하지 않습니다."),
+
   REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "REVIEW409_1", "이미 해당 주문에 대한 리뷰가 존재합니다."),
 
   REVIEW_IMAGE_VALIDATION_FAILED(

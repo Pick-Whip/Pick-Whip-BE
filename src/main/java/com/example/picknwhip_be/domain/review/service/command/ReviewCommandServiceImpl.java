@@ -13,11 +13,10 @@ import com.example.picknwhip_be.domain.review.entity.mapping.ReviewKeyword;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
 import com.example.picknwhip_be.domain.review.exception.ReviewException;
 import com.example.picknwhip_be.domain.review.exception.code.ReviewErrorCode;
-import com.example.picknwhip_be.domain.review.repository.ReviewImageRepository;
-import com.example.picknwhip_be.domain.review.repository.ReviewKeywordRepository;
-import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
-import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
+import com.example.picknwhip_be.domain.review.repository.*;
 import com.example.picknwhip_be.domain.review.validator.ReviewImageKeyValidator;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +34,9 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
   private final OrderRepository orderRepository;
   private final ReviewKeywordRepository reviewKeywordRepository;
   private final ReviewImageKeyValidator reviewImageKeyValidator;
+  private final ReviewReplyRepository reviewReplyRepository;
+  private final Clock clock;
+  private final ReviewLikeRepository reviewLikeRepository;
 
   @Override
   @Transactional
@@ -82,5 +84,34 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     reviewSelectedKeywordRepository.saveAll(mappings);
 
     return ReviewConverter.toWriteDTO(review.getId());
+  }
+
+  @Override
+  @Transactional
+  public Void deleteReview(Long reviewId, Long userId) {
+    Review review =
+        reviewRepository
+            .findById(reviewId)
+            .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+    if (!review.getUser().getUserId().equals(userId)) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_WRITE_NOT_ALLOWED);
+    }
+
+    if (review.isDeleted()) {
+      return null;
+    }
+
+    LocalDateTime now = LocalDateTime.now(clock);
+
+    review.softDelete(now);
+
+    reviewReplyRepository.softDeleteAllByReviewId(reviewId, now);
+    reviewImageRepository.softDeleteAllByReviewId(reviewId, now);
+
+    reviewSelectedKeywordRepository.deleteByReviewId(reviewId);
+    reviewLikeRepository.deleteByReviewId(reviewId);
+
+    return null;
   }
 }

@@ -12,7 +12,7 @@ public class ReviewReqDTO {
           @NotBlank
           @Size(min = 10, max = 500)
           String content,
-      @Schema(description = "선택된 키워드 코드(1~5개)", example = "[\"DELICIOUS\", \"CLEAN_STORE\"]")
+      @Schema(description = "선택된 키워드 코드(1~5개)", example = "[\"DELICIOUS\", \"CLEAN\"]")
           @NotEmpty
           @Size(min = 1, max = 5)
           List<String> keywords,
