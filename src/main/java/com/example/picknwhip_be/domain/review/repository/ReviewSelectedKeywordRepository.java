@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReviewSelectedKeywordRepository
     extends JpaRepository<ReviewSelectedKeyword, Long> {
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from ReviewSelectedKeyword rsk where rsk.review.id = :reviewId")
-    int deleteByReviewId(@Param("reviewId") Long reviewId);}
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("delete from ReviewSelectedKeyword rsk where rsk.review.id = :reviewId")
+  void deleteByReviewId(@Param("reviewId") Long reviewId);
+}

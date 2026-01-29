@@ -17,10 +17,10 @@ public class ReviewPurgeService {
 
   @Transactional
   public int hardDeleteReviewGraph(Long reviewId) {
-      reviewSelectedKeywordRepository.deleteByReviewId(reviewId);
-      reviewLikeRepository.deleteByReviewId(reviewId);
-      reviewImageRepository.hardDeleteAllByReviewId(reviewId);
-      reviewReplyRepository.hardDeleteAllByReviewId(reviewId);
+    reviewSelectedKeywordRepository.deleteByReviewId(reviewId);
+    reviewLikeRepository.deleteByReviewId(reviewId);
+    reviewImageRepository.hardDeleteAllByReviewId(reviewId);
+    reviewReplyRepository.hardDeleteAllByReviewId(reviewId);
     return reviewRepository.hardDeleteById(reviewId);
   }
 }

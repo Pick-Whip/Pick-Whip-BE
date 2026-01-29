@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from ReviewLike rl where rl.review.id = :reviewId")
-    int deleteByReviewId(@Param("reviewId") Long reviewId);
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("delete from ReviewLike rl where rl.review.id = :reviewId")
+  void deleteByReviewId(@Param("reviewId") Long reviewId);
 }

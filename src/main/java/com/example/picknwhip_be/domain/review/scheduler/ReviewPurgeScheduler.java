@@ -6,7 +6,6 @@ import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.service.command.ReviewPurgeService;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +30,8 @@ public class ReviewPurgeScheduler {
 
     LocalDateTime cutoff = LocalDateTime.now(clock).minusDays(RETENTION_DAYS);
     List<Long> targetIds = reviewRepository.findPurgeTargetIds(cutoff);
-      log.warn("[ReviewPurge] start cutoff={}", cutoff);
-      log.warn("[ReviewPurge] targetIds={}", targetIds);
+    log.warn("[ReviewPurge] start cutoff={}", cutoff);
+    log.warn("[ReviewPurge] targetIds={}", targetIds);
 
     if (targetIds.isEmpty()) {
       return;
