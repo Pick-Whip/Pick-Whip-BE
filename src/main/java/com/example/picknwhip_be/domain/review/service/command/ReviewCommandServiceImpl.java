@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,11 +57,15 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     // 리뷰 저장
     Review review = ReviewConverter.toReview(order, dto);
-    reviewRepository.save(review);
+    try {
+      reviewRepository.save(review);
+    } catch (DataIntegrityViolationException e) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_ALREADY_EXISTS);
+    }
 
     // 리뷰 이미지 저장
     if (dto.imageKeys() != null && !dto.imageKeys().isEmpty()) {
-      reviewImageKeyValidator.validateAll(dto.imageKeys(), userId);
+      reviewImageKeyValidator.validateAll(dto.imageKeys());
 
       List<ReviewImage> images = ReviewImageConverter.toReviewImages(review, dto.imageKeys());
       reviewImageRepository.saveAll(images);

@@ -23,7 +23,7 @@ public class S3ReviewImageKeyValidator implements ReviewImageKeyValidator {
   private String bucket;
 
   @Override
-  public void validateAll(List<String> imageKeys, Long userId) {
+  public void validateAll(List<String> imageKeys) {
     validateBucketConfigured();
 
     for (String key : imageKeys) {

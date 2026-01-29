@@ -30,7 +30,7 @@ public class ReviewController {
         GeneralSuccessCode.CREATED, reviewCommandService.createReview(orderId, dto, userId));
   }
 
-  @Operation(summary = "리뷰 작성 by 슝/하승연", description = "회원이 작성한 리뷰를 삭제하는 기능입니다.")
+  @Operation(summary = "리뷰 삭제 by 슝/하승연", description = "회원이 작성한 리뷰를 삭제하는 기능입니다.")
   @DeleteMapping("/{reviewId}")
   public ApiResponse<Void> DeleteReview(
       @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
