@@ -8,10 +8,13 @@ import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
 import com.example.picknwhip_be.domain.chat.service.ChatCommandService;
 import com.example.picknwhip_be.domain.chat.service.ChatQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
+import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +31,7 @@ public class ChatRestController {
   @Operation(summary = "채팅방 생성 또는 조회 API", description = "기존 채팅방이 있으면 조회하고, 없으면 새로 생성하여 정보를 반환합니다.")
   @PostMapping
   public ApiResponse<ChatResponseDTO.RoomInfo> createRoom(
-      @RequestBody ChatRequestDTO.CreateRoom dto) {
-    Long userId = 1L; // TODO: Security 연동
+      @ExtractPayload Long userId, @RequestBody ChatRequestDTO.CreateRoom dto) {
     return ApiResponse.of(GeneralSuccessCode.OK, chatCommandService.saveOrCreateRoom(dto, userId));
   }
 
@@ -40,10 +42,10 @@ public class ChatRestController {
   @GetMapping("/{roomId}/messages")
   public ApiResponse<ChatResponseDTO.MessageListDTO> getMessages(
       @PathVariable Long roomId,
+      @ExtractPayload Long userId,
       @RequestParam(required = false) Long cursor, // 이전 페이지의 마지막 메시지 ID
       @RequestParam(defaultValue = "10") Integer size // 한 번에 가져올 메시지 개수
       ) {
-    Long userId = 1L; // TODO: Security 연동
     chatCommandService.updateMarkAsRead(roomId, userId);
     return ApiResponse.of(
         GeneralSuccessCode.OK, chatQueryService.getMessages(roomId, cursor, size));
@@ -55,10 +57,9 @@ public class ChatRestController {
       description = "참여자 권한 확인 후 Presigned URL 리스트를 반환합니다.")
   @PostMapping("/{roomId}/images")
   public ApiResponse<List<S3ResDTO.PresignResponseDTO>> createChatImageUrls(
-      @PathVariable Long roomId, @RequestBody @Valid S3ReqDTO.BatchDTO request) {
-
-    // TODO: SecurityContext 연동 필요
-    Long userId = 1L;
+      @PathVariable Long roomId,
+      @ExtractPayload Long userId,
+      @RequestBody @Valid S3ReqDTO.BatchDTO request) {
 
     // 서비스 계층에서 권한 체크 및 URL 생성 수행
     List<S3ResDTO.PresignResponseDTO> result =
@@ -67,10 +68,16 @@ public class ChatRestController {
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
-  @Operation(summary = "내 채팅방 목록 조회 API", description = "로그인한 사용자가 참여 중인 모든 채팅방 목록을 조회합니다.")
+  @Operation(
+      summary = "내 채팅방 목록 조회 API",
+      description = "로그인한 사용자가 참여 중인 채팅방 목록을 조회합니다. 가게 이름 검색 및 커서 기반 페이징을 지원합니다.")
   @GetMapping
-  public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList() {
-    Long userId = 1L; // TODO: Security 연동
-    return ApiResponse.of(GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId));
+  public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList(
+      @ExtractPayload Long userId,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) Long cursor,
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, chatQueryService.getChatRoomList(userId, keyword, cursor, size));
   }
 }
