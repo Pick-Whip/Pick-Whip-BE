@@ -36,7 +36,8 @@ public class CustomController {
   @GetMapping("/drafts")
   public ApiResponse<List<CustomResDTO.GetDraftListDTO>> getDraftList() {
 
-    Long userId = 1L; // 추후 @AuthenticationPrincipal로 교체
+    // TODO  추후 @AuthenticationPrincipal로 교체
+    Long userId = 1L;
     List<CustomResDTO.GetDraftListDTO> result = customQueryService.findDraftList(userId);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
@@ -56,7 +57,8 @@ public class CustomController {
   public ApiResponse<CustomResDTO.DeleteDraftDTO> deleteDraft(
       @Parameter(description = "삭제할 임시저장 ID", required = true) @PathVariable Long draftId) {
 
-    Long userId = 1L; // 추후 @AuthenticationPrincipal로 교체
+    // TODO  추후 @AuthenticationPrincipal로 교체
+    Long userId = 1L;
 
     CustomResDTO.DeleteDraftDTO result = customQueryService.deleteDraft(draftId, userId);
 
