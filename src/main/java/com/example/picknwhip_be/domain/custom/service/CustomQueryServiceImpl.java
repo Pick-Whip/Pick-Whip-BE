@@ -6,7 +6,13 @@ import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.exception.CustomException;
 import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
+import com.example.picknwhip_be.domain.shop.entity.CustomOption;
+import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
+import com.example.picknwhip_be.domain.shop.repository.CustomOptionRepository;
+import com.example.picknwhip_be.domain.shop.repository.ShopCakeSizeRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
@@ -23,6 +29,8 @@ public class CustomQueryServiceImpl implements CustomQueryService {
 
   private final OrderDraftRepository orderDraftRepository;
   private final UserRepository userRepository;
+  private final CustomOptionRepository customOptionRepository;
+  private final ShopCakeSizeRepository shopCakeSizeRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -88,5 +96,21 @@ public class CustomQueryServiceImpl implements CustomQueryService {
     orderDraftRepository.delete(orderDraft);
 
     return CustomResDTO.DeleteDraftDTO.builder().draftId(orderDraft.getId()).build();
+  }
+
+  @Override
+  @Transactional
+  public CustomResDTO.GetDesignOptionDTO findDesignOption(Long shopId) {
+    List<ShopCakeSize> shopCakeSizes = shopCakeSizeRepository.findByShopId(shopId);
+    if (shopCakeSizes.isEmpty()) {
+      throw new ShopException(ShopErrorCode.CAKE_SIZE_INFO_NOT_FOUND);
+    }
+
+    List<CustomOption> customOptions = customOptionRepository.findByShopId(shopId);
+    if (customOptions.isEmpty()) {
+      throw new ShopException(ShopErrorCode.CUSTOMOPTION_INFO_NOT_FOUND);
+    }
+
+    return CustomConverter.toDesignOptionDTO(shopId, shopCakeSizes, customOptions);
   }
 }
