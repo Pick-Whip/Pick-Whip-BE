@@ -99,7 +99,7 @@ public class CustomQueryServiceImpl implements CustomQueryService {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public CustomResDTO.GetDesignOptionDTO findDesignOption(Long shopId) {
     List<ShopCakeSize> shopCakeSizes = shopCakeSizeRepository.findByShopId(shopId);
     if (shopCakeSizes.isEmpty()) {

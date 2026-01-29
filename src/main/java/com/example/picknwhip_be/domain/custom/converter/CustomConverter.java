@@ -52,7 +52,6 @@ public class CustomConverter {
                             .additionalPrice(item.getAdditionalPrice())
                             .colorRgbCode(item.getColorRgbCode())
                             .build())
-                .sorted()
                 .toList())
         .build();
   }

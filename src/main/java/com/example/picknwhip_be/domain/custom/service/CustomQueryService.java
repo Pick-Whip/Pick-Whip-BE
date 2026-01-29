@@ -11,5 +11,5 @@ public interface CustomQueryService {
 
   CustomResDTO.DeleteDraftDTO deleteDraft(Long id, Long userId);
 
-  CustomResDTO.GetDesignOptionDTO findDesignOption(Long id);
+  CustomResDTO.GetDesignOptionDTO findDesignOption(Long shopId);
 }
