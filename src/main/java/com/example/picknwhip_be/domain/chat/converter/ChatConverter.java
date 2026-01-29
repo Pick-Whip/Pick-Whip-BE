@@ -52,8 +52,12 @@ public class ChatConverter {
   }
 
   public static ChatResponseDTO.ChatRoomListDTO toChatRoomListDTO(
-      List<ChatResponseDTO.ChatRoomSummaryDTO> summaryList) {
-    return ChatResponseDTO.ChatRoomListDTO.builder().chatRooms(summaryList).build();
+      List<ChatResponseDTO.ChatRoomSummaryDTO> summaryList, Long nextCursor, boolean hasNext) {
+    return ChatResponseDTO.ChatRoomListDTO.builder()
+        .chatRooms(summaryList)
+        .nextCursor(nextCursor)
+        .hasNext(hasNext)
+        .build();
   }
 
   public static ChatResponseDTO.UnreadCountUpdateDTO toUnreadCountUpdateDTO(
