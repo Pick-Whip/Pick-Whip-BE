@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.home.service.serviceImpl;
+package com.example.picknwhip_be.domain.home.service;
 
 import com.example.picknwhip_be.domain.favorite.service.DesignMyPickChecker;
 import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResponseDto;

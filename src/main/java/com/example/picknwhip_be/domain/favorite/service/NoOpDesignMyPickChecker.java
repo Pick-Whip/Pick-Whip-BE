@@ -3,11 +3,11 @@ package com.example.picknwhip_be.domain.favorite.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnMissingBean(DesignMyPickChecker.class)
+@Primary
 public class NoOpDesignMyPickChecker implements DesignMyPickChecker {
 
   @Override
