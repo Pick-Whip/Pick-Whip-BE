@@ -24,7 +24,7 @@ public class HomeController {
   @Operation(
       summary = "인기 케이크 Top5 조회",
       description =
-          "최근 14일 동안 결제 완료(DONE) 판매량 기준 Top5 케이크(디자인)를 조회합니다. " + "집계는 매일 12:00(KST)에 스케줄러로 갱신됩니다.")
+          "최근 14일 동안 결제 완료(DONE) 판매량 기준 Top5 케이크(디자인)를 조회합니다. " + "집계는 매일 00:00(KST)에 스케줄러로 갱신됩니다.")
   @GetMapping("/popular-cakes/top5")
   public ApiResponse<List<PopularCakeResponseDto>> getPopularCakesTop5(
       @ExtractPayload Long userId) {
