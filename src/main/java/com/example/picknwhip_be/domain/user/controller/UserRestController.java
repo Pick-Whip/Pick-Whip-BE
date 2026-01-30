@@ -26,7 +26,7 @@ public class UserRestController {
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
 
-  @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호를 입력받아 업데이트합니다.")
+  @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호, 생일을 입력받아 업데이트합니다.")
   @PostMapping("/extra/info")
   public ApiResponse<String> createExtraInfo(
       @ExtractPayload Long userId, @Valid @RequestBody UserRequestDTO.ExtraInfoDTO request) {
