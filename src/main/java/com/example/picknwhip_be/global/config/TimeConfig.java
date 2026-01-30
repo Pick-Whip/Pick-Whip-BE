@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.config;
+package com.example.picknwhip_be.global.config;
 
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
