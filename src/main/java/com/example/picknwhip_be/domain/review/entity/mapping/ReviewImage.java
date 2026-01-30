@@ -5,6 +5,7 @@ import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Builder
@@ -12,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Table(name = "review_image")
+@SQLRestriction("deleted_at is null")
 public class ReviewImage extends BaseEntity {
 
   @Id
@@ -30,10 +32,4 @@ public class ReviewImage extends BaseEntity {
 
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
-
-  public void softDelete(LocalDateTime now) {
-    if (this.deletedAt == null) {
-      this.deletedAt = now;
-    }
-  }
 }

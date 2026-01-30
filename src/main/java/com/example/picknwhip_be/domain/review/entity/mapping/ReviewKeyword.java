@@ -9,13 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Table(
-    name = "review_keyword",
-    uniqueConstraints = {
-      @UniqueConstraint(
-          name = "uk_review_keyword_category_keyword",
-          columnNames = {"category", "keyword"})
-    })
+@Table(name = "review_keyword")
 public class ReviewKeyword {
 
   @Id
@@ -26,6 +20,9 @@ public class ReviewKeyword {
   @Enumerated(EnumType.STRING)
   private KeywordCategory category;
 
-  @Column(name = "keyword", nullable = false, length = 15)
-  private String keyword;
+  @Column(name = "code", nullable = false, length = 50, unique = true)
+  private String code;
+
+  @Column(name = "label", nullable = false, length = 15)
+  private String label;
 }
