@@ -24,7 +24,7 @@ public class PopularCakeRankingScheduler {
     private final PaymentRepository paymentRepository;
     private final PopularCakeRankingRepository rankingRepository;
 
-    @PersistenceContext private EntityManager em;
+    private final EntityManager em;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
