@@ -11,6 +11,6 @@ public interface PopularCakeRankingRepository extends JpaRepository<PopularCakeR
       "SELECT r FROM PopularCakeRanking r "
           + "JOIN FETCH r.design d "
           + "JOIN FETCH r.shop s "
-          + "ORDER BY r.rank ASC")
+          + "ORDER BY r.ranking ASC")
   List<PopularCakeRanking> findTop5WithDesignAndShop();
 }

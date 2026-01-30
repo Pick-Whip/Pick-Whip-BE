@@ -43,7 +43,7 @@ public class PopularCakeRankingScheduler {
     rankingRepository.deleteAllInBatch();
 
     List<PopularCakeRanking> toSave = new ArrayList<>();
-    int rank = 1;
+    int rankNum = 1;
 
     for (PaymentRepository.PopularCakeAgg row : top5) {
       DesignGallery designRef = em.getReference(DesignGallery.class, row.getDesignId());
@@ -51,7 +51,7 @@ public class PopularCakeRankingScheduler {
 
       toSave.add(
           PopularCakeRanking.builder()
-              .rank(rank++)
+              .ranking(rankNum++)
               .design(designRef)
               .shop(shopRef)
               .orderCount(row.getOrderCount())

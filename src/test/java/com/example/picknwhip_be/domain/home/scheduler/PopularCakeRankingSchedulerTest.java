@@ -66,10 +66,10 @@ class PopularCakeRankingSchedulerTest {
     List<PopularCakeRanking> savedList = captor.getValue();
     assertThat(savedList).hasSize(2);
 
-    assertThat(savedList.get(0).getRank()).isEqualTo(1);
+    assertThat(savedList.get(0).getRanking()).isEqualTo(1);
     assertThat(savedList.get(0).getOrderCount()).isEqualTo(100L);
 
-    assertThat(savedList.get(1).getRank()).isEqualTo(2);
+    assertThat(savedList.get(1).getRanking()).isEqualTo(2);
     assertThat(savedList.get(1).getOrderCount()).isEqualTo(80L);
   }
 }

@@ -54,7 +54,7 @@ class HomePopularCakeServiceTest {
     given(shop1.getMinPrice()).willReturn(30000);
 
     PopularCakeRanking ranking1 =
-        PopularCakeRanking.builder().rank(1).design(design1).shop(shop1).orderCount(50L).build();
+        PopularCakeRanking.builder().ranking(1).design(design1).shop(shop1).orderCount(50L).build();
 
     // 2위 케이크 (마이픽 안함)
     DesignGallery design2 = mock(DesignGallery.class);
@@ -63,7 +63,7 @@ class HomePopularCakeServiceTest {
     Shop shop2 = mock(Shop.class);
 
     PopularCakeRanking ranking2 =
-        PopularCakeRanking.builder().rank(2).design(design2).shop(shop2).orderCount(30L).build();
+        PopularCakeRanking.builder().ranking(2).design(design2).shop(shop2).orderCount(30L).build();
 
     given(rankingRepository.findTop5WithDesignAndShop()).willReturn(List.of(ranking1, ranking2));
     given(designMyPickChecker.findPickedDesignIds(eq(userId), anyList()))
@@ -94,7 +94,7 @@ class HomePopularCakeServiceTest {
     Shop shop = mock(Shop.class);
 
     PopularCakeRanking ranking =
-        PopularCakeRanking.builder().rank(1).design(design).shop(shop).orderCount(10L).build();
+        PopularCakeRanking.builder().ranking(1).design(design).shop(shop).orderCount(10L).build();
 
     given(rankingRepository.findTop5WithDesignAndShop()).willReturn(List.of(ranking));
 

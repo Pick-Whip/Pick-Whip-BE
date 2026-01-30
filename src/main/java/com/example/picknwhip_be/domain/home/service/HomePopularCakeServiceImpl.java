@@ -42,7 +42,7 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
         .map(
             r ->
                 PopularCakeResponseDto.builder()
-                    .rank(r.getRank())
+                    .rank(r.getRanking())
                     .designId(r.getDesign().getId())
                     .cakeName(r.getDesign().getDesignName())
                     .cakeImageUrl(r.getDesign().getImageUrl())

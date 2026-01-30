@@ -15,8 +15,8 @@ import lombok.*;
 public class PopularCakeRanking {
 
   @Id
-  @Column(name = "rank", nullable = false)
-  private Integer rank; // 1~5
+  @Column(name = "ranking", nullable = false)
+  private Integer ranking; // 1~5
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "design_id", nullable = false)
