@@ -26,7 +26,7 @@ public class ReviewController {
 
   @Operation(summary = "리뷰 작성 by 슝/하승연", description = "로그인한 회원이 리뷰를 등록하는 기능입니다.")
   @PostMapping("/{orderId}")
-  public ApiResponse<ReviewResDTO.WriteDTO> CreateReview(
+  public ApiResponse<ReviewResDTO.WriteDTO> createReview(
       @PathVariable Long orderId,
       @RequestBody @Valid ReviewReqDTO.WriteDTO dto,
       @Parameter(hidden = true) @ExtractPayload Long userId) {
@@ -36,7 +36,7 @@ public class ReviewController {
 
   @Operation(summary = "리뷰 삭제 by 슝/하승연", description = "회원이 작성한 리뷰를 삭제하는 기능입니다.")
   @DeleteMapping("/{reviewId}")
-  public ApiResponse<Void> DeleteReview(
+  public ApiResponse<Void> deleteReview(
       @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
 
     return ApiResponse.of(
@@ -45,7 +45,7 @@ public class ReviewController {
 
   @Operation(summary = "작성한 리뷰 목록 조회 by 슝/하승연", description = "회원이 작성한 리뷰 목록을 조회하는 기능입니다.")
   @GetMapping("/me")
-  public ApiResponse<ReviewResDTO.MyReviewListDTO> GetMyReviewList(
+  public ApiResponse<ReviewResDTO.MyReviewListDTO> getMyReviewList(
       @Parameter(description = "커서(마지막으로 조회한 reviewId). 첫 조회는 생략", example = "20")
           @RequestParam(required = false)
           Long cursor,
@@ -56,6 +56,6 @@ public class ReviewController {
           int size,
       @Parameter(hidden = true) @ExtractPayload Long userId) {
     return ApiResponse.of(
-        GeneralSuccessCode.OK, reviewQueryService.GetMyReviewList(cursor, size, userId));
+        GeneralSuccessCode.OK, reviewQueryService.getMyReviewList(cursor, size, userId));
   }
 }

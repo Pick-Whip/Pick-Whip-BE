@@ -19,7 +19,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   private final S3Service s3Service;
 
   @Override
-  public ReviewResDTO.MyReviewListDTO GetMyReviewList(Long cursor, int size, Long userId) {
+  public ReviewResDTO.MyReviewListDTO getMyReviewList(Long cursor, int size, Long userId) {
     ReviewRow.MyReviewSummaryRow summary = reviewRepository.fetchMyReviewSummary(userId);
     long count = (summary == null) ? 0L : summary.count();
     double avgRating = roundTo1Decimal(summary == null ? null : summary.averageRating());

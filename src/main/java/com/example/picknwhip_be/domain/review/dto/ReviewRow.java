@@ -11,7 +11,7 @@ public class ReviewRow {
       String option,
       int rating,
       String content,
-      LocalDateTime CreatedAt) {
+      LocalDateTime createdAt) {
     @QueryProjection
     public MyReviewRow {}
   }

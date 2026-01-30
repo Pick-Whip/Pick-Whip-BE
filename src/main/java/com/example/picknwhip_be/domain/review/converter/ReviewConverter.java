@@ -42,7 +42,7 @@ public class ReviewConverter {
               .reviewId(row.reviewId())
               .rating(row.rating())
               .content(row.content())
-              .createdDate(row.CreatedAt())
+              .createdDate(row.createdAt())
               .reply(replyByReviewId.get(row.reviewId()))
               .imageUrls(imageUrlsByReviewId.getOrDefault(row.reviewId(), List.of()))
               .build();
