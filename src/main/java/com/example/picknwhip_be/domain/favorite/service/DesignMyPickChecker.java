@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface DesignMyPickChecker {
-    Set<Long> findPickedDesignIds(Long userId, List<Long> designIds);
+  Set<Long> findPickedDesignIds(Long userId, List<Long> designIds);
 }

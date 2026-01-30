@@ -6,18 +6,18 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PopularCakeResponseDto {
-    private Integer rank;
+  private Integer rank;
 
-    private Long designId;
-    private String cakeName;
-    private String cakeImageUrl;
+  private Long designId;
+  private String cakeName;
+  private String cakeImageUrl;
 
-    private Long shopId;
-    private String shopName;
-    private Double averageRating;
-    private Integer minPrice;
+  private Long shopId;
+  private String shopName;
+  private Double averageRating;
+  private Integer minPrice;
 
-    private boolean isMyPick;
+  private boolean isMyPick;
 
-    private Long orderCount;
+  private Long orderCount;
 }

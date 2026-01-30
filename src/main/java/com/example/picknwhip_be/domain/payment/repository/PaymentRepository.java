@@ -9,14 +9,17 @@ import org.springframework.data.repository.query.Param;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    interface PopularCakeAgg {
-        Long getDesignId();
-        Long getShopId();
-        Long getOrderCount();
-    }
+  interface PopularCakeAgg {
+    Long getDesignId();
 
-    @Query(
-            value = """
+    Long getShopId();
+
+    Long getOrderCount();
+  }
+
+  @Query(
+      value =
+          """
       SELECT
         o.design_id AS designId,
         o.shop_id   AS shopId,
@@ -31,10 +34,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
       ORDER BY orderCount DESC
       LIMIT 5
       """,
-            nativeQuery = true
-    )
-    List<PopularCakeAgg> findPopularCakesTop5(
-            @Param("startAt") LocalDateTime startAt,
-            @Param("endAt") LocalDateTime endAt
-    );
+      nativeQuery = true)
+  List<PopularCakeAgg> findPopularCakesTop5(
+      @Param("startAt") LocalDateTime startAt, @Param("endAt") LocalDateTime endAt);
 }

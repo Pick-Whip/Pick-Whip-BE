@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Primary
 public class NoOpDesignMyPickChecker implements DesignMyPickChecker {
 
-    @Override
-    public Set<Long> findPickedDesignIds(Long userId, List<Long> designIds) {
-        return Collections.emptySet();
-    }
+  @Override
+  public Set<Long> findPickedDesignIds(Long userId, List<Long> designIds) {
+    return Collections.emptySet();
+  }
 }

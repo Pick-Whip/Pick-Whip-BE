@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class HomeException extends RuntimeException {
 
-    private final HomeErrorCode errorCode;
+  private final HomeErrorCode errorCode;
 
-    public HomeException(HomeErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
-    }
+  public HomeException(HomeErrorCode errorCode) {
+    super(errorCode.getMessage());
+    this.errorCode = errorCode;
+  }
 }

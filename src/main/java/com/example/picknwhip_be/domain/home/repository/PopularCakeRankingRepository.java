@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PopularCakeRankingRepository extends JpaRepository<PopularCakeRanking, Integer> {
 
-    @Query("SELECT r FROM PopularCakeRanking r " +
-            "JOIN FETCH r.design d " +
-            "JOIN FETCH r.shop s " +
-            "ORDER BY r.rank ASC")
-    List<PopularCakeRanking> findTop5WithDesignAndShop();
+  @Query(
+      "SELECT r FROM PopularCakeRanking r "
+          + "JOIN FETCH r.design d "
+          + "JOIN FETCH r.shop s "
+          + "ORDER BY r.rank ASC")
+  List<PopularCakeRanking> findTop5WithDesignAndShop();
 }

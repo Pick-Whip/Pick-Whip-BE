@@ -14,27 +14,27 @@ import lombok.*;
 @Builder
 public class PopularCakeRanking {
 
-    @Id
-    @Column(name = "rank", nullable = false)
-    private Integer rank; // 1~5
+  @Id
+  @Column(name = "rank", nullable = false)
+  private Integer rank; // 1~5
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "design_id", nullable = false)
-    private DesignGallery design;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "design_id", nullable = false)
+  private DesignGallery design;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id", nullable = false)
-    private Shop shop;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shop_id", nullable = false)
+  private Shop shop;
 
-    @Column(name = "order_count", nullable = false)
-    private Long orderCount;
+  @Column(name = "order_count", nullable = false)
+  private Long orderCount;
 
-    @Column(name = "window_start")
-    private LocalDateTime windowStart;
+  @Column(name = "window_start")
+  private LocalDateTime windowStart;
 
-    @Column(name = "window_end")
-    private LocalDateTime windowEnd;
+  @Column(name = "window_end")
+  private LocalDateTime windowEnd;
 
-    @Column(name = "calculated_at", nullable = false)
-    private LocalDateTime calculatedAt;
+  @Column(name = "calculated_at", nullable = false)
+  private LocalDateTime calculatedAt;
 }
