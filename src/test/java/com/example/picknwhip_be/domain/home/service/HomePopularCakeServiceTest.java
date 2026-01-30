@@ -15,7 +15,6 @@ import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
 import com.example.picknwhip_be.domain.home.exception.HomeException;
 import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
 import com.example.picknwhip_be.domain.home.repository.PopularCakeRankingRepository;
-import com.example.picknwhip_be.domain.home.service.serviceImpl.HomePopularCakeServiceImpl;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import java.util.List;
 import java.util.Set;
