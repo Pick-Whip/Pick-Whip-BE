@@ -1,7 +1,10 @@
 package com.example.picknwhip_be.domain.design.exception;
 
-public class DesignException extends RuntimeException {
-  public DesignException(String message) {
-    super(message);
+import com.example.picknwhip_be.global.apiPayload.code.BaseErrorCode;
+import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+
+public class DesignException extends GeneralException {
+  public DesignException(BaseErrorCode code) {
+    super(code);
   }
 }

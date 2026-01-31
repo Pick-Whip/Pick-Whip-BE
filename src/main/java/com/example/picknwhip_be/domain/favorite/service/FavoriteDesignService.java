@@ -1,6 +1,8 @@
 package com.example.picknwhip_be.domain.favorite.service;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.design.exception.DesignException;
+import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
 import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
@@ -31,7 +33,13 @@ public class FavoriteDesignService {
     DesignGallery design =
         designRepository
             .findById(designID)
-            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+
+    if(favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
+      throw new Favorite
+    }
+
+
     return null;
   }
 }
