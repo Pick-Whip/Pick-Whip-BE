@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.favorite.controller;
 
+import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
 import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteDesignService;
@@ -36,5 +37,12 @@ public class FavoriteDesignController {
     FavoriteDesignResponse result = favoriteDesignService.deleteFavoriteDesign(designId, userID);
 
     return ApiResponse.of(FavoriteSuccessCode.FAVORITE_DELETED, result);
+  }
+
+  @Operation(summary = "마이픽 디자인 목록 조회", description = "마이픽에 등록된 디자인 목록을 조회합니다")
+  @GetMapping("/me")
+  public ApiResponse<DesignResDTO.GetDesignListDTO> getFavoriteDesignList(
+      @ExtractPayload Long userID) {
+    return null;
   }
 }

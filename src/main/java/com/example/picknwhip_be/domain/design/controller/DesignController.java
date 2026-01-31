@@ -14,12 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/design")
 public class DesignController {
 
-  @GetMapping("/{userId}")
-  public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
-
-    return null;
-  }
-
   @GetMapping("/{shopId}")
   public DesignResDTO.GetDesignListDTO getDesignListByShopId(@PathVariable Long shopId) {
 
