@@ -47,6 +47,7 @@ public class CustomConverter {
                 .map(
                     item ->
                         CustomResDTO.OptionList.builder()
+                            .optionId(item.getId())
                             .category(item.getCategory())
                             .optionName(item.getOptionName())
                             .additionalPrice(item.getAdditionalPrice())

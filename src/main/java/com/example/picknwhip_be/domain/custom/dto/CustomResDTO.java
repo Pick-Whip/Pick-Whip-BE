@@ -77,6 +77,7 @@ public class CustomResDTO {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class OptionList {
+    private Long optionId;
     private OptionCategory category;
     private String optionName;
     private int additionalPrice;
