@@ -14,6 +14,7 @@ import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,47 +27,51 @@ public class FavoriteDesignService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
 
-  public FavoriteDesignResponse addFavoriteDesign(Long designID, Long userID) {
+  public FavoriteDesignResponse addFavoriteDesign(Long designId, Long userId) {
 
     User user =
         userRepository
-            .findById(userID)
+            .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     DesignGallery design =
         designRepository
-            .findById(designID)
+            .findById(designId)
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
     if (favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
       throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
     }
 
-    favoriteDesignRepository.save(
-        FavoriteDesign.builder().user(user).designGallery(design).build());
+    try {
+      favoriteDesignRepository.save(
+          FavoriteDesign.builder().user(user).designGallery(design).build());
+    } catch (DataIntegrityViolationException e) {
+      throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
+    }
 
-    return new FavoriteDesignResponse(designID, true);
+    return new FavoriteDesignResponse(designId, true);
   }
 
-  public FavoriteDesignResponse deleteFavoriteDesign(Long designID, Long userID) {
+  public FavoriteDesignResponse deleteFavoriteDesign(Long designId, Long userId) {
 
     User user =
         userRepository
-            .findById(userID)
+            .findById(userId)
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     DesignGallery design =
         designRepository
-            .findById(designID)
+            .findById(designId)
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
     FavoriteDesign favoriteDesign =
         favoriteDesignRepository
             .findByUserAndDesignGallery(user, design)
-            .orElseThrow(() -> new FavoriteException(FavoriteErrorCode.FAVORITE_NOT_FOUND));
+            .orElseThrow(() -> new FavoriteException(FavoriteErrorCode.DESIGN_NOT_FOUND));
 
     favoriteDesignRepository.delete(favoriteDesign);
 
-    return new FavoriteDesignResponse(designID, false);
+    return new FavoriteDesignResponse(designId, false);
   }
 }
