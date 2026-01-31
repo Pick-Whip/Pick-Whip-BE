@@ -1,0 +1,37 @@
+package com.example.picknwhip_be.domain.favorite.service;
+
+import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
+import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
+import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
+import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
+import com.example.picknwhip_be.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class FavoriteDesignService {
+
+  private final UserRepository userRepository;
+  private final DesignGalleryRepository designRepository;
+  private final FavoriteDesignRepository favoriteDesignRepository;
+
+  public FavoriteDesignResponse addFavoriteDesign(Long designID, Long userID) {
+
+    User user =
+        userRepository
+            .findById(userID)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+    DesignGallery design =
+        designRepository
+            .findById(designID)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    return null;
+  }
+}
