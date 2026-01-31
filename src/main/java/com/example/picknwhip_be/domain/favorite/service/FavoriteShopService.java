@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.favorite.service;
 
-import static com.example.picknwhip_be.domain.favorite.exception.code.FavoriteShopErrorCode.*;
+import static com.example.picknwhip_be.domain.favorite.exception.code.FavoriteErrorCode.*;
 
 import com.example.picknwhip_be.domain.favorite.converter.FavoriteShopConverter;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopDto;
@@ -40,9 +40,7 @@ public class FavoriteShopService {
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
-        shopRepository
-            .findById(shopId)
-            .orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
+        shopRepository.findById(shopId).orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
 
     if (favoriteShopRepository.existsByUserAndShop(user, shop)) {
       throw new FavoriteException(FAVORITE_ALREADY_EXISTS);
@@ -61,9 +59,7 @@ public class FavoriteShopService {
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
-        shopRepository
-            .findById(shopId)
-            .orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
+        shopRepository.findById(shopId).orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
 
     FavoriteShop favoriteShop =
         favoriteShopRepository

@@ -5,6 +5,9 @@ import com.example.picknwhip_be.domain.design.exception.DesignException;
 import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
 import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
+import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
+import com.example.picknwhip_be.domain.favorite.exception.FavoriteException;
+import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteErrorCode;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.exception.UserException;
@@ -35,11 +38,13 @@ public class FavoriteDesignService {
             .findById(designID)
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
-    if(favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
-      throw new Favorite
+    if (favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
+      throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
     }
 
+    favoriteDesignRepository.save(
+        FavoriteDesign.builder().user(user).designGallery(design).build());
 
-    return null;
+    return new FavoriteDesignResponse(designID, true);
   }
 }
