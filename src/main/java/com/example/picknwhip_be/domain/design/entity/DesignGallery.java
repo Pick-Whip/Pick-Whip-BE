@@ -2,6 +2,7 @@ package com.example.picknwhip_be.domain.design.entity;
 
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -34,4 +35,11 @@ public class DesignGallery {
 
   @Column(name = "description")
   private String description;
+
+  @ElementCollection
+  @CollectionTable(
+      name = "design_gallery_keywords",
+      joinColumns = @JoinColumn(name = "design_gallery_id"))
+  @Column(name = "keyword")
+  private List<String> keywords;
 }

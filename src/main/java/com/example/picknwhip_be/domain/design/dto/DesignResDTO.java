@@ -12,10 +12,18 @@ public class DesignResDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class GetDesignListDTO {
+  public static class DesignPreviewDTO {
     private String cakeName;
-    private Long price;
+    private int price;
     private List<String> keywords;
     private String imageUrl;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class GetDesignListDTO {
+    private List<DesignPreviewDTO> designs;
   }
 }
