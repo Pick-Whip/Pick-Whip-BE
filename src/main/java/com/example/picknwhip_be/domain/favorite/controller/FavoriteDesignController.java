@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "FavoriteDesign", description = "마이픽 디자인 관련 API")
 public class FavoriteDesignController {
 
-  FavoriteDesignService favoriteDesignService;
+  private final FavoriteDesignService favoriteDesignService;
 
   @Operation(summary = "마이픽 디자인 등록", description = "특정 디자인을 마이픽에 추가합니다.")
   @PostMapping("/{designId}/favorite")
@@ -33,6 +33,8 @@ public class FavoriteDesignController {
   public ApiResponse<FavoriteDesignResponse> removeFavoriteDesign(
       @PathVariable Long designId, @ExtractPayload Long userID) {
 
-    return null;
+    FavoriteDesignResponse result = favoriteDesignService.deleteFavoriteDesign(designId, userID);
+
+    return ApiResponse.of(FavoriteSuccessCode.FAVORITE_DELETED, result);
   }
 }

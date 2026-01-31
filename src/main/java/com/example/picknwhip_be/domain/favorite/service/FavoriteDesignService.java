@@ -47,4 +47,26 @@ public class FavoriteDesignService {
 
     return new FavoriteDesignResponse(designID, true);
   }
+
+  public FavoriteDesignResponse deleteFavoriteDesign(Long designID, Long userID) {
+
+    User user =
+        userRepository
+            .findById(userID)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+    DesignGallery design =
+        designRepository
+            .findById(designID)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+
+    FavoriteDesign favoriteDesign =
+        favoriteDesignRepository
+            .findByUserAndDesignGallery(user, design)
+            .orElseThrow(() -> new FavoriteException(FavoriteErrorCode.FAVORITE_NOT_FOUND));
+
+    favoriteDesignRepository.delete(favoriteDesign);
+
+    return new FavoriteDesignResponse(designID, false);
+  }
 }
