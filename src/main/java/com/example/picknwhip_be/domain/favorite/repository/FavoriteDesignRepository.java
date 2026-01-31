@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FavoriteDesignRepository extends JpaRepository<FavoriteDesign, Long> {
 
-    boolean existsByUserAndDesignGallery(User user, DesignGallery designGallery);
+  boolean existsByUserAndDesignGallery(User user, DesignGallery designGallery);
 }

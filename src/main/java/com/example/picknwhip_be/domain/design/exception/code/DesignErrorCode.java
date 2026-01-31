@@ -8,10 +8,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum DesignErrorCode implements BaseErrorCode {
+  DESIGN_NOT_FOUND(HttpStatus.NOT_FOUND, "DESIGN404_1", "해당 디자인을 찾을 수 없습니다.");
 
-    DESIGN_NOT_FOUND(HttpStatus.NOT_FOUND, "DESIGN404_1", "해당 디자인을 찾을 수 없습니다.");
-
-    private final HttpStatus status;
-    private final String code;
-    private final String message;
+  private final HttpStatus status;
+  private final String code;
+  private final String message;
 }
