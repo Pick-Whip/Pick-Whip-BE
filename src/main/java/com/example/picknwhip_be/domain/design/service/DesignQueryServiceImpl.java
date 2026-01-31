@@ -19,4 +19,11 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
     return null;
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long Id) {
+
+    return null;
+  }
 }

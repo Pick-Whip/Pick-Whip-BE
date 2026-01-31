@@ -19,4 +19,10 @@ public class DesignController {
 
     return null;
   }
+
+  @GetMapping("/{shopId}")
+  public DesignResDTO.GetDesignListDTO getDesignListByShopId(@PathVariable Long shopId) {
+
+    return null;
+  }
 }
