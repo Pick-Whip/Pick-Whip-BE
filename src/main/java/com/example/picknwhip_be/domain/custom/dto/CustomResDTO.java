@@ -40,7 +40,7 @@ public class CustomResDTO {
     private String additionalRequest;
     private String referenceImageUrl;
 
-    private List<Long> customOptionIds;
+    private List<Options> options;
     private List<Toppings> toppings;
   }
 
@@ -69,14 +69,14 @@ public class CustomResDTO {
   public static class GetDesignOptionDTO {
     private Long shopId;
     private List<String> cakeSizes;
-    private List<OptionList> customOptions;
+    private List<Options> customOptions;
   }
 
   @Builder
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class OptionList {
+  public static class Options {
     private Long optionId;
     private OptionCategory category;
     private String optionName;

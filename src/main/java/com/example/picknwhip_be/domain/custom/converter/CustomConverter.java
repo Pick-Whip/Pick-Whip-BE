@@ -46,7 +46,7 @@ public class CustomConverter {
             customOptions.stream()
                 .map(
                     item ->
-                        CustomResDTO.OptionList.builder()
+                        CustomResDTO.Options.builder()
                             .optionId(item.getId())
                             .category(item.getCategory())
                             .optionName(item.getOptionName())
