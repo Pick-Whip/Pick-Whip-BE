@@ -20,14 +20,22 @@ public class DesignController {
 
   private final DesignQueryService designQueryService;
 
-  @Operation(summary = "가게 디자인갤러리 조회 API",description = "특정 가게의 디자인갤러리 목록을 조회합니다.")
+  @Operation(summary = "가게 디자인갤러리 조회 API", description = "특정 가게의 디자인갤러리 목록을 조회합니다.")
   @GetMapping("/{shopId}")
-  public ApiResponse<DesignResDTO.GetDesignListDTO> getDesignListByShopId(@PathVariable Long shopId) {
+  public ApiResponse<DesignResDTO.GetDesignListDTO> getDesignListByShopId(
+      @PathVariable Long shopId) {
 
     DesignResDTO.GetDesignListDTO result = designQueryService.findDesignListByShopId(shopId);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
-  public ApiResponse<>
+  @Operation(summary = "디자인갤러리 상세조회 API", description = "design_id로 디자인 상세정보를 조회합니다.")
+  @GetMapping("/{designId}")
+  public ApiResponse<DesignResDTO.GetDesignDetailDTO> getDesignDetail(@PathVariable Long designId) {
+
+    DesignResDTO.GetDesignDetailDTO result = null;
+
+    return null;
+  }
 }

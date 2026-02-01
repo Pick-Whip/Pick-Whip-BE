@@ -8,12 +8,10 @@ import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
-import java.util.List;
-
-import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +41,9 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   @Transactional(readOnly = true)
   public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long ShopId) {
 
-    shopRepository.findById(ShopId).orElseThrow(()-> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
+    shopRepository
+        .findById(ShopId)
+        .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
 
     List<DesignGallery> designs = designRepository.findByShopId(ShopId);
 
@@ -52,5 +52,17 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     }
 
     return DesignConverter.toDesignListDTO(designs);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long DesignId) {
+
+    DesignGallery design =
+        designRepository
+            .findById(DesignId)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+
+    return null;
   }
 }

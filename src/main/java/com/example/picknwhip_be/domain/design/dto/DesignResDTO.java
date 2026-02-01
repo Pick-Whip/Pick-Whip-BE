@@ -1,8 +1,9 @@
 package com.example.picknwhip_be.domain.design.dto;
 
-import java.util.List;
-
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,13 +37,15 @@ public class DesignResDTO {
   public static class GetDesignDetailDTO {
     private String cakeName;
     private int price;
-    private List<String> keywords;
     private String imageUrl;
     private String allergyInfo;
     private String description;
+    private String letteringText;
+    private LetteringLineCount letteringLineCount;
+    private LetteringAlignment letteringAlignment;
+
+    private List<String> keywords;
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
   }
-
-
 }
