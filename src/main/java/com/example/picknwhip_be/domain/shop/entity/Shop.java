@@ -35,6 +35,9 @@ public class Shop {
   @Column(nullable = false)
   private String phone;
 
+  @Column(name = "address", nullable = false)
+  private String address;
+
   @Column(columnDefinition = "POINT SRID 4326", nullable = false)
   private Point location;
 
@@ -97,10 +100,11 @@ public class Shop {
   @Builder.Default
   private List<FavoriteShop> favoriteShops = new ArrayList<>();
 
-  public Shop(User owner, String shopName, String phone, Point location) {
+  public Shop(User owner, String shopName, String phone,String address, Point location) {
     this.owner = owner;
     this.shopName = shopName;
     this.phone = phone;
+    this.address = address;
     this.location = location;
   }
 }
