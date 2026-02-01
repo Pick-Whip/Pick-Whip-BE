@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ public class ShopConverter {
 
   private final ObjectMapper objectMapper;
 
-  public ShopPreviewResponseDto toPreviewDto(ShopRepository.ShopPreviewInfo info) {
+  public ShopPreviewResponseDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
 
     List<String> tagList = Collections.emptyList();
     String rawTags = info.getTags();
@@ -35,7 +35,7 @@ public class ShopConverter {
       }
     }
 
-    return ShopPreviewResponseDto.builder()
+    return ShopPreviewResponseDTO.builder()
         .shopId(info.getShopId())
         .shopName(info.getShopName())
         .shopImageUrl(info.getShopImageUrl())

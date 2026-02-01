@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.shop.service;
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -22,7 +22,7 @@ public class ShopServiceImpl implements ShopService {
     private final ShopConverter shopConverter;
 
     @Override
-    public List<ShopPreviewResponseDto> getNearbyShops(double lat, double lon, double radius) {
+    public List<ShopPreviewResponseDTO> getNearbyShops(double lat, double lon, double radius) {
         validateCoordinate(lat, lon);
 
         if (radius < 0.0 || radius > MAX_RADIUS_M) {

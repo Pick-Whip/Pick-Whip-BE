@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class FavoriteShopDto {
+public class FavoriteShopDTO {
   private Long favoriteId; // 찜 ID
   private Long shopId; // 가게 ID
   private String shopName;

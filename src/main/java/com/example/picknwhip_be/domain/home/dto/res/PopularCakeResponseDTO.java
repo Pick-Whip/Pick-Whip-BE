@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PopularCakeResponseDto {
+public class PopularCakeResponseDTO {
   private Integer rank;
 
   private Long designId;

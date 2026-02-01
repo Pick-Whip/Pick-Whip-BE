@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.favorite.controller;
 
-import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
+import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponseDTO;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteDesignService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
@@ -20,20 +20,20 @@ public class FavoriteDesignController {
 
   @Operation(summary = "마이픽 디자인 등록", description = "특정 디자인을 마이픽에 추가합니다.")
   @PostMapping("/{designId}/favorite")
-  public ApiResponse<FavoriteDesignResponse> addFavoriteDesign(
+  public ApiResponse<FavoriteDesignResponseDTO> addFavoriteDesign(
       @PathVariable Long designId, @ExtractPayload Long userID) {
 
-    FavoriteDesignResponse result = favoriteDesignService.addFavoriteDesign(designId, userID);
+    FavoriteDesignResponseDTO result = favoriteDesignService.addFavoriteDesign(designId, userID);
 
     return ApiResponse.of(FavoriteSuccessCode.FAVORITE_CREATED, result);
   }
 
   @Operation(summary = "마이픽 디자인 취소", description = "마이픽에 등록된 디자인을 삭제합니다.")
   @DeleteMapping("/{designId}/favorite")
-  public ApiResponse<FavoriteDesignResponse> removeFavoriteDesign(
+  public ApiResponse<FavoriteDesignResponseDTO> removeFavoriteDesign(
       @PathVariable Long designId, @ExtractPayload Long userID) {
 
-    FavoriteDesignResponse result = favoriteDesignService.deleteFavoriteDesign(designId, userID);
+    FavoriteDesignResponseDTO result = favoriteDesignService.deleteFavoriteDesign(designId, userID);
 
     return ApiResponse.of(FavoriteSuccessCode.FAVORITE_DELETED, result);
   }

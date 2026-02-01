@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ShopPreviewResponseDto {
+public class ShopPreviewResponseDTO {
   private Long shopId;
   private String shopName;
   private String shopImageUrl;

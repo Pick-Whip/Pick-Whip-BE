@@ -1,8 +1,8 @@
 package com.example.picknwhip_be.domain.favorite.converter;
 
-import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopDto;
-import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponse;
-import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponse;
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopDTO;
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponseDTO;
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponseDTO;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
 import java.util.List;
 
@@ -10,12 +10,12 @@ public class FavoriteShopConverter {
 
   private FavoriteShopConverter() {}
 
-  public static FavoriteShopResponse toResponse(Long shopId, boolean isFavorited) {
-    return new FavoriteShopResponse(shopId, isFavorited);
+  public static FavoriteShopResponseDTO toResponse(Long shopId, boolean isFavorited) {
+    return new FavoriteShopResponseDTO(shopId, isFavorited);
   }
 
-  public static FavoriteShopDto toDto(FavoriteShop favoriteShop) {
-    return FavoriteShopDto.builder()
+  public static FavoriteShopDTO toDto(FavoriteShop favoriteShop) {
+    return FavoriteShopDTO.builder()
         .favoriteId(favoriteShop.getId())
         .shopId(favoriteShop.getShop().getId())
         .shopName(favoriteShop.getShop().getShopName())
@@ -29,9 +29,9 @@ public class FavoriteShopConverter {
         .build();
   }
 
-  public static FavoriteShopListResponse toListResponse(
-      List<FavoriteShopDto> shopList, Long nextCursor, boolean hasNext) {
-    return FavoriteShopListResponse.builder()
+  public static FavoriteShopListResponseDTO toListResponse(
+          List<FavoriteShopDTO> shopList, Long nextCursor, boolean hasNext) {
+    return FavoriteShopListResponseDTO.builder()
         .shopList(shopList)
         .nextCursor(nextCursor)
         .hasNext(hasNext)

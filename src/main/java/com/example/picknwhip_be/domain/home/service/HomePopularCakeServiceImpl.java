@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.home.service;
 
 import com.example.picknwhip_be.domain.favorite.service.DesignMyPickChecker;
-import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResponseDto;
+import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResponseDTO;
 import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
 import com.example.picknwhip_be.domain.home.exception.HomeException;
 import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
@@ -22,7 +22,7 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<PopularCakeResponseDto> getPopularCakesTop5(Long userId) {
+  public List<PopularCakeResponseDTO> getPopularCakesTop5(Long userId) {
 
     List<PopularCakeRanking> rankings = rankingRepository.findTop5WithDesignAndShop();
 
@@ -40,7 +40,7 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
     return rankings.stream()
         .map(
             r ->
-                PopularCakeResponseDto.builder()
+                PopularCakeResponseDTO.builder()
                     .rank(r.getRanking())
                     .designId(r.getDesign().getId())
                     .cakeName(r.getDesign().getDesignName())
