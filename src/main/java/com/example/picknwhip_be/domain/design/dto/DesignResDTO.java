@@ -1,6 +1,8 @@
 package com.example.picknwhip_be.domain.design.dto;
 
 import java.util.List;
+
+import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,8 +40,8 @@ public class DesignResDTO {
     private String imageUrl;
     private String allergyInfo;
     private String description;
-    private List<>
-
+    private List<CustomResDTO.Topping> toppings;
+    private List<CustomResDTO.Option> options;
   }
 
 

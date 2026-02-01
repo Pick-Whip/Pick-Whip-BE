@@ -42,14 +42,14 @@ public class CustomResDTO {
     private String referenceImageUrl;
 
     private List<Long> customOptionIds;
-    private List<Toppings> toppings;
+    private List<Topping> toppings;
   }
 
   @Builder
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class Toppings {
+  public static class Topping {
     private Long optionId;
     private String name;
     private double x;
@@ -60,8 +60,17 @@ public class CustomResDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class Option {
+    private Long optionId;
+    private OptionCategory category;
+    private String name;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class DeleteDraftDTO {
     private Long draftId;
-    private OptionCategory category;
-    private String name;  }
+  }
 }
