@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.favorite.controller;
 
 import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.DesignQueryService;
 import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteDesignService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class FavoriteDesignController {
 
   private final FavoriteDesignService favoriteDesignService;
+  private final DesignQueryService designQueryService;
 
   @Operation(summary = "마이픽 디자인 등록", description = "특정 디자인을 마이픽에 추가합니다.")
   @PostMapping("/{designId}/favorite")
@@ -43,6 +45,9 @@ public class FavoriteDesignController {
   @GetMapping("/me")
   public ApiResponse<DesignResDTO.GetDesignListDTO> getFavoriteDesignList(
       @ExtractPayload Long userID) {
-    return null;
+
+    DesignResDTO.GetDesignListDTO result = designQueryService.findDesignListByUserId(userID);
+
+    return ApiResponse.of(FavoriteSuccessCode.FAVORITE_DESIGN_LIST_FETCHED, result);
   }
 }

@@ -1,6 +1,8 @@
 package com.example.picknwhip_be.domain.design.service;
 
+import com.example.picknwhip_be.domain.design.converter.DesignConverter;
 import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
+import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
@@ -23,7 +25,10 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
     List<FavoriteDesign> favoriteDesigns = favoriteDesignRepository.findAllByUserId(UserId);
 
-    return null;
+    List<DesignGallery> designs =
+        favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
+
+    return DesignConverter.toDesignListDTO(designs);
   }
 
   @Override
