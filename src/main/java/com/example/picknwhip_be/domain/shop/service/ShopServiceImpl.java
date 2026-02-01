@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.shop.service;
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResponseDTO;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -45,6 +46,15 @@ public class ShopServiceImpl implements ShopService {
             // 실제 운영 시엔 e.printStackTrace() 대신 로그(log.error)를 남겨야 함
             throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
         }
+    }
+    @Override
+    public ShopDetailResponseDTO getShopDetail(Long shopId, double lat, double lon) {
+        validateCoordinate(lat, lon);
+
+        // Repository에서 Native Query로 한 번에 조회
+        return shopRepository.findShopDetailById(shopId, lat, lon)
+                .map(shopConverter::toDetailDto)
+                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
     }
     private void validateCoordinate(double lat, double lon) {
         if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
