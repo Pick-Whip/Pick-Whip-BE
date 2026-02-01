@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.design.entity;
 
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import jakarta.persistence.*;
 import java.util.List;
@@ -35,6 +37,19 @@ public class DesignGallery {
 
   @Column(name = "description")
   private String description;
+
+  @Column(name = "lettering_text", length = 30)
+  private String letteringText;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "lettering_line_count")
+  private LetteringLineCount letteringLineCount;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "lettering_alignment")
+  private LetteringAlignment letteringAlignment;
+
+
 
   @ElementCollection
   @CollectionTable(
