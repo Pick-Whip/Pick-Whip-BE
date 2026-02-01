@@ -4,6 +4,8 @@ import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import lombok.*;
 
 public class CustomResDTO {
@@ -49,6 +51,7 @@ public class CustomResDTO {
   @AllArgsConstructor
   public static class Toppings {
     private Long optionId;
+    private String name;
     private double x;
     private double y;
   }
@@ -59,5 +62,6 @@ public class CustomResDTO {
   @AllArgsConstructor
   public static class DeleteDraftDTO {
     private Long draftId;
-  }
+    private OptionCategory category;
+    private String name;  }
 }

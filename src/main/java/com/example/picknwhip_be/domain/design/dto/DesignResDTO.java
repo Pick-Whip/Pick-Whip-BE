@@ -26,4 +26,21 @@ public class DesignResDTO {
   public static class GetDesignListDTO {
     private List<DesignPreviewDTO> designs;
   }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class GetDesignDetailDTO {
+    private String cakeName;
+    private int price;
+    private List<String> keywords;
+    private String imageUrl;
+    private String allergyInfo;
+    private String description;
+    private List<>
+
+  }
+
+
 }

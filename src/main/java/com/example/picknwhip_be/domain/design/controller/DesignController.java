@@ -1,6 +1,10 @@
 package com.example.picknwhip_be.domain.design.controller;
 
 import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.DesignQueryService;
+import com.example.picknwhip_be.global.apiPayload.ApiResponse;
+import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/design")
 public class DesignController {
 
-  @GetMapping("/{shopId}")
-  public DesignResDTO.GetDesignListDTO getDesignListByShopId(@PathVariable Long shopId) {
+  private final DesignQueryService designQueryService;
 
-    return null;
+  @Operation(summary = "가게 디자인갤러리 조회 API",description = "특정 가게의 디자인갤러리 목록을 조회합니다.")
+  @GetMapping("/{shopId}")
+  public ApiResponse<DesignResDTO.GetDesignListDTO> getDesignListByShopId(@PathVariable Long shopId) {
+
+    DesignResDTO.GetDesignListDTO result = designQueryService.findDesignListByShopId(shopId);
+
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
+
+  public ApiResponse<>
 }
