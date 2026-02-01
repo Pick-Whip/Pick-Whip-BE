@@ -61,4 +61,13 @@ public class CustomController {
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
+
+  @Operation(summary = "가게 커스텀 가능 옵션 조회", description = "특정 가게의 커스텀 가능한 옵션을 조회합니다.")
+  @GetMapping("/{shopId}")
+  public ApiResponse<CustomResDTO.GetDesignOptionDTO> getDesignOption(
+      @Parameter(description = "조회할 가게 ID", required = true) @PathVariable Long shopId) {
+    CustomResDTO.GetDesignOptionDTO result = customQueryService.findDesignOption(shopId);
+
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 }

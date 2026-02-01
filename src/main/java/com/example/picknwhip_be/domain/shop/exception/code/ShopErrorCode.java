@@ -14,8 +14,11 @@ public enum ShopErrorCode implements BaseErrorCode {
   SHOP_NEARBY_QUERY_FAILED(
       HttpStatus.INTERNAL_SERVER_ERROR, "SHOP500_3", "주변 가게 조회 중 서버 오류가 발생했습니다."),
 
-  CAKE_SIZE_NOT_FOUND(HttpStatus.NOT_FOUND, "CAKESIZE404_1", "해당 사이즈를 찾을 수 없습니다.");
+  CAKE_SIZE_NOT_FOUND(HttpStatus.NOT_FOUND, "CAKESIZE404_1", "해당 사이즈를 찾을 수 없습니다."),
 
+  CAKE_SIZE_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "SIZEINFO404_1", "해당 매장의 사이즈 정보를 찾을 수 없습니다."),
+  CUSTOMOPTION_INFO_NOT_FOUND(
+      HttpStatus.NOT_FOUND, "OPTIONINFO404_1", "해당 매장의 커스텀 옵션 정보를 찾을 수 없습니다.");
   private final HttpStatus status;
   private final String code;
   private final String message;
