@@ -2,10 +2,9 @@ package com.example.picknwhip_be.domain.custom.dto;
 
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
+import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import lombok.*;
 
 public class CustomResDTO {

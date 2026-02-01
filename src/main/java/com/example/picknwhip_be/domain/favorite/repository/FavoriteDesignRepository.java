@@ -13,7 +13,7 @@ public interface FavoriteDesignRepository extends JpaRepository<FavoriteDesign, 
 
   @Query(
       "SELECT fd FROM FavoriteDesign fd JOIN FETCH fd.designGallery WHERE fd.user.userId = :userId")
-  List<FavoriteDesign> findAllByUserId(@Param("userId") Long UserId);
+  List<FavoriteDesign> findAllByUserId(@Param("userId") Long userId);
 
   boolean existsByUserAndDesignGallery(User user, DesignGallery designGallery);
 

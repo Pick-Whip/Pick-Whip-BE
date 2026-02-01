@@ -24,6 +24,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
+  private final DesignGalleryRepository designGalleryRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -56,13 +57,13 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
   @Override
   @Transactional(readOnly = true)
-  public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long DesignId) {
+  public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId) {
 
     DesignGallery design =
         designRepository
-            .findById(DesignId)
+            .findById(designId)
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
-    return null;
+    return DesignConverter.toDesignDetailDTO(design);
   }
 }

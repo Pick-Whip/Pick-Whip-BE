@@ -36,6 +36,7 @@ public class DesignResDTO {
   @AllArgsConstructor
   public static class GetDesignDetailDTO {
     private String cakeName;
+    private String cakeSize;
     private int price;
     private String imageUrl;
     private String allergyInfo;
@@ -43,8 +44,8 @@ public class DesignResDTO {
     private String letteringText;
     private LetteringLineCount letteringLineCount;
     private LetteringAlignment letteringAlignment;
-
     private List<String> keywords;
+
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
   }
