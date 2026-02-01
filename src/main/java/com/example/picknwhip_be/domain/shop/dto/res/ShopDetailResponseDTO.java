@@ -12,7 +12,7 @@ public class ShopDetailResponseDTO {
   private String shopImageUrl;
   private Double averageRating;
   private Integer reviewCount;
-  private String distance;
+  private Double distance;
   private String address;
   private String phone;
   private List<String> keywords;

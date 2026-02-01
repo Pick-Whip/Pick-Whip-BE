@@ -46,8 +46,7 @@ public class ShopConverter {
   }
 
   public ShopDetailResponseDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
-    // 미터(m)를 킬로미터(km)로 변환 (소수점 1자리)
-    String distanceStr = String.format("%.1fkm", info.getDistance() / 1000.0);
+    Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
     return ShopDetailResponseDTO.builder()
         .shopId(info.getShopId())
@@ -55,7 +54,7 @@ public class ShopConverter {
         .shopImageUrl(info.getShopImageUrl())
         .averageRating(info.getAverageRating())
         .reviewCount(info.getReviewCount())
-        .distance(distanceStr)
+        .distance(distanceInKm)
         .address(info.getAddress())
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
