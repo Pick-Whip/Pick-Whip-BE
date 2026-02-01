@@ -100,7 +100,7 @@ public class Shop {
   @Builder.Default
   private List<FavoriteShop> favoriteShops = new ArrayList<>();
 
-  public Shop(User owner, String shopName, String phone,String address, Point location) {
+  public Shop(User owner, String shopName, String phone, String address, Point location) {
     this.owner = owner;
     this.shopName = shopName;
     this.phone = phone;

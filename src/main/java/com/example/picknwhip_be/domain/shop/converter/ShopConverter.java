@@ -15,50 +15,50 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ShopConverter {
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    private List<String> parseTags(String rawTags) {
-        if (rawTags == null || rawTags.isBlank()) {
-            return Collections.emptyList();
-        }
-        try {
-            List<String> tagList = objectMapper.readValue(rawTags, new TypeReference<List<String>>() {});
-            return tagList.stream()
-                    .filter(Objects::nonNull)
-                    .map(String::trim)
-                    .filter(s -> !s.isBlank())
-                    .toList();
-        } catch (Exception ignored) {
-            return Collections.emptyList();
-        }
+  private List<String> parseTags(String rawTags) {
+    if (rawTags == null || rawTags.isBlank()) {
+      return Collections.emptyList();
     }
-
-    public ShopPreviewResponseDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
-        return ShopPreviewResponseDTO.builder()
-                .shopId(info.getShopId())
-                .shopName(info.getShopName())
-                .shopImageUrl(info.getShopImageUrl())
-                .averageRating(info.getAverageRating())
-                .minPrice(info.getMinPrice())
-                .distance(info.getDistance())
-                .tags(parseTags(info.getTags()))
-                .build();
+    try {
+      List<String> tagList = objectMapper.readValue(rawTags, new TypeReference<List<String>>() {});
+      return tagList.stream()
+          .filter(Objects::nonNull)
+          .map(String::trim)
+          .filter(s -> !s.isBlank())
+          .toList();
+    } catch (Exception ignored) {
+      return Collections.emptyList();
     }
+  }
 
-    public ShopDetailResponseDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
-        // 미터(m)를 킬로미터(km)로 변환 (소수점 1자리)
-        String distanceStr = String.format("%.1fkm", info.getDistance() / 1000.0);
+  public ShopPreviewResponseDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
+    return ShopPreviewResponseDTO.builder()
+        .shopId(info.getShopId())
+        .shopName(info.getShopName())
+        .shopImageUrl(info.getShopImageUrl())
+        .averageRating(info.getAverageRating())
+        .minPrice(info.getMinPrice())
+        .distance(info.getDistance())
+        .tags(parseTags(info.getTags()))
+        .build();
+  }
 
-        return ShopDetailResponseDTO.builder()
-                .shopId(info.getShopId())
-                .shopName(info.getShopName())
-                .shopImageUrl(info.getShopImageUrl())
-                .averageRating(info.getAverageRating())
-                .reviewCount(info.getReviewCount())
-                .distance(distanceStr)
-                .address(info.getAddress())
-                .phone(info.getPhone())
-                .keywords(parseTags(info.getKeywords()))
-                .build();
-    }
+  public ShopDetailResponseDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
+    // 미터(m)를 킬로미터(km)로 변환 (소수점 1자리)
+    String distanceStr = String.format("%.1fkm", info.getDistance() / 1000.0);
+
+    return ShopDetailResponseDTO.builder()
+        .shopId(info.getShopId())
+        .shopName(info.getShopName())
+        .shopImageUrl(info.getShopImageUrl())
+        .averageRating(info.getAverageRating())
+        .reviewCount(info.getReviewCount())
+        .distance(distanceStr)
+        .address(info.getAddress())
+        .phone(info.getPhone())
+        .keywords(parseTags(info.getKeywords()))
+        .build();
+  }
 }

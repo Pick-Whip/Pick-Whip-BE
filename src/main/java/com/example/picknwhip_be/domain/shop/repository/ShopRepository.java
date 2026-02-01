@@ -3,7 +3,6 @@ package com.example.picknwhip_be.domain.shop.repository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,18 +24,27 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     String getTags();
   }
-    // 상세 조회용
-    interface ShopDetailInfo {
-        Long getShopId();
-        String getShopName();
-        String getShopImageUrl();
-        Double getAverageRating();
-        Integer getReviewCount();
-        Double getDistance();
-        String getAddress();
-        String getPhone();
-        String getKeywords();
-    }
+
+  // 상세 조회용
+  interface ShopDetailInfo {
+    Long getShopId();
+
+    String getShopName();
+
+    String getShopImageUrl();
+
+    Double getAverageRating();
+
+    Integer getReviewCount();
+
+    Double getDistance();
+
+    String getAddress();
+
+    String getPhone();
+
+    String getKeywords();
+  }
 
   @Query(
       value =
@@ -87,8 +95,10 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
       @Param("radius") double radius,
       @Param("limit") int limit);
 
-    // 가게 상세 조회
-    @Query(value = """
+  // 가게 상세 조회
+  @Query(
+      value =
+          """
       SELECT s.shop_id as shopId,
              s.shop_name as shopName,
              s.shop_image_url as shopImageUrl,
@@ -106,8 +116,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
       ) kt ON s.shop_id = kt.shop_id
       WHERE s.shop_id = :shopId AND s.status = 'ACTIVE'
       GROUP BY s.shop_id
-      """, nativeQuery = true)
-    Optional<ShopDetailInfo> findShopDetailById(@Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
+      """,
+      nativeQuery = true)
+  Optional<ShopDetailInfo> findShopDetailById(
+      @Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
 }
-
-

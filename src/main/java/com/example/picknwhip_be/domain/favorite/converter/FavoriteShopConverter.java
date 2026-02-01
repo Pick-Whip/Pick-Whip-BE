@@ -30,7 +30,7 @@ public class FavoriteShopConverter {
   }
 
   public static FavoriteShopListResponseDTO toListResponse(
-          List<FavoriteShopDTO> shopList, Long nextCursor, boolean hasNext) {
+      List<FavoriteShopDTO> shopList, Long nextCursor, boolean hasNext) {
     return FavoriteShopListResponseDTO.builder()
         .shopList(shopList)
         .nextCursor(nextCursor)

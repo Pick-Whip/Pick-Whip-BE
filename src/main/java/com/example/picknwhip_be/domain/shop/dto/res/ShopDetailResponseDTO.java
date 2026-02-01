@@ -7,13 +7,13 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ShopDetailResponseDTO {
-    private Long shopId;
-    private String shopName;
-    private String shopImageUrl;
-    private Double averageRating;
-    private Integer reviewCount;
-    private String distance;
-    private String address;
-    private String phone;
-    private List<String> keywords;
+  private Long shopId;
+  private String shopName;
+  private String shopImageUrl;
+  private Double averageRating;
+  private Integer reviewCount;
+  private String distance;
+  private String address;
+  private String phone;
+  private List<String> keywords;
 }
