@@ -1,13 +1,13 @@
 package com.example.picknwhip_be.domain.favorite.service;
 
-import static com.example.picknwhip_be.domain.favorite.exception.code.FavoriteShopErrorCode.*;
+import static com.example.picknwhip_be.domain.favorite.exception.code.FavoriteErrorCode.*;
 
 import com.example.picknwhip_be.domain.favorite.converter.FavoriteShopConverter;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopDto;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponse;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponse;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
-import com.example.picknwhip_be.domain.favorite.exception.FavoriteShopException;
+import com.example.picknwhip_be.domain.favorite.exception.FavoriteException;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -40,12 +40,10 @@ public class FavoriteShopService {
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
-        shopRepository
-            .findById(shopId)
-            .orElseThrow(() -> new FavoriteShopException(SHOP_NOT_FOUND));
+        shopRepository.findById(shopId).orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
 
     if (favoriteShopRepository.existsByUserAndShop(user, shop)) {
-      throw new FavoriteShopException(FAVORITE_ALREADY_EXISTS);
+      throw new FavoriteException(FAVORITE_ALREADY_EXISTS);
     }
 
     favoriteShopRepository.save(FavoriteShop.create(user, shop));
@@ -61,14 +59,12 @@ public class FavoriteShopService {
             .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
     Shop shop =
-        shopRepository
-            .findById(shopId)
-            .orElseThrow(() -> new FavoriteShopException(SHOP_NOT_FOUND));
+        shopRepository.findById(shopId).orElseThrow(() -> new FavoriteException(SHOP_NOT_FOUND));
 
     FavoriteShop favoriteShop =
         favoriteShopRepository
             .findByUserAndShop(user, shop)
-            .orElseThrow(() -> new FavoriteShopException(FAVORITE_NOT_FOUND));
+            .orElseThrow(() -> new FavoriteException(FAVORITE_NOT_FOUND));
 
     favoriteShopRepository.delete(favoriteShop);
 
@@ -80,7 +76,7 @@ public class FavoriteShopService {
   public FavoriteShopListResponse getMyPickShops(Long userId, Long cursor, int limit) {
     // limit 파라미터 유효성 검사 (0 이하일 경우 400 에러 발생)
     if (limit <= 0) {
-      throw new FavoriteShopException(INVALID_PAGE_SIZE);
+      throw new FavoriteException(INVALID_PAGE_SIZE);
     }
     // 유저 검증
     if (!userRepository.existsById(userId)) {

@@ -2,7 +2,7 @@ package com.example.picknwhip_be.domain.favorite.controller;
 
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponse;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponse;
-import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteShopSuccessCode;
+import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
@@ -28,7 +28,7 @@ public class FavoriteShopController {
       @PathVariable Long shopId, @ExtractPayload Long userId) {
     FavoriteShopResponse result = favoriteShopService.addFavoriteShop(userId, shopId);
 
-    return ApiResponse.of(FavoriteShopSuccessCode.FAVORITE_CREATED, result);
+    return ApiResponse.of(FavoriteSuccessCode.FAVORITE_CREATED, result);
   }
 
   @Operation(summary = "마이픽 가게 취소", description = "마이픽에 등록된 가게를 삭제합니다.")
@@ -37,7 +37,7 @@ public class FavoriteShopController {
       @PathVariable Long shopId, @ExtractPayload Long userId) {
     FavoriteShopResponse result = favoriteShopService.removeFavoriteShop(userId, shopId);
 
-    return ApiResponse.of(FavoriteShopSuccessCode.FAVORITE_DELETED, result);
+    return ApiResponse.of(FavoriteSuccessCode.FAVORITE_DELETED, result);
   }
 
   @Operation(summary = "마이픽 가게 목록 조회", description = "커서 페이징을 적용하여 찜한 가게 목록을 조회합니다.")
@@ -51,6 +51,6 @@ public class FavoriteShopController {
           @RequestParam(defaultValue = "10")
           Integer limit) {
     FavoriteShopListResponse result = favoriteShopService.getMyPickShops(userId, cursor, limit);
-    return ApiResponse.of(FavoriteShopSuccessCode.FAVORITE_LIST_FETCHED, result);
+    return ApiResponse.of(FavoriteSuccessCode.FAVORITE_LIST_FETCHED, result);
   }
 }
