@@ -59,10 +59,10 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   @Transactional(readOnly = true)
   public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId) {
 
-    DesignGallery design =
-        designRepository
-            .findById(designId)
-            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+    DesignGallery design = designRepository.findDesignGalleryById(designId);
+    if (design == null) {
+      throw new DesignException(DesignErrorCode.DESIGN_NOT_FOUND);
+    }
 
     return DesignConverter.toDesignDetailDTO(design);
   }
