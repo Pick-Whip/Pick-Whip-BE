@@ -1,7 +1,9 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
+import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
+import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -26,5 +28,14 @@ public class ShopController {
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {
     return ResponseEntity.ok(shopService.getNearbyShops(lat, lon, radius));
+  }
+
+  public ApiResponse<ShopResDTO.ShopInMapListDTO> getShopOnMapList(
+      @RequestParam Double lowLat,
+      @RequestParam Double highLat,
+      @RequestParam Double lowLon,
+      @RequestParam Double highLon) {
+
+    return null;
   }
 }

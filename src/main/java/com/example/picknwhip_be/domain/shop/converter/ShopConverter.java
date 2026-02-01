@@ -1,6 +1,8 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
+import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +45,22 @@ public class ShopConverter {
         .minPrice(info.getMinPrice())
         .distance(info.getDistance())
         .tags(tagList)
+        .build();
+  }
+
+  public ShopResDTO.ShopInMapListDTO toShopInMapListDTO(List<Shop> shop) {
+    return ShopResDTO.ShopInMapListDTO.builder()
+        .shops(
+            shop.stream()
+                .map(
+                    item ->
+                        ShopResDTO.ShopInMap.builder()
+                            .shopId(item.getId())
+                            .shopName(item.getShopName())
+                            .latitude(item.getLocation().getX())
+                            .longitude(item.getLocation().getY())
+                            .build())
+                .toList())
         .build();
   }
 }
