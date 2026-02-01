@@ -64,5 +64,6 @@ public class DesignGallery {
   private List<String> keywords;
 
   @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
   private List<DesignOption> options = new ArrayList<>();
 }

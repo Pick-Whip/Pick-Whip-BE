@@ -3,7 +3,10 @@ package com.example.picknwhip_be.domain.design.converter;
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DesignConverter {
 
@@ -26,6 +29,35 @@ public class DesignConverter {
   }
 
   public static DesignResDTO.GetDesignDetailDTO toDesignDetailDTO(DesignGallery design) {
+
+    List<DesignOption> rawOptions = design.getOptions() != null ? design.getOptions() : List.of();
+
+    Map<Boolean, List<DesignOption>> partitionedOptions =
+        rawOptions.stream().collect(Collectors.partitioningBy(item -> item.getPositionX() != null));
+
+    List<CustomResDTO.Topping> toppings =
+        partitionedOptions.get(true).stream()
+            .map(
+                item ->
+                    CustomResDTO.Topping.builder()
+                        .optionId(item.getCustomOption().getId())
+                        .name(item.getCustomOption().getOptionName())
+                        .x(item.getPositionX())
+                        .y(item.getPositionY())
+                        .build())
+            .toList();
+
+    List<CustomResDTO.Option> options =
+        partitionedOptions.get(false).stream()
+            .map(
+                item ->
+                    CustomResDTO.Option.builder()
+                        .optionId(item.getCustomOption().getId())
+                        .name(item.getCustomOption().getOptionName())
+                        .category(item.getCustomOption().getCategory())
+                        .build())
+            .toList();
+
     return DesignResDTO.GetDesignDetailDTO.builder()
         .cakeName(design.getDesignName())
         .cakeSize(design.getShopCakeSize().getSizeName())
@@ -37,29 +69,8 @@ public class DesignConverter {
         .letteringAlignment(design.getLetteringAlignment())
         .letteringLineCount(design.getLetteringLineCount())
         .keywords(design.getKeywords())
-        .toppings(
-            design.getOptions().stream()
-                .filter(item -> item.getPositionX() != null)
-                .map(
-                    item ->
-                        CustomResDTO.Topping.builder()
-                            .optionId(item.getCustomOption().getId())
-                            .name(item.getCustomOption().getOptionName())
-                            .x(item.getPositionX())
-                            .y(item.getPositionY())
-                            .build())
-                .toList())
-        .options(
-            design.getOptions().stream()
-                .filter(item -> item.getPositionX() == null)
-                .map(
-                    item ->
-                        CustomResDTO.Option.builder()
-                            .optionId(item.getCustomOption().getId())
-                            .name(item.getCustomOption().getOptionName())
-                            .category(item.getCustomOption().getCategory())
-                            .build())
-                .toList())
+        .toppings(toppings)
+        .options(options)
         .build();
   }
 }

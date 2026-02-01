@@ -24,13 +24,12 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
-  private final DesignGalleryRepository designGalleryRepository;
 
   @Override
   @Transactional(readOnly = true)
-  public DesignResDTO.GetDesignListDTO findDesignListByUserId(Long UserId) {
+  public DesignResDTO.GetDesignListDTO findDesignListByUserId(Long userId) {
 
-    List<FavoriteDesign> favoriteDesigns = favoriteDesignRepository.findAllByUserId(UserId);
+    List<FavoriteDesign> favoriteDesigns = favoriteDesignRepository.findAllByUserId(userId);
 
     List<DesignGallery> designs =
         favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
@@ -40,13 +39,13 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
   @Override
   @Transactional(readOnly = true)
-  public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long ShopId) {
+  public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long shopId) {
 
     shopRepository
-        .findById(ShopId)
+        .findById(shopId)
         .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
 
-    List<DesignGallery> designs = designRepository.findByShopId(ShopId);
+    List<DesignGallery> designs = designRepository.findByShopId(shopId);
 
     if (designs.isEmpty()) {
       throw new DesignException(DesignErrorCode.DESIGN_NOT_REGISTER);
@@ -59,10 +58,10 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   @Transactional(readOnly = true)
   public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId) {
 
-    DesignGallery design = designRepository.findDesignGalleryById(designId);
-    if (design == null) {
-      throw new DesignException(DesignErrorCode.DESIGN_NOT_FOUND);
-    }
+    DesignGallery design =
+        designRepository
+            .findDesignGalleryById(designId)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
     return DesignConverter.toDesignDetailDTO(design);
   }
