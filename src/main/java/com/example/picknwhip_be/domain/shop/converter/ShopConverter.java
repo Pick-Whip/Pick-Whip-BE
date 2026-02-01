@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +49,7 @@ public class ShopConverter {
         .build();
   }
 
-  public ShopResDTO.ShopInMapListDTO toShopInMapListDTO(List<Shop> shop) {
+  public ShopResDTO.ShopInMapListDTO toShopInMapListDTO(List<Shop> shop, Set<Long> pickedShopIds) {
     return ShopResDTO.ShopInMapListDTO.builder()
         .shops(
             shop.stream()
@@ -57,8 +58,9 @@ public class ShopConverter {
                         ShopResDTO.ShopInMap.builder()
                             .shopId(item.getId())
                             .shopName(item.getShopName())
-                            .latitude(item.getLocation().getX())
-                            .longitude(item.getLocation().getY())
+                            .latitude(item.getLocation().getY())
+                            .longitude(item.getLocation().getX())
+                            .isPicked(pickedShopIds.contains(item.getId()))
                             .build())
                 .toList())
         .build();

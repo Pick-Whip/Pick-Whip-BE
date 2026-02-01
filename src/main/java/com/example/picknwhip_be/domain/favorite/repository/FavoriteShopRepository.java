@@ -26,4 +26,7 @@ public interface FavoriteShopRepository extends JpaRepository<FavoriteShop, Long
           + "ORDER BY fs.id DESC")
   List<FavoriteShop> findAllByUserIdAndCursor(
       @Param("userId") Long userId, @Param("cursor") Long cursor, Pageable pageable);
+
+  @Query("SELECT f.shop.id FROM FavoriteShop f WHERE f.user.userId = :userId")
+  List<Long> findShopIdsByUserId(@Param("userId") Long userId);
 }

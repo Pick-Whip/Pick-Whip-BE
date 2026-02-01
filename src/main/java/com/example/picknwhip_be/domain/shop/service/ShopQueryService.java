@@ -1,9 +1,13 @@
 package com.example.picknwhip_be.domain.shop.service;
 
+import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
+import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShopQueryService {
 
   private final ShopRepository shopRepository;
+  private final FavoriteShopRepository favoriteShopRepository;
+  private final ShopConverter shopConverter;
 
   public ShopResDTO.ShopInMapListDTO findShopInMap(
-      Double lowLat, Double highLat, Double lowLon, Double highLon) {
+      Double lowLat, Double highLat, Double lowLon, Double highLon, Long userId) {
 
-    List<Shop> shop = shopRepository.findShopsInBoundary(lowLat, highLat, lowLon, highLon);
+    List<Shop> shops = shopRepository.findShopsInBoundary(lowLat, highLat, lowLon, highLon);
 
-    return null;
+    Set<Long> pickedShopIds = new HashSet<>();
+    if (userId != null) {
+      List<Long> ids = favoriteShopRepository.findShopIdsByUserId(userId);
+      pickedShopIds.addAll(ids);
+    }
+
+    return shopConverter.toShopInMapListDTO(shops, pickedShopIds);
   }
 }
