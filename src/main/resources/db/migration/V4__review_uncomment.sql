@@ -29,9 +29,9 @@ ALTER TABLE design_gallery
     ADD CONSTRAINT FK_DESIGN_GALLERY_ON_SHOP FOREIGN KEY (shop_id) REFERENCES shops (shop_id);
 
 ALTER TABLE review_keyword
-    DROP COLUMN keyword;
+DROP COLUMN keyword;
 
 ALTER TABLE review_selected_keyword
-    DROP COLUMN deleted_at;
+DROP COLUMN deleted_at;
 
 ALTER TABLE review_keyword DROP INDEX uk_review_keyword_category_keyword;
