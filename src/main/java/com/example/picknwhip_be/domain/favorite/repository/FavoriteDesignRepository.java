@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 public interface FavoriteDesignRepository extends JpaRepository<FavoriteDesign, Long> {
 
   @Query(
-      "SELECT fd FROM FavoriteDesign fd JOIN FETCH fd.designGallery WHERE fd.user.userId = :userId")
+      "SELECT DISTINCT fd FROM FavoriteDesign fd JOIN FETCH fd.designGallery dg LEFT JOIN FETCH dg.keywords WHERE fd.user.userId = :userId")
   List<FavoriteDesign> findAllByUserId(@Param("userId") Long userId);
 
   boolean existsByUserAndDesignGallery(User user, DesignGallery designGallery);
