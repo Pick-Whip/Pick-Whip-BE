@@ -23,7 +23,12 @@ public class ShopRepositoryImpl implements ShopRepository.ShopRepositoryCustom {
         .selectFrom(shop)
         .distinct()
         .leftJoin(shop.designGalleries, designGallery)
-        .where();
+        .where(
+            containsKeyword(condition.getKeyword()),
+            eqRegion(condition.getRegion()),
+            betweenPrice(condition.getMinPrice(), condition.getMaxPrice()),
+            inStyles(condition.getStyles()))
+        .fetch();
   }
 
   private BooleanExpression containsKeyword(String keyword) {
@@ -64,9 +69,7 @@ public class ShopRepositoryImpl implements ShopRepository.ShopRepositoryCustom {
 
     BooleanBuilder builder = new BooleanBuilder();
     for (String style : styles) {
-      builder
-          .or(designGallery.keywords.contains(style))
-          .or(designGallery.description.contains(style));
+      builder.or(designGallery.description.contains(style));
     }
     return builder;
   }
