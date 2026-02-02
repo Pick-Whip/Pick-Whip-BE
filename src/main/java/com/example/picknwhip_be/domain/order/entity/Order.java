@@ -80,4 +80,7 @@ public class Order extends BaseEntity {
 
   @Column(name = "rejection_reason")
   private String rejectionReason;
+
+  @Column(name = "order_code", unique = true, length = 20)
+  private String orderCode;
 }
