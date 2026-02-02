@@ -10,4 +10,6 @@ public interface CustomQueryService {
   CustomResDTO.GetDraftDetailDTO findDraftDetail(Long id);
 
   CustomResDTO.DeleteDraftDTO deleteDraft(Long id, Long userId);
+
+  CustomResDTO.GetDesignOptionDTO findDesignOption(Long shopId);
 }

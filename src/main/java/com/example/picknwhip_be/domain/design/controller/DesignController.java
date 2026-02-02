@@ -37,5 +37,10 @@ public class DesignController {
     DesignResDTO.GetDesignDetailDTO result = designQueryService.findDesignDetail(designId);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
+  @GetMapping("/{userId}")
+  public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
+
+    return null;
   }
+
 }

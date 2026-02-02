@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.design.dto;
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,5 +49,4 @@ public class DesignResDTO {
 
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
-  }
 }
