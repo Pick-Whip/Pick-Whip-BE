@@ -5,7 +5,6 @@ import com.example.picknwhip_be.domain.shop.dto.res.PickupResDTO;
 import com.example.picknwhip_be.domain.shop.entity.ShopBusinessHour;
 import com.example.picknwhip_be.domain.shop.entity.enums.ScheduleType;
 import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
-import com.example.picknwhip_be.domain.shop.service.PickupQueryService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

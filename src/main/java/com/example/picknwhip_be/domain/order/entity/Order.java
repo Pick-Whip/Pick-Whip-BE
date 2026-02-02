@@ -29,6 +29,12 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  @Column(name = "customer_name", nullable = false)
+  private String customerName;
+
+  @Column(name = "customer_phone", nullable = false)
+  private String customerPhone;
+
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "shop_id", nullable = false)
   private Shop shop;

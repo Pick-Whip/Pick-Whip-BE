@@ -15,7 +15,6 @@ import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.repository.DailyShopOrderCounterRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
-import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     private final OrderItemRepository orderItemRepository;
     private final OrderDraftRepository orderDraftRepository;
     private final DailyShopOrderCounterRepository counterRepository;
-    private final UserRepository userRepository;
 
     @Override
     public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
@@ -44,13 +42,18 @@ public class OrderCommandServiceImpl implements OrderCommandService {
             throw new CustomException(CustomErrorCode.FORBIDDEN);
         }
 
-        // 주문 코드 생성
         String orderCode = generateOrderCode(draft.getShop().getId(), LocalDate.now());
 
-        int estimatedPrice = calculateTotalPrice(draft);
+        int estimatedPrice = draft.getShopCakeSize().getPrice();
+        for(OrderDraftItem item : draft.getItems()) {
+            estimatedPrice += item.getCustomOption().getAdditionalPrice();
+        }
 
         Order order = Order.builder()
                 .user(draft.getUser())
+                .customerName(dto.getCustomerName())
+                .customerPhone(dto.getCustomerPhone())
+                .additionalRequest(dto.getAdditionalRequest())
                 .shop(draft.getShop())
                 .shopCakeSize(draft.getShopCakeSize())
                 .designGallery(draft.getDesignGallery())
@@ -59,9 +62,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
                 .letteringText(draft.getLetteringText())
                 .letteringLineCount(draft.getLetteringLineCount())
                 .letteringAlignment(draft.getLetteringAlignment())
-                .additionalRequest(draft.getAdditionalRequest())
                 .referenceImageUrl(draft.getReferenceImageUrl())
-                .paymentMethod("TBD")
                 .paymentStatus(PaymentStatus.WAITING)
                 .totalPrice(estimatedPrice)
                 .orderCode(orderCode)
@@ -101,13 +102,5 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
         String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
         return String.format("%s_%03d", dateStr, counter.getCount());
-    }
-
-    private int calculateTotalPrice(OrderDraft draft) {
-        int total = draft.getShopCakeSize().getPrice();
-        for (OrderDraftItem item : draft.getItems()) {
-            total += item.getCustomOption().getAdditionalPrice();
-        }
-        return total;
     }
 }
