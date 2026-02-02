@@ -1,8 +1,8 @@
 package com.example.picknwhip_be.domain.design.converter;
 
 import com.example.picknwhip_be.domain.custom.converter.CustomConverter;
-import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
-import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
+import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
+import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import java.util.List;

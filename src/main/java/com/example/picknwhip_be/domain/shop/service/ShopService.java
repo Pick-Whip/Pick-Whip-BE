@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.shop.service;
 
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -22,7 +22,7 @@ public class ShopService {
   private final ShopRepository shopRepository;
   private final ShopConverter shopConverter;
 
-  public List<ShopPreviewResponseDto> getNearbyShops(double lat, double lon, double radius) {
+  public List<ShopPreviewResDTO> getNearbyShops(double lat, double lon, double radius) {
 
     // 좌표 검증
     if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {

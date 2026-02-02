@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
@@ -28,7 +28,7 @@ public class ShopController {
       summary = "내 주변 가게 조회",
       description = "현재 위치(lat, lon)를 기준으로 특정 반경(radius) 내의 가게 목록을 조회합니다.")
   @GetMapping("/nearby")
-  public ResponseEntity<List<ShopPreviewResponseDto>> getNearbyShops(
+  public ResponseEntity<List<ShopPreviewResDTO>> getNearbyShops(
       @RequestParam double lat,
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {

@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.favorite.controller;
 
-import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
-import com.example.picknwhip_be.domain.design.service.DesignQueryService;
+import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
 import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteSuccessCode;
 import com.example.picknwhip_be.domain.favorite.service.FavoriteDesignService;

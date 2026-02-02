@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.user.service;
 
 import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
+import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
