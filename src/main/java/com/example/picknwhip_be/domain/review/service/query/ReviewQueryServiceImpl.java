@@ -13,10 +13,8 @@ import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +57,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
   @Override
   public ReviewResDTO.BestReviewListDTO getBestCustomReviews() {
+    // 베스트 리뷰 조회
     List<Review> reviews = reviewRepository.findBestHelpfulReviews(5);
 
     if (reviews.isEmpty()) {
@@ -66,25 +65,31 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     }
 
     List<Long> orderIds = reviews.stream().map(r -> r.getOrder().getId()).toList();
-    List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
     List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
+
+    List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
     List<ReviewSelectedKeyword> allKeywords =
         reviewSelectedKeywordRepository.findAllByReviewIdIn(reviewIds);
+
+    Map<Long, List<OrderItem>> optionsByOrderId =
+        allOrderItems.stream().collect(Collectors.groupingBy(item -> item.getOrder().getId()));
+
+    Map<Long, List<String>> keywordsByReviewId =
+        allKeywords.stream()
+            .collect(
+                Collectors.groupingBy(
+                    k -> k.getReview().getId(),
+                    Collectors.mapping(k -> k.getKeyword().getLabel(), Collectors.toList())));
 
     List<ReviewResDTO.BestReviewItemDTO> items =
         reviews.stream()
             .map(
                 review -> {
                   List<OrderItem> myOptions =
-                      allOrderItems.stream()
-                          .filter(item -> item.getOrder().getId().equals(review.getOrder().getId()))
-                          .toList();
-
+                      optionsByOrderId.getOrDefault(
+                          review.getOrder().getId(), Collections.emptyList());
                   List<String> myKeywords =
-                      allKeywords.stream()
-                          .filter(k -> k.getReview().getId().equals(review.getId()))
-                          .map(k -> k.getKeyword().getLabel())
-                          .toList();
+                      keywordsByReviewId.getOrDefault(review.getId(), Collections.emptyList());
 
                   return convertToBestReviewItemDTO(review, myOptions, myKeywords);
                 })
@@ -111,32 +116,28 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
       if (item.getOptionCategory() == null) continue;
 
       OptionCategory category = item.getOptionCategory();
-      switch (category.name()) {
-        case "SHEET":
+
+      switch (category) {
+        case SHEET -> {
           sheetName = item.getOptionName();
           if (item.getColorRgbCode() != null) sheetColor = item.getColorRgbCode();
-          break;
-        case "CREAM":
+        }
+        case CREAM -> {
           creamName = item.getOptionName();
           if (item.getColorRgbCode() != null) creamColor = item.getColorRgbCode();
-          break;
-        case "TOPPING": // or DECO
+        }
+        case TOPPING -> {
           decos.add(item.getOptionName());
-          break;
-        case "ICING": // or COLOR
+        }
+        case ICING -> {
           if (item.getColorRgbCode() != null) icingColor = item.getColorRgbCode();
-          break;
-        case "SHEET_COLOR":
-          sheetColor = item.getColorRgbCode();
-          break;
-        case "CREAM_COLOR":
-          creamColor = item.getColorRgbCode();
-          break;
+        }
       }
     }
 
     String taste = sheetName + (creamName.isEmpty() ? "" : " + " + creamName);
     String deco = String.join(", ", decos);
+
     ReviewResDTO.CakeColorsDTO colorsDTO =
         ReviewResDTO.CakeColorsDTO.builder()
             .icingColor(icingColor)
@@ -155,6 +156,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
             .additionalRequest(order.getAdditionalRequest())
             .colors(colorsDTO)
             .build();
+
     String resultImageUrl = order.getReferenceImageUrl();
 
     return ReviewResDTO.BestReviewItemDTO.builder()
