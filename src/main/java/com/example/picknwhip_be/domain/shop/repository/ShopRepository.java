@@ -76,7 +76,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
   @Query(
       value =
           "SELECT * FROM shops s "
-              + "WHERE MBRContains(ST_SRID(ST_MakeEnvelope(POINT(:lowLon, :lowLat), POINT(:highLon, :highLat)), 4326), s.location)",
+              + "WHERE s.status = 'ACTIVE' "
+              + "AND ST_SRID(s.location) = 4326 "
+              + "AND MBRContains(ST_SRID(ST_MakeEnvelope(POINT(:lowLon, :lowLat), POINT(:highLon, :highLat)), 4326), s.location)",
       nativeQuery = true)
   List<Shop> findShopsInBoundary(
       @Param("lowLat") Double lowLat,

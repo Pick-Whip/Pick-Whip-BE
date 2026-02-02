@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.shop.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,8 @@ public class ShopResDTO {
     private String shopName;
     private Double latitude;
     private Double longitude;
+
+    @JsonProperty("isPicked")
     private boolean isPicked;
   }
 }

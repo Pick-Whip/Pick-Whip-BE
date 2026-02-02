@@ -5,7 +5,6 @@ import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +25,10 @@ public class ShopQueryService {
 
     List<Shop> shops = shopRepository.findShopsInBoundary(lowLat, highLat, lowLon, highLon);
 
-    Set<Long> pickedShopIds = new HashSet<>();
-    if (userId != null) {
-      List<Long> ids = favoriteShopRepository.findShopIdsByUserId(userId);
-      pickedShopIds.addAll(ids);
-    }
+    Set<Long> pickedShopIds =
+        (userId != null)
+            ? favoriteShopRepository.findShopIdsByUserId(userId)
+            : java.util.Collections.emptySet();
 
     return shopConverter.toShopInMapListDTO(shops, pickedShopIds);
   }
