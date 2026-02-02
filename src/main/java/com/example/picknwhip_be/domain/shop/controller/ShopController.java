@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
@@ -49,5 +50,16 @@ public class ShopController {
     ShopResDTO.ShopInMapListDTO result =
         shopQueryService.findShopInMap(lowLat, highLat, lowLon, highLon, userId);
     return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
+
+  @Operation(
+      summary = "가게 상세 조회",
+      description = "가게 ID와 현재 위치(lat, lon)를 받아 가게 상세 정보(거리 포함)를 조회합니다.")
+  @GetMapping("/{shopId}")
+  public ResponseEntity<ShopDetailResDTO> getShopDetail(
+      @PathVariable Long shopId,
+      @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
+      @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
+    return ResponseEntity.ok(shopService.getShopDetail(shopId, lat, lon));
   }
 }

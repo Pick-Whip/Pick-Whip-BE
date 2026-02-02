@@ -51,6 +51,7 @@ public class Review extends BaseEntity {
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
+  @Builder.Default
   @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
   private List<ReviewLike> likes = new ArrayList<>();
 

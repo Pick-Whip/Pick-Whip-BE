@@ -4,7 +4,7 @@ import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.exception.DesignException;
 import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
-import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignResponse;
+import com.example.picknwhip_be.domain.favorite.dto.req.FavoriteDesignReqDTO;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
 import com.example.picknwhip_be.domain.favorite.exception.FavoriteException;
 import com.example.picknwhip_be.domain.favorite.exception.code.FavoriteErrorCode;
@@ -27,7 +27,7 @@ public class FavoriteDesignService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
 
-  public FavoriteDesignResponse addFavoriteDesign(Long designId, Long userId) {
+  public FavoriteDesignReqDTO addFavoriteDesign(Long designId, Long userId) {
 
     User user =
         userRepository
@@ -50,10 +50,10 @@ public class FavoriteDesignService {
       throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
     }
 
-    return new FavoriteDesignResponse(designId, true);
+    return new FavoriteDesignReqDTO(designId, true);
   }
 
-  public FavoriteDesignResponse deleteFavoriteDesign(Long designId, Long userId) {
+  public FavoriteDesignReqDTO deleteFavoriteDesign(Long designId, Long userId) {
 
     User user =
         userRepository
@@ -72,6 +72,6 @@ public class FavoriteDesignService {
 
     favoriteDesignRepository.delete(favoriteDesign);
 
-    return new FavoriteDesignResponse(designId, false);
+    return new FavoriteDesignReqDTO(designId, false);
   }
 }
