@@ -1,8 +1,10 @@
 package com.example.picknwhip_be.domain.shop.entity;
 
+import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
 import com.example.picknwhip_be.domain.shop.entity.enums.ShopStatus;
 import com.example.picknwhip_be.domain.shop.entity.enums.VerificationStatus;
+import com.example.picknwhip_be.domain.shop.entity.mapping.Address;
 import com.example.picknwhip_be.domain.shop.entity.mapping.ShopKeywordMapping;
 import com.example.picknwhip_be.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -96,6 +98,11 @@ public class Shop {
   @OneToMany(mappedBy = "shop", cascade = CascadeType.REMOVE, orphanRemoval = true)
   @Builder.Default
   private List<FavoriteShop> favoriteShops = new ArrayList<>();
+
+  @Embedded private Address address;
+
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  private List<DesignGallery> designGalleries = new ArrayList<>();
 
   public Shop(User owner, String shopName, String phone, Point location) {
     this.owner = owner;
