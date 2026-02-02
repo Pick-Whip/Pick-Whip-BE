@@ -2,7 +2,6 @@ package com.example.picknwhip_be.domain.review.repository;
 
 import com.example.picknwhip_be.domain.review.dto.ReviewRow;
 import com.example.picknwhip_be.domain.review.entity.Review;
-
 import java.util.List;
 
 public interface ReviewRepositoryCustom {
