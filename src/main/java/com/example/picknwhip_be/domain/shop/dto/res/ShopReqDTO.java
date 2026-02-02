@@ -14,5 +14,7 @@ public class ShopReqDTO {
     private List<String> styles;
     private Integer minPrice;
     private Integer maxPrice;
+    private Double lat;
+    private Double lon;
   }
 }

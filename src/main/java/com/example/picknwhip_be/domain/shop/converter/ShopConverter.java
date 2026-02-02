@@ -6,10 +6,7 @@ import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -64,5 +61,30 @@ public class ShopConverter {
                             .build())
                 .toList())
         .build();
+  }
+
+  public ShopResDTO.ShopInfoDTO toShopInfoDTO(
+      Shop shop, Double distance, Integer minPrice, Integer maxPrice) {
+    return ShopResDTO.ShopInfoDTO.builder()
+        .shopName(shop.getShopName())
+        // ...
+        .minPrice(minPrice) // 받은 값 그대로 사용
+        .maxPrice(maxPrice) // 받은 값 그대로 사용
+        .distance(distance != null ? distance.intValue() : 0)
+        .keywords(extractKeywords(shop))
+        .build();
+  }
+
+  public ShopResDTO.ShopListDTO toShopListDTO(List<ShopResDTO.ShopInfoDTO> shopInfoList) {
+    return ShopResDTO.ShopListDTO.builder().shops(shopInfoList).build();
+  }
+
+  private List<String> extractKeywords(Shop shop) {
+    if (shop.getKeywordMappings() == null) {
+      return List.of();
+    }
+    return shop.getKeywordMappings().stream()
+        .map(mapping -> mapping.getKeyword().getKeywordText())
+        .toList();
   }
 }

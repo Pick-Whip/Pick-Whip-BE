@@ -30,4 +30,26 @@ public class ShopResDTO {
     @JsonProperty("isPicked")
     private boolean isPicked;
   }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ShopListDTO {
+    private List<ShopInfoDTO> shops;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ShopInfoDTO {
+    private String shopName;
+    private String shopImageUrl;
+    private Double averageRating;
+    private Integer minPrice;
+    private Integer maxPrice;
+    private Integer distance;
+    private List<String> keywords;
+  }
 }

@@ -3,24 +3,49 @@ package com.example.picknwhip_be.domain.shop.repository;
 import static com.example.picknwhip_be.domain.design.entity.QDesignGallery.designGallery;
 import static com.example.picknwhip_be.domain.shop.entity.QShop.shop;
 
+import com.example.picknwhip_be.domain.design.entity.QDesignGallery;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopReqDTO;
-import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLSubQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class ShopRepositoryImpl implements ShopRepository.ShopRepositoryCustom {
+public class ShopRepositoryImpl implements ShopRepositoryCustom {
 
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public List<Shop> searchShopByDynamicFilter(ShopReqDTO.ShopSearchReqDTO condition) {
+  public List<Tuple> searchShopByDynamicFilter(ShopReqDTO.ShopSearchReqDTO condition) {
+
+    NumberTemplate<Double> distanceExpression =
+        Expressions.numberTemplate(
+            Double.class,
+            "ST_Distance_Sphere({0}, {1})",
+            shop.location,
+            createPoint(condition.getLat(), condition.getLon()));
+
+    QDesignGallery designSub = new QDesignGallery("designSub");
+
+    JPQLSubQuery<Integer> minPriceSub =
+        JPAExpressions.select(designSub.basePrice.min().coalesce(0)) // 없으면 0
+            .from(designSub)
+            .where(designSub.shop.eq(shop));
+
+    JPQLSubQuery<Integer> maxPriceSub =
+        JPAExpressions.select(designSub.basePrice.max().coalesce(0))
+            .from(designSub)
+            .where(designSub.shop.eq(shop));
 
     return queryFactory
-        .selectFrom(shop)
+        .select(shop, distanceExpression, minPriceSub, maxPriceSub)
+        .from(shop)
         .distinct()
         .leftJoin(shop.designGalleries, designGallery)
         .where(
@@ -69,8 +94,17 @@ public class ShopRepositoryImpl implements ShopRepository.ShopRepositoryCustom {
 
     BooleanBuilder builder = new BooleanBuilder();
     for (String style : styles) {
+      builder.or(designGallery.keywords.contains(style));
       builder.or(designGallery.description.contains(style));
     }
     return builder;
+  }
+
+  private com.querydsl.core.types.Expression createPoint(Double lat, Double lon) {
+    if (lat == null || lon == null) {
+      return Expressions.nullExpression();
+    }
+    return Expressions.stringTemplate(
+        "ST_GeomFromText({0}, 4326)", "POINT(" + lon + " " + lat + ")");
   }
 }

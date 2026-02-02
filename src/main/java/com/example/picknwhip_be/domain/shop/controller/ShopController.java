@@ -1,7 +1,9 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
+import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDto;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopReqDTO;
 import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
@@ -23,6 +25,7 @@ public class ShopController {
 
   private final ShopService shopService;
   private final ShopQueryService shopQueryService;
+  private final ShopConverter shopConverter;
 
   @Operation(
       summary = "내 주변 가게 조회",
@@ -49,5 +52,13 @@ public class ShopController {
     ShopResDTO.ShopInMapListDTO result =
         shopQueryService.findShopInMap(lowLat, highLat, lowLon, highLon, userId);
     return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
+
+  @GetMapping("/search")
+  public ApiResponse<ShopResDTO.ShopListDTO> searchShops(
+      @ModelAttribute ShopReqDTO.ShopSearchReqDTO request // 쿼리 스트링 자동 매핑
+      ) {
+    ShopResDTO.ShopListDTO shops = shopQueryService.searchShops(request);
+    return ApiResponse.of(GeneralSuccessCode.OK, shops);
   }
 }

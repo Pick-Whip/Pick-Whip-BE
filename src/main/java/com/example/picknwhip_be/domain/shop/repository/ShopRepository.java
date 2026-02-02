@@ -1,13 +1,12 @@
 package com.example.picknwhip_be.domain.shop.repository;
 
-import com.example.picknwhip_be.domain.shop.dto.res.ShopReqDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ShopRepository extends JpaRepository<Shop, Long> {
+public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositoryCustom {
 
   interface ShopPreviewInfo {
     Long getShopId();
@@ -86,8 +85,4 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
       @Param("highLat") Double highLat,
       @Param("lowLon") Double lowLon,
       @Param("highLon") Double highLon);
-
-  public interface ShopRepositoryCustom {
-    List<Shop> searchShopByDynamicFilter(ShopReqDTO.ShopSearchReqDTO condition);
-  }
 }
