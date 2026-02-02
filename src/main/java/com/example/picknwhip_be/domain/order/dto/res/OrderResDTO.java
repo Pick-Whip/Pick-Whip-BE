@@ -12,7 +12,7 @@ public class OrderResDTO {
     @AllArgsConstructor
     public static class OrderCompleteDTO {
         private Long orderId;
-        private String orderCode; // #HKR6B...
+        private String orderCode;
         private String shopName;
         private LocalDateTime pickupDatetime;
         private int totalPrice;
