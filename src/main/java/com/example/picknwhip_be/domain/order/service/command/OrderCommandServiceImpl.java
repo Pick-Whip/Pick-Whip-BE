@@ -59,6 +59,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
                 .user(draft.getUser())
                 .customerName(dto.getCustomerName())
                 .customerPhone(dto.getCustomerPhone())
+                .additionalRequest(draft.getAdditionalRequest())
                 .orderAdditionalRequest(dto.getAdditionalRequest())
                 .shop(draft.getShop())
                 .shopCakeSize(draft.getShopCakeSize())

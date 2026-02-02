@@ -153,7 +153,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                     : "Unknown Design")
             .taste(taste)
             .deco(deco)
-            .additionalRequest(order.getAdditionalRequest())
+            .additionalRequest(order.getOrderAdditionalRequest())
             .colors(colorsDTO)
             .build();
 
