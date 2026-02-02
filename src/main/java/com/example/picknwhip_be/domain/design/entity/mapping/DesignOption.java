@@ -24,4 +24,10 @@ public class DesignOption {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "custom_option_id", nullable = false)
   private CustomOption customOption;
+
+  @Column(name = "position_x")
+  private Double positionX;
+
+  @Column(name = "position_y")
+  private Double positionY;
 }
