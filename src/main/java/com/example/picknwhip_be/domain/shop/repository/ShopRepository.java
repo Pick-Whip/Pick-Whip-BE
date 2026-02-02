@@ -95,6 +95,19 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
       @Param("radius") double radius,
       @Param("limit") int limit);
 
+  @Query(
+      value =
+          "SELECT * FROM shops s "
+              + "WHERE s.status = 'ACTIVE' "
+              + "AND ST_SRID(s.location) = 4326 "
+              + "AND MBRContains(ST_SRID(ST_MakeEnvelope(POINT(:lowLon, :lowLat), POINT(:highLon, :highLat)), 4326), s.location)",
+      nativeQuery = true)
+  List<Shop> findShopsInBoundary(
+      @Param("lowLat") Double lowLat,
+      @Param("highLat") Double highLat,
+      @Param("lowLon") Double lowLon,
+      @Param("highLon") Double highLon);
+
   // 가게 상세 조회
   @Query(
       value =

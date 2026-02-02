@@ -14,7 +14,7 @@ public enum FavoriteErrorCode implements BaseErrorCode {
   INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST, "FAVORITE400_1", "페이지 크기는 1 이상이어야 합니다."),
 
   DESIGN_ALREADY_EXISTS(HttpStatus.CONFLICT, "FAVORITE409_2", "이미 마이픽에 등록된 디자인입니다."),
-  DESIGN_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE404_1", "마이픽에 등록되지 않은 디자인입니다."),
+  DESIGN_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE404_2", "마이픽에 등록되지 않은 디자인입니다."),
   ;
 
   private final HttpStatus status;

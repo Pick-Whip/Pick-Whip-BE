@@ -1,13 +1,16 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
+import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResponseDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
+import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +61,23 @@ public class ShopConverter {
         .address(info.getAddress())
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
+        .build();
+  }
+
+  public ShopResDTO.ShopInMapListDTO toShopInMapListDTO(List<Shop> shop, Set<Long> pickedShopIds) {
+    return ShopResDTO.ShopInMapListDTO.builder()
+        .shops(
+            shop.stream()
+                .map(
+                    item ->
+                        ShopResDTO.ShopInMap.builder()
+                            .shopId(item.getId())
+                            .shopName(item.getShopName())
+                            .latitude(item.getLocation().getY())
+                            .longitude(item.getLocation().getX())
+                            .isPicked(pickedShopIds.contains(item.getId()))
+                            .build())
+                .toList())
         .build();
   }
 }
