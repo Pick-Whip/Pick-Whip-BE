@@ -54,9 +54,11 @@ public class ShopController {
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
+  @Operation(summary = "필터링 포함 검색", description = "필터링을 포함한 검색기능입니다. 없는 조건은 null로 보내주세요.")
   @GetMapping("/search")
   public ApiResponse<ShopResDTO.ShopListDTO> searchShops(
-      @ModelAttribute ShopReqDTO.ShopSearchReqDTO request // 쿼리 스트링 자동 매핑
+      @Parameter(description = "없는 조건은 null로 보내주세요") @ModelAttribute
+          ShopReqDTO.ShopSearchReqDTO request // 쿼리 스트링 자동 매핑
       ) {
     ShopResDTO.ShopListDTO shops = shopQueryService.searchShops(request);
     return ApiResponse.of(GeneralSuccessCode.OK, shops);
