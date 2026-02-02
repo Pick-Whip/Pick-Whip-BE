@@ -1,8 +1,8 @@
 package com.example.picknwhip_be.domain.shop.service;
 
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResponseDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -24,7 +24,7 @@ public class ShopServiceImpl implements ShopService {
   private final ShopConverter shopConverter;
 
   @Override
-  public List<ShopPreviewResponseDTO> getNearbyShops(double lat, double lon, double radius) {
+  public List<ShopPreviewResDTO> getNearbyShops(double lat, double lon, double radius) {
     validateCoordinate(lat, lon);
 
     if (radius < 0.0 || radius > MAX_RADIUS_M) {
@@ -54,7 +54,7 @@ public class ShopServiceImpl implements ShopService {
   }
 
   @Override
-  public ShopDetailResponseDTO getShopDetail(Long shopId, double lat, double lon) {
+  public ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon) {
     validateCoordinate(lat, lon);
 
     // Repository에서 Native Query로 한 번에 조회

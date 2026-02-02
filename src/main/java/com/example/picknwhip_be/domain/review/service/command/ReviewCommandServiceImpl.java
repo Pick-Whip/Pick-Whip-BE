@@ -51,7 +51,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
       throw new ReviewException(ReviewErrorCode.REVIEW_WRITE_NOT_ALLOWED);
     }
 
-    if (reviewRepository.existsByOrderId(orderId)) {
+    if (reviewRepository.existsByOrderIdAndDeletedAtIsNull(orderId)) {
       throw new ReviewException(ReviewErrorCode.REVIEW_ALREADY_EXISTS);
     }
 

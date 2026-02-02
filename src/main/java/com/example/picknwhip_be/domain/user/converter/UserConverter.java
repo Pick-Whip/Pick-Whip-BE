@@ -1,12 +1,12 @@
 package com.example.picknwhip_be.domain.user.converter;
 
-import com.example.picknwhip_be.domain.user.dto.res.UserResponseDTO;
+import com.example.picknwhip_be.domain.user.dto.res.UserResDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
 
 public class UserConverter {
 
-  public static UserResponseDTO.UserProfileDTO toUserProfileDTO(User user) {
-    return UserResponseDTO.UserProfileDTO.builder()
+  public static UserResDTO.UserProfileDTO toUserProfileDTO(User user) {
+    return UserResDTO.UserProfileDTO.builder()
         .userId(user.getUserId())
         .email(user.getEmail())
         .name(user.getName())
@@ -18,8 +18,8 @@ public class UserConverter {
         .build();
   }
 
-  public static UserResponseDTO.UpdateProfileResultDTO toUpdateProfileResultDTO(User user) {
-    return UserResponseDTO.UpdateProfileResultDTO.builder()
+  public static UserResDTO.UpdateProfileResultDTO toUpdateProfileResultDTO(User user) {
+    return UserResDTO.UpdateProfileResultDTO.builder()
         .userId(user.getUserId())
         .updatedAt(user.getUpdatedAt())
         .build();

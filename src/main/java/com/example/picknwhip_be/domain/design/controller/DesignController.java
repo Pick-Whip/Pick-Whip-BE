@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.design.controller;
 
-import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
-import com.example.picknwhip_be.domain.design.service.DesignQueryService;
+import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;

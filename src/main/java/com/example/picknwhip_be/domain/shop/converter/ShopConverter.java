@@ -1,8 +1,8 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResponseDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,8 +36,8 @@ public class ShopConverter {
     }
   }
 
-  public ShopPreviewResponseDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
-    return ShopPreviewResponseDTO.builder()
+  public ShopPreviewResDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
+    return ShopPreviewResDTO.builder()
         .shopId(info.getShopId())
         .shopName(info.getShopName())
         .shopImageUrl(info.getShopImageUrl())
@@ -48,10 +48,10 @@ public class ShopConverter {
         .build();
   }
 
-  public ShopDetailResponseDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
+  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
     Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
-    return ShopDetailResponseDTO.builder()
+    return ShopDetailResDTO.builder()
         .shopId(info.getShopId())
         .shopName(info.getShopName())
         .shopImageUrl(info.getShopImageUrl())

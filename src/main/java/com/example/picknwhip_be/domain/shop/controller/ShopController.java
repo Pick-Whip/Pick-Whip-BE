@@ -1,8 +1,9 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResponseDTO;
-import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResponseDTO;
+
+import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
 import com.example.picknwhip_be.domain.shop.service.ShopService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
@@ -29,7 +30,7 @@ public class ShopController {
       summary = "내 주변 가게 조회",
       description = "현재 위치(lat, lon)를 기준으로 특정 반경(radius) 내의 가게 목록을 조회합니다.")
   @GetMapping("/nearby")
-  public ResponseEntity<List<ShopPreviewResponseDTO>> getNearbyShops(
+  public ResponseEntity<List<ShopPreviewResDTO>> getNearbyShops(
       @RequestParam double lat,
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {
@@ -56,7 +57,7 @@ public class ShopController {
       summary = "가게 상세 조회",
       description = "가게 ID와 현재 위치(lat, lon)를 받아 가게 상세 정보(거리 포함)를 조회합니다.")
   @GetMapping("/{shopId}")
-  public ResponseEntity<ShopDetailResponseDTO> getShopDetail(
+  public ResponseEntity<ShopDetailResDTO> getShopDetail(
       @PathVariable Long shopId,
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
       @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {

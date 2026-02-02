@@ -4,8 +4,8 @@ import static com.example.picknwhip_be.domain.favorite.exception.code.FavoriteEr
 
 import com.example.picknwhip_be.domain.favorite.converter.FavoriteShopConverter;
 import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopDTO;
-import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResponseDTO;
-import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResponseDTO;
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopListResDTO;
+import com.example.picknwhip_be.domain.favorite.dto.res.FavoriteShopResDTO;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
 import com.example.picknwhip_be.domain.favorite.exception.FavoriteException;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
@@ -33,7 +33,7 @@ public class FavoriteShopService {
   private final UserRepository userRepository; // 유저 조회를 위해 필요
 
   /** 마이픽 가게 등록 */
-  public FavoriteShopResponseDTO addFavoriteShop(Long userId, Long shopId) {
+  public FavoriteShopResDTO addFavoriteShop(Long userId, Long shopId) {
     User user =
         userRepository
             .findById(userId)
@@ -48,11 +48,11 @@ public class FavoriteShopService {
 
     favoriteShopRepository.save(FavoriteShop.create(user, shop));
 
-    return new FavoriteShopResponseDTO(shopId, true);
+    return new FavoriteShopResDTO(shopId, true);
   }
 
   /** 마이픽 가게 취소 */
-  public FavoriteShopResponseDTO removeFavoriteShop(Long userId, Long shopId) {
+  public FavoriteShopResDTO removeFavoriteShop(Long userId, Long shopId) {
     User user =
         userRepository
             .findById(userId)
@@ -68,12 +68,12 @@ public class FavoriteShopService {
 
     favoriteShopRepository.delete(favoriteShop);
 
-    return new FavoriteShopResponseDTO(shopId, false);
+    return new FavoriteShopResDTO(shopId, false);
   }
 
   /** 마이픽 가게 목록 조회 (커서 페이징) */
   @Transactional(readOnly = true)
-  public FavoriteShopListResponseDTO getMyPickShops(Long userId, Long cursor, int limit) {
+  public FavoriteShopListResDTO getMyPickShops(Long userId, Long cursor, int limit) {
     // limit 파라미터 유효성 검사 (0 이하일 경우 400 에러 발생)
     if (limit <= 0) {
       throw new FavoriteException(INVALID_PAGE_SIZE);
