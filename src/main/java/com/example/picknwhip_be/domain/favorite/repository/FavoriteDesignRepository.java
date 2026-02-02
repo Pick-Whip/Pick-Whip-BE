@@ -2,7 +2,7 @@ package com.example.picknwhip_be.domain.favorite.repository;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
-import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

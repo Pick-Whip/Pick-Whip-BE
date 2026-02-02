@@ -1,0 +1,22 @@
+package com.example.picknwhip_be.domain.review.service.user.service.command;
+
+import com.example.picknwhip_be.domain.review.service.user.dto.req.UserReqDTO;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
+
+public interface UserCommandService {
+  User joinOrCreateUser(
+      Long kakaoId,
+      String email,
+      String name,
+      String phone,
+      String birthdate,
+      String profileImageUrl);
+
+  void updateExtraInfo(Long userId, UserReqDTO.ExtraInfoDTO request);
+
+  User updateProfile(Long userId, UserReqDTO.UpdateProfileDTO request);
+
+  void withdrawMember(Long userId, UserReqDTO.WithdrawalDTO request);
+
+  void logout(Long userId);
+}

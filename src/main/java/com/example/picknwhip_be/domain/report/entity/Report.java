@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.report.entity;
 
-import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

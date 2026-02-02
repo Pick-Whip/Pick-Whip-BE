@@ -1,10 +1,10 @@
 package com.example.picknwhip_be.domain.shop.entity;
 
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import com.example.picknwhip_be.domain.shop.entity.enums.ShopStatus;
 import com.example.picknwhip_be.domain.shop.entity.enums.VerificationStatus;
 import com.example.picknwhip_be.domain.shop.entity.mapping.ShopKeywordMapping;
-import com.example.picknwhip_be.domain.user.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

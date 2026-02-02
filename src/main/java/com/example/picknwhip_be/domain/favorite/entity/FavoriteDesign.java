@@ -1,7 +1,7 @@
 package com.example.picknwhip_be.domain.favorite.entity;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
-import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;

@@ -4,7 +4,7 @@ import com.example.picknwhip_be.domain.chat.dto.req.ChatReqDTO;
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResDTO;
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
-import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import java.util.List;
 
 public class ChatConverter {

@@ -2,7 +2,7 @@ package com.example.picknwhip_be.domain.chat.repository;
 
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
-import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 package com.example.picknwhip_be.global.apiPayload.handler;
 
-import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
-import com.example.picknwhip_be.domain.user.entity.User;
-import com.example.picknwhip_be.domain.user.repository.UserRepository;
+import com.example.picknwhip_be.domain.review.service.user.dto.auth.KakaoUserInfo;
+import com.example.picknwhip_be.domain.review.service.user.entity.User;
+import com.example.picknwhip_be.domain.review.service.user.repository.UserRepository;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

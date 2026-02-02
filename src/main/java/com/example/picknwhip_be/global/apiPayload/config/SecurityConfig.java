@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.global.apiPayload.config;
 
-import com.example.picknwhip_be.domain.user.service.CustomOAuth2UserService;
+import com.example.picknwhip_be.domain.review.service.user.service.CustomOAuth2UserService;
 import com.example.picknwhip_be.global.apiPayload.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import java.util.List;
