@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.design.converter;
 
+import com.example.picknwhip_be.domain.custom.converter.CustomConverter;
 import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
 import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
@@ -39,23 +40,13 @@ public class DesignConverter {
         partitionedOptions.get(true).stream()
             .map(
                 item ->
-                    CustomResDTO.Topping.builder()
-                        .optionId(item.getCustomOption().getId())
-                        .name(item.getCustomOption().getOptionName())
-                        .x(item.getPositionX())
-                        .y(item.getPositionY())
-                        .build())
+                    CustomConverter.createToppingDTO(
+                        item.getCustomOption(), item.getPositionX(), item.getPositionY()))
             .toList();
 
     List<CustomResDTO.Option> options =
         partitionedOptions.get(false).stream()
-            .map(
-                item ->
-                    CustomResDTO.Option.builder()
-                        .optionId(item.getCustomOption().getId())
-                        .name(item.getCustomOption().getOptionName())
-                        .category(item.getCustomOption().getCategory())
-                        .build())
+            .map(item -> CustomConverter.createOptionDTO(item.getCustomOption()))
             .toList();
 
     return DesignResDTO.GetDesignDetailDTO.builder()
