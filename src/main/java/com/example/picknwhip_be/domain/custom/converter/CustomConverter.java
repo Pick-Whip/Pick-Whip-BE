@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 public class CustomConverter {
 
   public static CustomResDTO.GetDraftDetailDTO toDraftDetailDTO(OrderDraft draft) {
@@ -66,7 +65,6 @@ public class CustomConverter {
         .build();
   }
 
-
   public static CustomResDTO.Topping createToppingDTO(CustomOption option, Double x, Double y) {
     return CustomResDTO.Topping.builder()
         .optionId(option.getId())
@@ -82,26 +80,9 @@ public class CustomConverter {
     return CustomResDTO.Option.builder()
         .optionId(option.getId())
         .optionName(option.getOptionName())
-        .category(option.getCategory())
+        .category(option.getCategory()) // Enum이나 String
         .additionalPrice(option.getAdditionalPrice())
         .colorRgbCode(option.getColorRgbCode())
-  public static CustomResDTO.GetDesignOptionDTO toDesignOptionDTO(
-      Long shopId, List<ShopCakeSize> shopCakeSizes, List<CustomOption> customOptions) {
-    return CustomResDTO.GetDesignOptionDTO.builder()
-        .shopId(shopId)
-        .cakeSizes(shopCakeSizes.stream().map(ShopCakeSize::getSizeName).toList())
-        .customOptions(
-            customOptions.stream()
-                .map(
-                    item ->
-                        CustomResDTO.OptionList.builder()
-                            .optionId(item.getId())
-                            .category(item.getCategory())
-                            .optionName(item.getOptionName())
-                            .additionalPrice(item.getAdditionalPrice())
-                            .colorRgbCode(item.getColorRgbCode())
-                            .build())
-                .toList())
         .build();
   }
 }

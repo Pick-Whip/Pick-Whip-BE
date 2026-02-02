@@ -69,16 +69,6 @@ public class CustomResDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class GetDesignOptionDTO {
-    private Long shopId;
-    private List<String> cakeSizes;
-    private List<Option> customOptions;
-  }
-
-  @Builder
-  @Getter
-  @NoArgsConstructor
-  @AllArgsConstructor
   public static class Option {
     private Long optionId;
     private OptionCategory category;
@@ -94,18 +84,6 @@ public class CustomResDTO {
   public static class GetDesignOptionDTO {
     private Long shopId;
     private List<String> cakeSizes;
-    private List<OptionList> customOptions;
-  }
-
-  @Builder
-  @Getter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class OptionList {
-    private Long optionId;
-    private OptionCategory category;
-    private String optionName;
-    private int additionalPrice;
-    private String colorRgbCode;
+    private List<Option> customOptions;
   }
 }
