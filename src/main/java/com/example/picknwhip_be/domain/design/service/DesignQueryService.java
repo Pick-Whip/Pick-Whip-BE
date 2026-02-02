@@ -9,4 +9,5 @@ public interface DesignQueryService {
   DesignResDTO.GetDesignListDTO findDesignListByShopId(Long shopId);
 
   DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId);
+
 }

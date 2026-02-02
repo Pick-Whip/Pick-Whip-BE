@@ -13,6 +13,7 @@ public enum FavoriteSuccessCode implements BaseSuccessCode {
   FAVORITE_LIST_FETCHED(HttpStatus.OK, "FAVORITE200_3", "마이픽 가게 목록 조회가 완료되었습니다."),
 
   FAVORITE_DESIGN_LIST_FETCHED(HttpStatus.OK, "FAVORITE200_4", "마이픽 디자인 목록 조회가 완료되었습니다.");
+
   private final HttpStatus status;
   private final String code;
   private final String message;

@@ -24,7 +24,6 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
-  private final DesignGalleryRepository designGalleryRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -36,6 +35,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
         favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
 
     return DesignConverter.toDesignListDTO(designs);
+
   }
 
   @Override
@@ -65,5 +65,5 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     }
 
     return DesignConverter.toDesignDetailDTO(design);
-  }
+
 }
