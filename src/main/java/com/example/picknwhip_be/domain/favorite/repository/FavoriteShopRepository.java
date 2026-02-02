@@ -5,6 +5,7 @@ import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,7 @@ public interface FavoriteShopRepository extends JpaRepository<FavoriteShop, Long
           + "ORDER BY fs.id DESC")
   List<FavoriteShop> findAllByUserIdAndCursor(
       @Param("userId") Long userId, @Param("cursor") Long cursor, Pageable pageable);
+
+  @Query("SELECT distinct f.shop.id FROM FavoriteShop f WHERE f.user.userId = :userId")
+  Set<Long> findShopIdsByUserId(@Param("userId") Long userId);
 }

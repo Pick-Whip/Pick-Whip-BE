@@ -23,6 +23,7 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO design_gallery (
     id,
     shop_id,
+    shop_cake_size_id,
     design_name,
     base_price,
     image_url,
@@ -31,6 +32,7 @@ INSERT INTO design_gallery (
 ) VALUES (
              1,
              1,
+          1,
              '심플 플라워 디자인',
              35000,
              NULL,

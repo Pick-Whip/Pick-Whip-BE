@@ -4,7 +4,9 @@ import com.example.picknwhip_be.domain.design.dto.DesignResDTO;
 
 public interface DesignQueryService {
 
-  DesignResDTO.GetDesignListDTO findDesignListByUserId(Long id);
+  DesignResDTO.GetDesignListDTO findDesignListByUserId(Long userId);
 
-  DesignResDTO.GetDesignListDTO findDesignListByShopId(Long id);
+  DesignResDTO.GetDesignListDTO findDesignListByShopId(Long shopId);
+
+  DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId);
 }
