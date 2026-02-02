@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
-  boolean existsByOrderIdAndDeletedAtIsNull(Long orderId);
+  boolean existsByOrderId(Long orderId);
 
   @Query(
       value =
