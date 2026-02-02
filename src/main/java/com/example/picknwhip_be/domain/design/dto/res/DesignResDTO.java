@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.design.dto.res;
 
-import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
+import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import java.util.List;
