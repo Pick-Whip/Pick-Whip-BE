@@ -35,7 +35,6 @@ public class DesignQueryServiceImpl implements DesignQueryService {
         favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
 
     return DesignConverter.toDesignListDTO(designs);
-
   }
 
   @Override
@@ -65,5 +64,5 @@ public class DesignQueryServiceImpl implements DesignQueryService {
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
     return DesignConverter.toDesignDetailDTO(design);
-
+  }
 }
