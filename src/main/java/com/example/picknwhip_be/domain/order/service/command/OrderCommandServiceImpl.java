@@ -12,10 +12,14 @@ import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.order.entity.OrderItem;
 import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
+import com.example.picknwhip_be.domain.order.exception.OrderException;
+import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.order.repository.DailyShopOrderCounterRepository;
-import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
+import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,8 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     private final OrderDraftRepository orderDraftRepository;
     private final DailyShopOrderCounterRepository counterRepository;
 
+    private static final int SLOT_CAPACITY = 1;
+
     @Override
     public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
         OrderDraft draft = orderDraftRepository.findById(dto.getDraftId())
@@ -42,8 +48,8 @@ public class OrderCommandServiceImpl implements OrderCommandService {
             throw new CustomException(CustomErrorCode.FORBIDDEN);
         }
 
+        checkSlotAvailability(draft.getShop().getId(), draft.getPickupDatetime());
         String orderCode = generateOrderCode(draft.getShop().getId(), LocalDate.now());
-
         int estimatedPrice = draft.getShopCakeSize().getPrice();
         for(OrderDraftItem item : draft.getItems()) {
             estimatedPrice += item.getCustomOption().getAdditionalPrice();
@@ -53,7 +59,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
                 .user(draft.getUser())
                 .customerName(dto.getCustomerName())
                 .customerPhone(dto.getCustomerPhone())
-                .additionalRequest(dto.getAdditionalRequest())
+                .orderAdditionalRequest(dto.getAdditionalRequest())
                 .shop(draft.getShop())
                 .shopCakeSize(draft.getShopCakeSize())
                 .designGallery(draft.getDesignGallery())
@@ -86,6 +92,22 @@ public class OrderCommandServiceImpl implements OrderCommandService {
         orderDraftRepository.delete(draft);
 
         return OrderResDTO.from(savedOrder);
+    }
+
+    private void checkSlotAvailability(Long shopId, LocalDateTime pickupDatetime) {
+        LocalDate date = pickupDatetime.toLocalDate();
+        LocalTime time = pickupDatetime.toLocalTime();
+        List<Object[]> counts = orderRepository.countOrdersByShopAndDate(shopId, date);
+
+        long currentCount = counts.stream()
+                .filter(obj -> ((LocalDateTime) obj[0]).toLocalTime().equals(time))
+                .mapToLong(obj -> (Long) obj[1])
+                .findFirst()
+                .orElse(0L);
+
+        if (currentCount >= SLOT_CAPACITY) {
+            throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
+        }
     }
 
     private String generateOrderCode(Long shopId, LocalDate date) {

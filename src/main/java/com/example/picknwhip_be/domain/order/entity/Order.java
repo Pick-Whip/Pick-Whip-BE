@@ -65,8 +65,8 @@ public class Order extends BaseEntity {
   @Column(name = "lettering_alignment")
   private LetteringAlignment letteringAlignment;
 
-  @Column(name = "additional_request")
-  private String additionalRequest;
+  @Column(name = "order_additional_request")
+  private String orderAdditionalRequest;
 
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
