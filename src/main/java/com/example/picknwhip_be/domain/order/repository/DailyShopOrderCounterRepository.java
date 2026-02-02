@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface DailyShopOrderCounterRepository extends JpaRepository<DailyShopOrderCounter, Long> {
+public interface DailyShopOrderCounterRepository
+    extends JpaRepository<DailyShopOrderCounter, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT c FROM DailyShopOrderCounter c WHERE c.shopId = :shopId AND c.date = :date")
-    Optional<DailyShopOrderCounter> findByShopIdAndDateWithLock(
-            @Param("shopId") Long shopId, @Param("date") LocalDate date);
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT c FROM DailyShopOrderCounter c WHERE c.shopId = :shopId AND c.date = :date")
+  Optional<DailyShopOrderCounter> findByShopIdAndDateWithLock(
+      @Param("shopId") Long shopId, @Param("date") LocalDate date);
 }

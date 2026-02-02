@@ -7,6 +7,7 @@ import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final OrderCommandService orderCommandService;
+  private final OrderCommandService orderCommandService;
 
-    @Operation(summary = "주문 생성하기", description = "작성된 주문서(Draft)를 바탕으로 실제 주문을 생성합니다.")
-    @PostMapping("")
-    public ApiResponse<OrderResDTO.OrderCompleteDTO> createOrder(
-            @ExtractPayload Long userId,
-            @Valid @RequestBody OrderReqDTO.CreateOrderDTO dto) {
+  @Operation(summary = "주문 생성하기", description = "작성된 주문서(Draft)를 바탕으로 실제 주문을 생성합니다.")
+  @PostMapping("")
+  public ApiResponse<OrderResDTO.OrderCompleteDTO> createOrder(
+      @Parameter(hidden = true) @ExtractPayload Long userId,
+      @Valid @RequestBody OrderReqDTO.CreateOrderDTO dto) {
 
-        OrderResDTO.OrderCompleteDTO result = orderCommandService.createOrder(userId, dto);
-        return ApiResponse.of(GeneralSuccessCode.CREATED, result);
-    }
+    OrderResDTO.OrderCompleteDTO result = orderCommandService.createOrder(userId, dto);
+    return ApiResponse.of(GeneralSuccessCode.CREATED, result);
+  }
 }

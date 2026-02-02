@@ -4,5 +4,5 @@ import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
 
 public interface OrderCommandService {
-    OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto);
+  OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto);
 }

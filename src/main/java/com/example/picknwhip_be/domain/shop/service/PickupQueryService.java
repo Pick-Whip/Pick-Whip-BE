@@ -4,5 +4,5 @@ import com.example.picknwhip_be.domain.shop.dto.res.PickupResDTO;
 import java.time.LocalDate;
 
 public interface PickupQueryService {
-    PickupResDTO.PickupCalendarDTO getAvailableSlots(Long shopId, LocalDate date);
+  PickupResDTO.PickupCalendarDTO getAvailableSlots(Long shopId, LocalDate date);
 }

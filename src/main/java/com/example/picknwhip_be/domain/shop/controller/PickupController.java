@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/shops")
 public class PickupController {
 
-    private final PickupQueryService pickupQueryService;
+  private final PickupQueryService pickupQueryService;
 
-    @Operation(summary = "픽업 가능 시간 조회", description = "특정 날짜의 예약 가능 시간을 조회합니다.")
-    @GetMapping("/{shopId}/pickup-availability")
-    public ApiResponse<PickupResDTO.PickupCalendarDTO> getPickupAvailability(
-            @PathVariable Long shopId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+  @Operation(summary = "픽업 가능 시간 조회", description = "특정 날짜의 예약 가능 시간을 조회합니다.")
+  @GetMapping("/{shopId}/pickup-availability")
+  public ApiResponse<PickupResDTO.PickupCalendarDTO> getPickupAvailability(
+      @PathVariable Long shopId,
+      @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
 
-        PickupResDTO.PickupCalendarDTO result = pickupQueryService.getAvailableSlots(shopId, date);
-        return ApiResponse.of(GeneralSuccessCode.OK, result);
-    }
+    PickupResDTO.PickupCalendarDTO result = pickupQueryService.getAvailableSlots(shopId, date);
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 }
