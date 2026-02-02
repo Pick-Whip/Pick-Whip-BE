@@ -58,4 +58,10 @@ public class ReviewController {
     return ApiResponse.of(
         GeneralSuccessCode.OK, reviewQueryService.getMyReviewList(cursor, size, userId));
   }
+
+  @Operation(summary = "BEST 커스텀 옵션 조회", description = "도움이 많이 된 리뷰 순으로 커스텀 케이크 정보를 조회합니다. (최대 5개)")
+  @GetMapping("/best")
+  public ApiResponse<ReviewResDTO.BestReviewListDTO> getBestReviews() {
+      return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getBestCustomReviews());
+  }
 }
