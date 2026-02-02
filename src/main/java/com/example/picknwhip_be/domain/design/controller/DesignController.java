@@ -38,4 +38,10 @@ public class DesignController {
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
+
+  @GetMapping("/{userId}")
+  public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
+
+    return null;
+  }
 }

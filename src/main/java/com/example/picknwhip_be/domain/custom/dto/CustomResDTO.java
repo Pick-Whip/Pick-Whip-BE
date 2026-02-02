@@ -86,4 +86,26 @@ public class CustomResDTO {
     private int additionalPrice;
     private String colorRgbCode;
   }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class GetDesignOptionDTO {
+    private Long shopId;
+    private List<String> cakeSizes;
+    private List<OptionList> customOptions;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class OptionList {
+    private Long optionId;
+    private OptionCategory category;
+    private String optionName;
+    private int additionalPrice;
+    private String colorRgbCode;
+  }
 }
