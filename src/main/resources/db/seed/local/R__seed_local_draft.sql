@@ -142,13 +142,13 @@ ON DUPLICATE KEY UPDATE custom_option_id = new.custom_option_id;
 INSERT INTO shop_business_hours (
     shop_id, schedule_type, day_of_week, open_time, close_time, is_closed
 ) VALUES
-      (1, 'WEEKLY', 1, '10:00:00', '22:00:00', false), -- 월
-      (1, 'WEEKLY', 2, '10:00:00', '22:00:00', false), -- 화
-      (1, 'WEEKLY', 3, '10:00:00', '22:00:00', false), -- 수
-      (1, 'WEEKLY', 4, '10:00:00', '22:00:00', false), -- 목
-      (1, 'WEEKLY', 5, '10:00:00', '22:00:00', false), -- 금
-      (1, 'WEEKLY', 6, '10:00:00', '22:00:00', false), -- 토
-      (1, 'WEEKLY', 7, '10:00:00', '22:00:00', false)  -- 일
+      (2, 'WEEKLY', 1, '10:00:00', '22:00:00', false), -- 월
+      (2, 'WEEKLY', 2, '10:00:00', '22:00:00', false), -- 화
+      (2, 'WEEKLY', 3, '10:00:00', '22:00:00', false), -- 수
+      (2, 'WEEKLY', 4, '10:00:00', '22:00:00', false), -- 목
+      (2, 'WEEKLY', 5, '10:00:00', '22:00:00', false), -- 금
+      (2, 'WEEKLY', 6, '10:00:00', '22:00:00', false), -- 토
+      (2, 'WEEKLY', 7, '10:00:00', '22:00:00', false)  -- 일
     AS new
 ON DUPLICATE KEY UPDATE
                      open_time = new.open_time,
