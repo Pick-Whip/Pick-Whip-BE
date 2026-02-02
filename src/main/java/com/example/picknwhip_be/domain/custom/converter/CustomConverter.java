@@ -28,7 +28,7 @@ public class CustomConverter {
                 .filter(item -> item.getPositionX() != null)
                 .map(
                     item ->
-                        CustomResDTO.Toppings.builder()
+                        CustomResDTO.Topping.builder()
                             .optionId(item.getCustomOption().getId())
                             .x(item.getPositionX())
                             .y(item.getPositionY())
