@@ -70,6 +70,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
                 .letteringLineCount(draft.getLetteringLineCount())
                 .letteringAlignment(draft.getLetteringAlignment())
                 .referenceImageUrl(draft.getReferenceImageUrl())
+                .paymentMethod("TBD")
                 .paymentStatus(PaymentStatus.WAITING)
                 .totalPrice(estimatedPrice)
                 .orderCode(orderCode)
