@@ -1,7 +1,6 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
-
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
