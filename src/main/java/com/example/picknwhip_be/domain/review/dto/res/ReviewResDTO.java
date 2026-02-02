@@ -39,4 +39,35 @@ public class ReviewResDTO {
       @Schema(description = "리뷰 목록") List<MyReviewItemDTO> items,
       @Schema(description = "다음 커서 값", example = "0") Long nextCursor,
       @Schema(description = "다음 데이터 존재", example = "true") boolean hasNext) {}
+
+  // 홈화면 - 베스트 커스텀 옵션 리뷰 조회 DTO
+  @Builder
+  public record BestReviewListDTO(
+      @Schema(description = "베스트 리뷰 목록") List<BestReviewItemDTO> items) {}
+
+  @Builder
+  public record BestReviewItemDTO(
+      @Schema(description = "작성자 닉네임", example = "해밍") String writerName,
+      @Schema(description = "작성일", example = "2025.12.09") String createdDate, // 포맷팅해서 문자열로 반환
+      @Schema(description = "별점", example = "5") int rating,
+      @Schema(description = "도움이 됐어요 개수", example = "10") Long helpfulCount,
+      @Schema(description = "리뷰 내용", example = "생각보다 크기가 딱 좋았고...") String content,
+      @Schema(description = "리뷰 키워드 문구 목록", example = "[\"요청사항을 잘 들어주셨어요\"]") List<String> keywords,
+      @Schema(description = "케이크 완성 이미지 (옵션 반영된 이미지)", example = "https://s3...")
+          String cakeImageUrl,
+      @Schema(description = "케이크 주문 옵션 상세") CakeOptionDTO options) {}
+
+  @Builder
+  public record CakeOptionDTO(
+      @Schema(description = "디자인 이름 (1호 원형 등)", example = "1호 원형") String designName,
+      @Schema(description = "맛 (시트 + 생크림)", example = "초코 시트 + 생크림") String taste,
+      @Schema(description = "데코 (토핑)", example = "오레오") String deco,
+      @Schema(description = "추가 요청 사항", example = "크리스마스 토퍼") String additionalRequest,
+      @Schema(description = "선택된 컬러 정보 (아이싱, 시트, 크림)") CakeColorsDTO colors) {}
+
+  @Builder
+  public record CakeColorsDTO(
+      @Schema(description = "아이싱 컬러 코드", example = "#F4E0C9") String icingColor,
+      @Schema(description = "시트 컬러 코드", example = "#8B4513") String sheetColor,
+      @Schema(description = "크림 컬러 코드", example = "#D3EBFA") String creamColor) {}
 }

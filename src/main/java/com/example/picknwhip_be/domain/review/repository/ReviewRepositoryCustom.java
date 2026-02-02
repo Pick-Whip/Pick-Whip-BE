@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.review.repository;
 
 import com.example.picknwhip_be.domain.review.dto.ReviewRow;
+import com.example.picknwhip_be.domain.review.entity.Review;
 import java.util.List;
 
 public interface ReviewRepositoryCustom {
@@ -11,4 +12,6 @@ public interface ReviewRepositoryCustom {
   List<ReviewRow.MyReviewImageRow> fetchMyReviewImages(List<Long> reviewIds);
 
   List<ReviewRow.MyReviewReplyRow> fetchMyReviewReplies(List<Long> reviewIds);
+
+  List<Review> findBestHelpfulReviews(int limit);
 }
