@@ -3,10 +3,10 @@ package com.example.picknwhip_be.domain.chat.controller;
 import com.example.picknwhip_be.domain.S3.dto.req.S3ReqDTO;
 import com.example.picknwhip_be.domain.S3.dto.res.S3ResDTO;
 import com.example.picknwhip_be.domain.S3.service.S3Service;
-import com.example.picknwhip_be.domain.chat.dto.req.ChatRequestDTO;
-import com.example.picknwhip_be.domain.chat.dto.res.ChatResponseDTO;
-import com.example.picknwhip_be.domain.chat.service.ChatCommandService;
-import com.example.picknwhip_be.domain.chat.service.ChatQueryService;
+import com.example.picknwhip_be.domain.chat.dto.req.ChatReqDTO;
+import com.example.picknwhip_be.domain.chat.dto.res.ChatResDTO;
+import com.example.picknwhip_be.domain.chat.service.command.ChatCommandService;
+import com.example.picknwhip_be.domain.chat.service.query.ChatQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
@@ -30,8 +30,8 @@ public class ChatRestController {
 
   @Operation(summary = "채팅방 생성 또는 조회 API", description = "기존 채팅방이 있으면 조회하고, 없으면 새로 생성하여 정보를 반환합니다.")
   @PostMapping
-  public ApiResponse<ChatResponseDTO.RoomInfo> createRoom(
-      @ExtractPayload Long userId, @RequestBody ChatRequestDTO.CreateRoom dto) {
+  public ApiResponse<ChatResDTO.RoomInfo> createRoom(
+      @ExtractPayload Long userId, @RequestBody ChatReqDTO.CreateRoom dto) {
     return ApiResponse.of(GeneralSuccessCode.OK, chatCommandService.saveOrCreateRoom(dto, userId));
   }
 
@@ -40,7 +40,7 @@ public class ChatRestController {
       description =
           "커서 기반 페이징을 사용하여 메시지 내역을 조회합니다. 특정 채팅방의 메시지를 과거 순으로 불러오며, 상대방이 보낸 메시지는 읽음 처리됩니다.")
   @GetMapping("/{roomId}/messages")
-  public ApiResponse<ChatResponseDTO.MessageListDTO> getMessages(
+  public ApiResponse<ChatResDTO.MessageListDTO> getMessages(
       @PathVariable Long roomId,
       @ExtractPayload Long userId,
       @RequestParam(required = false) Long cursor, // 이전 페이지의 마지막 메시지 ID
@@ -72,7 +72,7 @@ public class ChatRestController {
       summary = "내 채팅방 목록 조회 API",
       description = "로그인한 사용자가 참여 중인 채팅방 목록을 조회합니다. 가게 이름 검색 및 커서 기반 페이징을 지원합니다.")
   @GetMapping
-  public ApiResponse<ChatResponseDTO.ChatRoomListDTO> getChatRoomList(
+  public ApiResponse<ChatResDTO.ChatRoomListDTO> getChatRoomList(
       @ExtractPayload Long userId,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long cursor,

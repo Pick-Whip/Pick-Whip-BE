@@ -1,9 +1,9 @@
 package com.example.picknwhip_be.domain.custom.controller;
 
-import com.example.picknwhip_be.domain.custom.dto.CustomReqDTO;
-import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
-import com.example.picknwhip_be.domain.custom.service.CustomCommandService;
-import com.example.picknwhip_be.domain.custom.service.CustomQueryService;
+import com.example.picknwhip_be.domain.custom.dto.req.CustomReqDTO;
+import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
+import com.example.picknwhip_be.domain.custom.service.command.CustomCommandService;
+import com.example.picknwhip_be.domain.custom.service.query.CustomQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
