@@ -13,5 +13,9 @@ public interface ReviewRepositoryCustom {
 
   List<ReviewRow.MyReviewReplyRow> fetchMyReviewReplies(List<Long> reviewIds);
 
+  ReviewRow.ReviewDetailRow fetchReviewDetail(Long reviewId);
+
+  List<ReviewRow.KeywordRow> fetchReviewDetailKeywords(Long reviewId);
+
   List<Review> findBestHelpfulReviews(int limit);
 }
