@@ -23,46 +23,55 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FavoriteDesignServiceImpl implements FavoriteDesignService {
 
-    private final UserRepository userRepository;
-    private final DesignGalleryRepository designRepository;
-    private final FavoriteDesignRepository favoriteDesignRepository;
+  private final UserRepository userRepository;
+  private final DesignGalleryRepository designRepository;
+  private final FavoriteDesignRepository favoriteDesignRepository;
 
-    @Override
-    public FavoriteDesignReqDTO addFavoriteDesign(Long designId, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+  @Override
+  public FavoriteDesignReqDTO addFavoriteDesign(Long designId, Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        DesignGallery design = designRepository.findById(designId)
-                .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+    DesignGallery design =
+        designRepository
+            .findById(designId)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
-        if (favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
-            throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
-        }
-
-        try {
-            favoriteDesignRepository.save(
-                    FavoriteDesign.builder().user(user).designGallery(design).build());
-        } catch (DataIntegrityViolationException e) {
-            throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
-        }
-
-        return new FavoriteDesignReqDTO(designId, true);
+    if (favoriteDesignRepository.existsByUserAndDesignGallery(user, design)) {
+      throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
     }
 
-    @Override
-    public FavoriteDesignReqDTO deleteFavoriteDesign(Long designId, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        DesignGallery design = designRepository.findById(designId)
-                .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
-
-        FavoriteDesign favoriteDesign = favoriteDesignRepository
-                .findByUserAndDesignGallery(user, design)
-                .orElseThrow(() -> new FavoriteException(FavoriteErrorCode.DESIGN_NOT_FOUND));
-
-        favoriteDesignRepository.delete(favoriteDesign);
-
-        return new FavoriteDesignReqDTO(designId, false);
+    try {
+      favoriteDesignRepository.save(
+          FavoriteDesign.builder().user(user).designGallery(design).build());
+    } catch (DataIntegrityViolationException e) {
+      throw new FavoriteException(FavoriteErrorCode.DESIGN_ALREADY_EXISTS);
     }
+
+    return new FavoriteDesignReqDTO(designId, true);
+  }
+
+  @Override
+  public FavoriteDesignReqDTO deleteFavoriteDesign(Long designId, Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+    DesignGallery design =
+        designRepository
+            .findById(designId)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+
+    FavoriteDesign favoriteDesign =
+        favoriteDesignRepository
+            .findByUserAndDesignGallery(user, design)
+            .orElseThrow(() -> new FavoriteException(FavoriteErrorCode.DESIGN_NOT_FOUND));
+
+    favoriteDesignRepository.delete(favoriteDesign);
+
+    return new FavoriteDesignReqDTO(designId, false);
+  }
 }
