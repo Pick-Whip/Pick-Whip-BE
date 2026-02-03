@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.order.repository;
 
+import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -7,9 +8,6 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,43 +19,44 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Order> findOrdersByMemberAndType(Long userId, String type, Pageable pageable) {
+    public List<Order> findAllByCursor(Long userId, OrderCursorReqDTO req) {
 
         NumberExpression<Integer> statusScore = getStatusScore();
 
-        List<Order> content = queryFactory
+        return queryFactory
                 .selectFrom(order)
                 .where(
                         order.user.userId.eq(userId),
-                        filterByType(type)
+                        filterByType(req.getType()),
+                        cursorCondition(req, statusScore)
                 )
                 .orderBy(
                         statusScore.asc(),
                         order.pickupDatetime.asc(),
-                        order.id.desc()
+                        order.id.asc()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(req.getLimit() + 1)
                 .fetch();
-
-        Long total = queryFactory
-                .select(order.count())
-                .from(order)
-                .where(
-                        order.user.userId.eq(userId),
-                        filterByType(type)
-                )
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
+    // 1. 탭 분류
     private BooleanExpression filterByType(String type) {
         if ("REQUEST".equalsIgnoreCase(type)) {
             return order.status.in(Status.CONFIRM_WAIT, Status.PROD_CONFIRM, Status.IMPOSSIBLE);
         } else {
             return order.status.in(Status.MAKING, Status.PICKUP_WAIT, Status.COMPLETED);
         }
+    }
+
+    private BooleanExpression cursorCondition(OrderCursorReqDTO req, NumberExpression<Integer> statusScore) {
+        if (req.getLastOrderId() == null) return null;
+
+        return statusScore.gt(req.getLastStatusScore())
+                .or(statusScore.eq(req.getLastStatusScore())
+                        .and(order.pickupDatetime.gt(req.getLastPickupDatetime())))
+                .or(statusScore.eq(req.getLastStatusScore())
+                        .and(order.pickupDatetime.eq(req.getLastPickupDatetime()))
+                        .and(order.id.gt(req.getLastOrderId())));
     }
 
     private NumberExpression<Integer> getStatusScore() {

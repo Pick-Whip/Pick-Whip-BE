@@ -1,9 +1,9 @@
 package com.example.picknwhip_be.domain.order.controller;
 
+import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import com.example.picknwhip_be.global.common.CursorResult;
+import org.springdoc.core.annotations.ParameterObject;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
 import com.example.picknwhip_be.domain.order.service.command.OrderCommandService;
@@ -34,14 +34,13 @@ public class OrderController {
     OrderResDTO.OrderCompleteDTO result = orderCommandService.createOrder(userId, dto);
     return ApiResponse.of(GeneralSuccessCode.CREATED, result);
   }
-    @Operation(summary = "주문 내역 조회", description = "요청 내역(REQUEST) 또는 완료 내역(COMPLETE)을 조회합니다.")
+    @Operation(summary = "주문 내역 조회 (커서 페이징)", description = "무한 스크롤을 위한 API입니다. type=REQUEST(요청) 또는 COMPLETE(완료)를 선택하세요.")
     @GetMapping("/history")
-    public ApiResponse<Page<OrderHistoryResDTO>> getOrderHistory(
-            @Parameter(hidden = true) @ExtractPayload Long userId,
-            @RequestParam(defaultValue = "REQUEST") String type,
-            @PageableDefault(size = 10) Pageable pageable
+    public ApiResponse<CursorResult<OrderHistoryResDTO>> getOrderHistory(
+            @ExtractPayload Long userId,
+            @ParameterObject @ModelAttribute OrderCursorReqDTO reqDto
     ) {
-        Page<OrderHistoryResDTO> result = orderQueryService.getOrderHistory(userId, type, pageable);
+        CursorResult<OrderHistoryResDTO> result = orderQueryService.getOrderHistory(userId, reqDto);
         return ApiResponse.of(GeneralSuccessCode.OK, result);
     }
 }

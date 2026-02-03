@@ -1,9 +1,9 @@
 package com.example.picknwhip_be.domain.order.service.query;
 
+import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.example.picknwhip_be.global.common.CursorResult;
 
 public interface OrderQueryService {
-    Page<OrderHistoryResDTO> getOrderHistory(Long userId, String type, Pageable pageable);
+    CursorResult<OrderHistoryResDTO> getOrderHistory(Long userId, OrderCursorReqDTO req);
 }
