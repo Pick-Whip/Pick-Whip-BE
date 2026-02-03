@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,8 @@ public class OrderCommandServiceImpl implements OrderCommandService {
       throw new CustomException(CustomErrorCode.FORBIDDEN);
     }
 
+    LocalDateTime pickupDatetime = draft.getPickupDatetime().withSecond(0).withNano(0);
+
     checkSlotAvailability(draft.getShop().getId(), draft.getPickupDatetime());
     String orderCode = generateOrderCode(draft.getShop().getId(), LocalDate.now());
     int estimatedPrice = draft.getShopCakeSize().getPrice();
@@ -67,7 +70,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
             .shopCakeSize(draft.getShopCakeSize())
             .designGallery(draft.getDesignGallery())
             .status(Status.CONFIRM_WAIT)
-            .pickupDatetime(draft.getPickupDatetime())
+            .pickupDatetime(pickupDatetime)
             .letteringText(draft.getLetteringText())
             .letteringLineCount(draft.getLetteringLineCount())
             .letteringAlignment(draft.getLetteringAlignment())
@@ -109,16 +112,30 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   }
 
   private String generateOrderCode(Long shopId, LocalDate date) {
-    DailyShopOrderCounter counter =
-        counterRepository
-            .findByShopIdAndDateWithLock(shopId, date)
-            .orElseGet(
-                () -> DailyShopOrderCounter.builder().shopId(shopId).date(date).count(0).build());
+    int maxRetries = 3;
+    int retryCount = 0;
 
-    counter.increaseCount();
-    counterRepository.save(counter);
+    while (retryCount < maxRetries) {
+      try {
+        DailyShopOrderCounter counter =
+            counterRepository
+                .findByShopIdAndDateWithLock(shopId, date)
+                .orElseGet(
+                    () ->
+                        DailyShopOrderCounter.builder().shopId(shopId).date(date).count(0).build());
 
-    String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
-    return String.format("%s_%03d", dateStr, counter.getCount());
+        counter.increaseCount();
+        counterRepository.save(counter);
+        String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
+        return String.format("%s_%03d", dateStr, counter.getCount());
+
+      } catch (DataIntegrityViolationException e) {
+        retryCount++;
+        if (retryCount >= maxRetries) {
+          throw e;
+        }
+      }
+    }
+    throw new RuntimeException("Failed to generate order code");
   }
 }

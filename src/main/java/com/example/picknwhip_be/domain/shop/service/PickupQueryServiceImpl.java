@@ -55,9 +55,9 @@ public class PickupQueryServiceImpl implements PickupQueryService {
         counts.stream()
             .collect(
                 Collectors.toMap(
-                    obj -> ((LocalDateTime) obj[0]).toLocalTime(), obj -> (Long) obj[1]));
-
-    // 3. 슬롯 생성
+                    obj -> ((LocalDateTime) obj[0]).toLocalTime().withSecond(0).withNano(0),
+                    obj -> (Long) obj[1],
+                    Long::sum));
     List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
     LocalTime current = hour.getOpenTime();
 
