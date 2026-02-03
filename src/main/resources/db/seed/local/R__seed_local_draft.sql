@@ -80,7 +80,7 @@ INSERT INTO design_gallery (
     id, shop_id, shop_cake_size_id, design_name, base_price, description
     -- created_at, updated_at이 없을 수 있으므로 제거 (있다면 DB Default 사용)
 ) VALUES (
-             1, 1, 1, '기본 생크림 케이크', 30000, '테스트용 기본 디자인'
+             1, 2, 1, '기본 생크림 케이크', 30000, '테스트용 기본 디자인'
          ) AS new
 ON DUPLICATE KEY UPDATE design_name = new.design_name;
 
@@ -89,7 +89,7 @@ ON DUPLICATE KEY UPDATE design_name = new.design_name;
 INSERT INTO custom_options (
     id, shop_id, category, option_name, additional_price
 ) VALUES (
-             1, 1, 'SHEET', '초코 시트', 2000
+             1, 2, 'SHEET', '초코 시트', 2000
          ) AS new
 ON DUPLICATE KEY UPDATE additional_price = new.additional_price;
 

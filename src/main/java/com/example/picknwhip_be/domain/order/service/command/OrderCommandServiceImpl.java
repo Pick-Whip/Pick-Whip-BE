@@ -19,7 +19,6 @@ import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final OrderItemRepository orderItemRepository;
   private final OrderDraftRepository orderDraftRepository;
   private final DailyShopOrderCounterRepository counterRepository;
-    // TODO: 추후 Shop 엔티티 필드나 가게별로 조건이 다를 시에 수정하기
+  // TODO: 추후 Shop 엔티티 필드나 가게별로 조건이 다를 시에 수정하기
   private static final int SLOT_CAPACITY = 1;
 
   @Override
@@ -100,27 +99,26 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     return OrderResDTO.from(savedOrder);
   }
 
-    private void checkSlotAvailability(Long shopId, LocalDateTime pickupDatetime) {
-        long currentCount = orderRepository.countByShopAndPickupTime(
-                shopId, pickupDatetime, Status.IMPOSSIBLE
-        );
+  private void checkSlotAvailability(Long shopId, LocalDateTime pickupDatetime) {
+    long currentCount =
+        orderRepository.countByShopAndPickupTime(shopId, pickupDatetime, Status.IMPOSSIBLE);
 
-        if (currentCount >= SLOT_CAPACITY) {
-            throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
-        }
+    if (currentCount >= SLOT_CAPACITY) {
+      throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
     }
+  }
 
-    private String generateOrderCode(Long shopId, LocalDate date) {
-        DailyShopOrderCounter counter =
-                counterRepository
-                        .findByShopIdAndDateWithLock(shopId, date)
-                        .orElseGet(
-                                () -> DailyShopOrderCounter.builder().shopId(shopId).date(date).count(0).build());
+  private String generateOrderCode(Long shopId, LocalDate date) {
+    DailyShopOrderCounter counter =
+        counterRepository
+            .findByShopIdAndDateWithLock(shopId, date)
+            .orElseGet(
+                () -> DailyShopOrderCounter.builder().shopId(shopId).date(date).count(0).build());
 
-        counter.increaseCount();
-        counterRepository.save(counter);
+    counter.increaseCount();
+    counterRepository.save(counter);
 
-        String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
-        return String.format("%s_%03d", dateStr, counter.getCount());
-    }
+    String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
+    return String.format("%s_%03d", dateStr, counter.getCount());
+  }
 }

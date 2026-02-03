@@ -45,34 +45,34 @@ public class PickupQueryServiceImpl implements PickupQueryService {
           .build();
     }
 
-      LocalDateTime startOfDay = date.atStartOfDay();
-      LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-      List<Object[]> counts =
-              orderRepository.countOrdersByShopAndDateRange(shopId, startOfDay, endOfDay);
+    List<Object[]> counts =
+        orderRepository.countOrdersByShopAndDateRange(shopId, startOfDay, endOfDay);
 
-      Map<LocalTime, Long> reservedCounts =
-              counts.stream()
-                      .collect(
-                              Collectors.toMap(
-                                      obj -> ((LocalDateTime) obj[0]).toLocalTime(), obj -> (Long) obj[1]));
+    Map<LocalTime, Long> reservedCounts =
+        counts.stream()
+            .collect(
+                Collectors.toMap(
+                    obj -> ((LocalDateTime) obj[0]).toLocalTime(), obj -> (Long) obj[1]));
 
-      // 3. 슬롯 생성
-      List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
-      LocalTime current = hour.getOpenTime();
+    // 3. 슬롯 생성
+    List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
+    LocalTime current = hour.getOpenTime();
 
-      while (current.isBefore(hour.getCloseTime())) {
-          long currentCount = reservedCounts.getOrDefault(current, 0L);
-          boolean isAvailable = currentCount < SLOT_CAPACITY;
+    while (current.isBefore(hour.getCloseTime())) {
+      long currentCount = reservedCounts.getOrDefault(current, 0L);
+      boolean isAvailable = currentCount < SLOT_CAPACITY;
 
-          slots.add(new PickupResDTO.TimeSlotDTO(current, isAvailable));
-          current = current.plusMinutes(30);
-      }
+      slots.add(new PickupResDTO.TimeSlotDTO(current, isAvailable));
+      current = current.plusMinutes(30);
+    }
 
-      return PickupResDTO.PickupCalendarDTO.builder()
-              .date(date.toString())
-              .isClosed(false)
-              .slots(slots)
-              .build();
+    return PickupResDTO.PickupCalendarDTO.builder()
+        .date(date.toString())
+        .isClosed(false)
+        .slots(slots)
+        .build();
   }
 }
