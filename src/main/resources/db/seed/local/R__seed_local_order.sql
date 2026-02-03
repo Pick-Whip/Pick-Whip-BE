@@ -61,6 +61,7 @@ INSERT INTO orders (
     lettering_line_count,
     lettering_alignment,
     additional_request,
+    order_additional_request,
     reference_image_url,
     payment_method,
     payment_status,
@@ -68,7 +69,10 @@ INSERT INTO orders (
     deposit_amount,
     rejection_reason,
     created_at,
-    updated_at
+    updated_at,
+    order_code,
+    customer_name,
+    customer_phone
 ) VALUES (
              1,
              1,
@@ -81,6 +85,7 @@ INSERT INTO orders (
              'ONE_LINE',
              'CENTER',
              '딸기 많이 올려주세요',
+          '주문이 완료되면 문자 한번만 남겨주세요',
              'https://example.com/reference/sample.jpg',
              'CARD',
              'PAID',
@@ -88,7 +93,10 @@ INSERT INTO orders (
              10000,
              NULL,
              NOW(),
-             NOW()
+             NOW(),
+          '260203_001',
+          '김픽휩',
+          '010-1234-5678'
          ) AS new
 ON DUPLICATE KEY UPDATE
                      user_id = new.user_id,
@@ -101,10 +109,14 @@ ON DUPLICATE KEY UPDATE
                      lettering_line_count = new.lettering_line_count,
                      lettering_alignment = new.lettering_alignment,
                      additional_request = new.additional_request,
+                     order_additional_request = new.order_additional_request,
                      reference_image_url = new.reference_image_url,
                      payment_method = new.payment_method,
                      payment_status = new.payment_status,
                      total_price = new.total_price,
                      deposit_amount = new.deposit_amount,
                      rejection_reason = new.rejection_reason,
-                     updated_at = NOW();
+                     updated_at = NOW(),
+                     order_code = new.order_code,
+                     customer_name = new.customer_name,
+                     customer_phone = new.customer_phone;
