@@ -40,6 +40,21 @@ public class ReviewResDTO {
       @Schema(description = "다음 커서 값", example = "0") Long nextCursor,
       @Schema(description = "다음 데이터 존재", example = "true") boolean hasNext) {}
 
+  // 리뷰 상세 조회 DTO
+  //    public record ReviewDetailDTO(
+  //            @Schema(description = "리뷰 내용") ReviewDTO review,
+  //            @Schema(description = "닉네임") String Nickname,
+  //            @Schema(description = "프로필 사진 url") String profileUrl,
+  //            @Schema(description = "키워드 목록") List<String> keywords
+  //    ) {}
+
+  // 리뷰 도움 선택/취소 DTO
+  @Builder
+  public record ReviewLikeDTO(
+      @Schema(description = "리뷰 ID") Long reviewId,
+      @Schema(description = "도움이 됐어요 여부") boolean isLike,
+      @Schema(description = "도움이 됐어요 수") Long likeCount) {}
+
   // 홈화면 - 베스트 커스텀 옵션 리뷰 조회 DTO
   @Builder
   public record BestReviewListDTO(

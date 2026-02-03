@@ -64,4 +64,29 @@ public class ReviewController {
   public ApiResponse<ReviewResDTO.BestReviewListDTO> getBestReviews() {
     return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getBestCustomReviews());
   }
+
+  @Operation(summary = "리뷰 도움 선택 by 슝/하승연", description = "리뷰에 ‘도움이 됐어요’를 선택하는 기능입니다.")
+  @PutMapping("/{reviewId}/likes")
+  public ApiResponse<ReviewResDTO.ReviewLikeDTO> updateReviewLike(
+      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewCommandService.saveReviewLike(reviewId, userId));
+  }
+
+  @Operation(summary = "리뷰 도움 취소 by 슝/하승연", description = "리뷰에 ‘도움이 됐어요’를 취소하는 기능입니다.")
+  @DeleteMapping("/{reviewId}/likes")
+  public ApiResponse<ReviewResDTO.ReviewLikeDTO> deleteReviewLike(
+      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewCommandService.deleteReviewLike(reviewId, userId));
+  }
+
+  //    @Operation(summary = "리뷰 상세 조회 by 슝/하승연", description = "특정 리뷰의 정보를 상세 조회하는 기능입니다.")
+  //    @GetMapping("/{reviewId}")
+  //    public ApiResponse<ReviewResDTO.ReviewLikeDTO> getReviewDetail(
+  //            @PathVariable Long reviewId,
+  //            @Parameter(hidden = true) @ExtractPayload Long userId
+  //    ){
+  //        return ApiResponse.of(GeneralSuccessCode.CREATED, (reviewId, userId));
+  //    }
 }

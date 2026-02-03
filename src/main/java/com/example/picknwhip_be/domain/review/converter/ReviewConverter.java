@@ -5,6 +5,8 @@ import com.example.picknwhip_be.domain.review.dto.ReviewRow;
 import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
+import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
+import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,19 @@ public class ReviewConverter {
         .items(items)
         .nextCursor(nextCursor)
         .hasNext(hasNext)
+        .build();
+  }
+
+  public static ReviewLike toReviewLike(Review review, User user) {
+    return ReviewLike.builder().review(review).user(user).build();
+  }
+
+  public static ReviewResDTO.ReviewLikeDTO toReviewLikeDTO(
+      Long reviewId, boolean isLike, Long likeCount) {
+    return ReviewResDTO.ReviewLikeDTO.builder()
+        .reviewId(reviewId)
+        .isLike(isLike)
+        .likeCount(likeCount)
         .build();
   }
 }

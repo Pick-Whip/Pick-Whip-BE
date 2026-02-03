@@ -8,4 +8,8 @@ public interface ReviewCommandService {
   ReviewResDTO.WriteDTO createReview(Long orderId, ReviewReqDTO.WriteDTO dto, Long userId);
 
   Void deleteReview(Long reviewId, Long userId);
+
+  ReviewResDTO.ReviewLikeDTO saveReviewLike(Long reviewId, Long userId);
+
+  ReviewResDTO.ReviewLikeDTO deleteReviewLike(Long reviewId, Long userId);
 }
