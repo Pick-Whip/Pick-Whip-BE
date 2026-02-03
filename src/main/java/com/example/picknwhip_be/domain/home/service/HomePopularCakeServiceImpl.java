@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.home.service;
 
-import com.example.picknwhip_be.domain.favorite.service.DesignMyPickChecker;
+import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
 import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResDTO;
 import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
 import com.example.picknwhip_be.domain.home.exception.HomeException;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class HomePopularCakeServiceImpl implements HomePopularCakeService {
 
   private final PopularCakeRankingRepository rankingRepository;
-  private final DesignMyPickChecker designMyPickChecker;
+  private final DesignMyPickCheckerService designMyPickChecker;
 
   @Override
   @Transactional(readOnly = true)

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
-import com.example.picknwhip_be.domain.favorite.service.DesignMyPickChecker;
+import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
 import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResDTO;
 import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
 import com.example.picknwhip_be.domain.home.exception.HomeException;
@@ -32,7 +32,7 @@ class HomePopularCakeServiceTest {
 
   @Mock private PopularCakeRankingRepository rankingRepository;
 
-  @Mock private DesignMyPickChecker designMyPickChecker;
+  @Mock private DesignMyPickCheckerService designMyPickChecker;
 
   @Test
   @DisplayName("인기 케이크 Top5 조회 성공 - 로그인 유저 (마이픽 포함)")
