@@ -56,6 +56,29 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   }
 
   @Override
+  public ReviewResDTO.ReviewDetailDTO getReviewDetail(Long reviewId) {
+    ReviewRow.ReviewDetailRow review = reviewRepository.fetchReviewDetail(reviewId);
+    List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewDetailKeywords(reviewId);
+    List<ReviewRow.MyReviewImageRow> imageRows =
+        reviewRepository.fetchMyReviewImages(List.of(reviewId));
+    List<String> imageUrls = extractImageUrlsForReview(reviewId, imageRows);
+
+    List<ReviewResDTO.KeywordDTO> keywords =
+        keywordRows.stream().map(k -> new ReviewResDTO.KeywordDTO(k.code(), k.label())).toList();
+
+    return ReviewConverter.toReviewDetailDTO(
+        reviewId,
+        review.rating(),
+        review.content(),
+        review.reply(),
+        imageUrls,
+        review.createdAt(),
+        review.nickname(),
+        review.profileUrl(),
+        keywords);
+  }
+
+  @Override
   public ReviewResDTO.BestReviewListDTO getBestCustomReviews() {
     // 베스트 리뷰 조회
     List<Review> reviews = reviewRepository.findBestHelpfulReviews(5);
@@ -197,5 +220,11 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   private double roundTo1Decimal(Double avg) {
     double value = (avg == null) ? 0.0 : avg;
     return Math.round(value * 10.0) / 10.0;
+  }
+
+  private List<String> extractImageUrlsForReview(
+      Long reviewId, List<ReviewRow.MyReviewImageRow> imageRows) {
+
+    return groupImageUrlsByReviewId(imageRows).getOrDefault(reviewId, List.of());
   }
 }

@@ -6,7 +6,9 @@ import com.example.picknwhip_be.domain.review.dto.*;
 import com.example.picknwhip_be.domain.review.entity.QReview;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewImage;
+import com.example.picknwhip_be.domain.review.entity.mapping.QReviewKeyword;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewReply;
+import com.example.picknwhip_be.domain.review.entity.mapping.QReviewSelectedKeyword;
 import com.example.picknwhip_be.domain.shop.entity.QShop;
 import com.example.picknwhip_be.domain.user.entity.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,6 +26,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
   private static final QReviewReply reviewReply = QReviewReply.reviewReply;
   private static final QUser user = QUser.user;
   private static final QDesignGallery designGallery = QDesignGallery.designGallery;
+  private static final QReviewKeyword reviewKeyword = QReviewKeyword.reviewKeyword;
+  private static final QReviewSelectedKeyword reviewSelectedKeyword =
+      QReviewSelectedKeyword.reviewSelectedKeyword;
 
   @Override
   public ReviewRow.MyReviewSummaryRow fetchMyReviewSummary(Long userId) {
@@ -83,6 +88,39 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         .select(new QReviewRow_MyReviewReplyRow(reviewReply.review.id, reviewReply.content))
         .from(reviewReply)
         .where(reviewReply.review.id.in(reviewIds), reviewReply.deletedAt.isNull())
+        .fetch();
+  }
+
+  @Override
+  public ReviewRow.ReviewDetailRow fetchReviewDetail(Long reviewId) {
+    return queryFactory
+        .select(
+            new QReviewRow_ReviewDetailRow(
+                review.id,
+                user.nickname,
+                user.profileImageUrl,
+                review.rating,
+                review.content,
+                review.createdAt,
+                reviewReply.content))
+        .from(review)
+        .join(review.user, user)
+        .leftJoin(reviewReply)
+        .on(reviewReply.review.id.eq(review.id), reviewReply.deletedAt.isNull())
+        .where(review.id.eq(reviewId), review.deletedAt.isNull())
+        .fetchOne();
+  }
+
+  @Override
+  public List<ReviewRow.KeywordRow> fetchReviewDetailKeywords(Long reviewId) {
+    return queryFactory
+        .select(
+            new QReviewRow_KeywordRow(
+                reviewSelectedKeyword.review.id, reviewKeyword.code, reviewKeyword.label))
+        .from(reviewSelectedKeyword)
+        .join(reviewSelectedKeyword.keyword, reviewKeyword)
+        .where(reviewSelectedKeyword.review.id.eq(reviewId))
+        .orderBy(reviewKeyword.id.asc())
         .fetch();
   }
 
