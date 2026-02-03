@@ -22,7 +22,7 @@ public class PickupQueryServiceImpl implements PickupQueryService {
   private final ShopBusinessHourRepository businessHourRepository;
   private final OrderRepository orderRepository;
 
-  // 30분 단위 슬롯 당 최대 수용량 (추후 Shop 엔티티로 이동 가능)
+  // TODO: 추후에 상황 확인해서 가게마다 다르면 변경하기
   private static final int SLOT_CAPACITY = 1;
 
   @Override
@@ -45,28 +45,34 @@ public class PickupQueryServiceImpl implements PickupQueryService {
           .build();
     }
 
-    List<Object[]> counts = orderRepository.countOrdersByShopAndDate(shopId, date);
-    Map<LocalTime, Long> reservedCounts =
-        counts.stream()
-            .collect(
-                Collectors.toMap(
-                    obj -> ((LocalDateTime) obj[0]).toLocalTime(), obj -> (Long) obj[1]));
+      LocalDateTime startOfDay = date.atStartOfDay();
+      LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-    List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
-    LocalTime current = hour.getOpenTime();
+      List<Object[]> counts =
+              orderRepository.countOrdersByShopAndDateRange(shopId, startOfDay, endOfDay);
 
-    while (current.isBefore(hour.getCloseTime())) {
-      long currentCount = reservedCounts.getOrDefault(current, 0L);
-      boolean isAvailable = currentCount < SLOT_CAPACITY;
+      Map<LocalTime, Long> reservedCounts =
+              counts.stream()
+                      .collect(
+                              Collectors.toMap(
+                                      obj -> ((LocalDateTime) obj[0]).toLocalTime(), obj -> (Long) obj[1]));
 
-      slots.add(new PickupResDTO.TimeSlotDTO(current, isAvailable));
-      current = current.plusMinutes(30);
-    }
+      // 3. 슬롯 생성
+      List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
+      LocalTime current = hour.getOpenTime();
 
-    return PickupResDTO.PickupCalendarDTO.builder()
-        .date(date.toString())
-        .isClosed(false)
-        .slots(slots)
-        .build();
+      while (current.isBefore(hour.getCloseTime())) {
+          long currentCount = reservedCounts.getOrDefault(current, 0L);
+          boolean isAvailable = currentCount < SLOT_CAPACITY;
+
+          slots.add(new PickupResDTO.TimeSlotDTO(current, isAvailable));
+          current = current.plusMinutes(30);
+      }
+
+      return PickupResDTO.PickupCalendarDTO.builder()
+              .date(date.toString())
+              .isClosed(false)
+              .slots(slots)
+              .build();
   }
 }
