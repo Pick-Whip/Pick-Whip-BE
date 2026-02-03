@@ -30,4 +30,21 @@ public class ReviewRow {
     @QueryProjection
     public MyReviewSummaryRow {}
   }
+
+  public record ReviewDetailRow(
+      Long reviewId,
+      String nickname,
+      String profileUrl,
+      int rating,
+      String content,
+      LocalDateTime createdAt,
+      String reply) {
+    @QueryProjection
+    public ReviewDetailRow {}
+  }
+
+  public record KeywordRow(Long reviewId, String code, String label) {
+    @QueryProjection
+    public KeywordRow {}
+  }
 }

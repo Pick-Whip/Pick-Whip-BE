@@ -7,6 +7,7 @@ import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
 import com.example.picknwhip_be.domain.user.entity.User;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,29 @@ public class ReviewConverter {
         .reviewId(reviewId)
         .isLike(isLike)
         .likeCount(likeCount)
+        .build();
+  }
+
+  public static ReviewResDTO.ReviewDetailDTO toReviewDetailDTO(
+      Long reviewId,
+      int rating,
+      String content,
+      String reply,
+      List<String> imageUrls,
+      LocalDateTime createdDate,
+      String nickname,
+      String profileUrl,
+      List<ReviewResDTO.KeywordDTO> keywords) {
+    return ReviewResDTO.ReviewDetailDTO.builder()
+        .reviewId(reviewId)
+        .nickname(nickname)
+        .profileUrl(profileUrl)
+        .rating(rating)
+        .content(content)
+        .imageUrls(imageUrls)
+        .keywords(keywords)
+        .createdDate(createdDate)
+        .reply(reply)
         .build();
   }
 }
