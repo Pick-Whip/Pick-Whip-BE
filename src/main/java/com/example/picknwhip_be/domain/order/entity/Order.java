@@ -88,7 +88,7 @@ public class Order extends BaseEntity {
   private int totalPrice;
 
   @Column(name = "deposit_amount")
-  private int depositAmount;
+  private Integer depositAmount;
 
   @Column(name = "rejection_reason")
   private String rejectionReason;

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,9 @@ public class OrderHistoryResDTO {
             this.options = order.getOrderItems().stream()
                     .map(OrderItemResDTO::new)
                     .collect(Collectors.toList());
+        } else {
+            this.options = new ArrayList<>(); // null 방지
+            this.cakeName = "옵션 정보 없음";
         }
 
         mapStatusToUi(order);
