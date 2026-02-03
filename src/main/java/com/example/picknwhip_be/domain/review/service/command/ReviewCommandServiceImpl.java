@@ -156,6 +156,13 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
   @Override
   @Transactional
   public ReviewResDTO.ReviewLikeDTO deleteReviewLike(Long reviewId, Long userId) {
+    if (!reviewRepository.existsById(reviewId)) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND);
+    }
+    if (!userRepository.existsById(userId)) {
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
+    }
+
     reviewLikeRepository.deleteByReviewIdAndUserUserId(reviewId, userId);
     long likeCount = reviewLikeRepository.countByReviewId(reviewId);
     return ReviewConverter.toReviewLikeDTO(reviewId, false, likeCount);

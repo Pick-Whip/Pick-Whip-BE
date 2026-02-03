@@ -56,7 +56,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   }
 
   @Override
-  public ReviewResDTO.ReviewDetailDTO getReviewDetail(Long reviewId, Long userId) {
+  public ReviewResDTO.ReviewDetailDTO getReviewDetail(Long reviewId) {
     ReviewRow.ReviewDetailRow review = reviewRepository.fetchReviewDetail(reviewId);
     List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewDetailKeywords(reviewId);
     List<ReviewRow.MyReviewImageRow> imageRows =

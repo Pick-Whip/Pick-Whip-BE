@@ -83,9 +83,7 @@ public class ReviewController {
 
   @Operation(summary = "리뷰 상세 조회 by 슝/하승연", description = "특정 리뷰의 정보를 상세 조회하는 기능입니다.")
   @GetMapping("/{reviewId}")
-  public ApiResponse<ReviewResDTO.ReviewDetailDTO> getReviewDetail(
-      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
-    return ApiResponse.of(
-        GeneralSuccessCode.OK, reviewQueryService.getReviewDetail(reviewId, userId));
+  public ApiResponse<ReviewResDTO.ReviewDetailDTO> getReviewDetail(@PathVariable Long reviewId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getReviewDetail(reviewId));
   }
 }
