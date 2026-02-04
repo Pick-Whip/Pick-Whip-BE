@@ -11,6 +11,10 @@ import com.example.picknwhip_be.domain.chat.exception.ChatException;
 import com.example.picknwhip_be.domain.chat.exception.code.ChatErrorCode;
 import com.example.picknwhip_be.domain.chat.repository.ChatMessageRepository;
 import com.example.picknwhip_be.domain.chat.repository.ChatRoomRepository;
+import com.example.picknwhip_be.domain.order.entity.Order;
+import com.example.picknwhip_be.domain.order.exception.OrderException;
+import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
+import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
@@ -33,6 +37,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
   private final UserRepository userRepository;
   private final ShopRepository shopRepository;
   private final S3Service s3Service;
+  private final OrderRepository orderRepository;
 
   @Override
   public ChatResDTO.RoomInfo saveOrCreateRoom(ChatReqDTO.CreateRoom dto, Long customerId) {
@@ -53,7 +58,24 @@ public class ChatCommandServiceImpl implements ChatCommandService {
                     chatRoomRepository.save(
                         ChatRoom.builder().customer(customer).shop(shop).build()));
 
-    return ChatConverter.toRoomInfo(room);
+    // 요청에 orderId가 포함되어 있다면 해당 주문 정보 조회
+    Order order = null;
+    if (dto.getOrderId() != null) {
+      order =
+          orderRepository
+              .findById(dto.getOrderId())
+              .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+      if (!order.getUser().getUserId().equals(customerId)) {
+        throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
+      }
+
+      if (!order.getShop().getId().equals(shop.getId())) {
+        throw new OrderException(OrderErrorCode.INVALID_ORDER_CONTEXT);
+      }
+    }
+
+    return ChatConverter.toRoomInfo(room, order);
   }
 
   @Override
