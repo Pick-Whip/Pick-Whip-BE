@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.notification.dto.res;
 
+import com.example.picknwhip_be.domain.notification.enums.NotificationKind;
+import com.example.picknwhip_be.domain.notification.enums.NotificationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -16,8 +18,9 @@ public class NotiResDTO {
   @Builder
   public record NotiDTO(
       @Schema(description = "알림 ID", example = "1") Long notificationId,
-      @Schema(description = "알림 타입", example = "주문") String type,
-      @Schema(description = "알림 종류", example = "ORDER_SHEET_CHECKING") String kind,
+      @Schema(description = "알림 타입", example = "ORDER") NotificationType type,
+      @Schema(description = "알림 종류", example = "ORDER_SHEET_CHECKING") NotificationKind kind,
+      @Schema(description = "관련 ID(orderId, reviewId, reportId)", example = "1") Long targetId,
       @Schema(description = "제목", example = "주문서가 전달되었습니다") String title,
       @Schema(description = "본문", example = "가게에서 주문서를 확인 후 알려드릴게요!") String content,
       @Schema(description = "발송일", example = "2026-01-01")

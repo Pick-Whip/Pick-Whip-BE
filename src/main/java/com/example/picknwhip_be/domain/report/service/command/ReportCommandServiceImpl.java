@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.report.service.command;
 
+import com.example.picknwhip_be.domain.notification.enums.NotificationKind;
+import com.example.picknwhip_be.domain.notification.event.CreateNotificationEvent;
 import com.example.picknwhip_be.domain.report.converter.ReportConverter;
 import com.example.picknwhip_be.domain.report.dto.req.ReportReqDTO;
 import com.example.picknwhip_be.domain.report.entity.Report;
@@ -9,6 +11,7 @@ import com.example.picknwhip_be.domain.report.repository.ReportRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.service.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +22,10 @@ public class ReportCommandServiceImpl implements ReportCommandService {
 
   private final ReportRepository reportRepository;
   private final UserQueryService userQueryService;
+  private final ApplicationEventPublisher publisher;
 
   @Override
+  @Transactional
   public Report createReport(Long userId, ReportReqDTO.CreateReportDTO request) {
     User reporter = userQueryService.getUser(userId);
 
@@ -39,6 +44,11 @@ public class ReportCommandServiceImpl implements ReportCommandService {
      */
 
     Report newReport = ReportConverter.toReport(request, reporter);
-    return reportRepository.save(newReport);
+    Report saved = reportRepository.save(newReport);
+    Long reportId = saved.getReportId();
+    publisher.publishEvent(
+        new CreateNotificationEvent(userId, NotificationKind.REPORT_RECEIVED, reportId, null));
+
+    return saved;
   }
 }

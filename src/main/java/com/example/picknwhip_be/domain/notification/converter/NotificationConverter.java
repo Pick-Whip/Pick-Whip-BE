@@ -20,6 +20,9 @@ public class NotificationConverter {
   public static NotiResDTO.NotiDTO toNotiDTO(Notification notification) {
     return NotiResDTO.NotiDTO.builder()
         .notificationId(notification.getId())
+        .type(notification.getType())
+        .kind(notification.getKind())
+        .targetId(notification.getTargetId())
         .title(notification.getTitle())
         .content(notification.getContent())
         .createdDate(notification.getCreatedAt())
