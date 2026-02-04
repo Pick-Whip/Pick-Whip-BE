@@ -11,6 +11,7 @@ public class ChatReqDTO {
   @AllArgsConstructor
   public static class CreateRoom {
     private Long shopId;
+    private Long orderId;
   }
 
   @Getter

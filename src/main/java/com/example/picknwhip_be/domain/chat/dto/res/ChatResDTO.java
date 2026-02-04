@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.chat.dto.res;
 
 import com.example.picknwhip_be.domain.chat.entity.MessageType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,23 @@ public class ChatResDTO {
   public static class RoomInfo {
     private Long roomId;
     private String shopName;
+    private OrderSummary orderSummary;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class OrderSummary {
+    private Long orderId;
+    private String orderCode;
+    private String cakeSize;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    private LocalDateTime pickupDatetime;
+
+    private int totalPrice;
+    private String status;
   }
 
   @Builder
