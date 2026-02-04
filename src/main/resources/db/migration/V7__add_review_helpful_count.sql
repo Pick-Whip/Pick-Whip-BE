@@ -1,0 +1,2 @@
+ALTER TABLE review
+    ADD COLUMN helpful_count BIGINT DEFAULT 0;

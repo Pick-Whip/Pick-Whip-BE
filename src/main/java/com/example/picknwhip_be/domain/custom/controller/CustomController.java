@@ -1,9 +1,9 @@
 package com.example.picknwhip_be.domain.custom.controller;
 
-import com.example.picknwhip_be.domain.custom.dto.CustomReqDTO;
-import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
-import com.example.picknwhip_be.domain.custom.service.CustomCommandService;
-import com.example.picknwhip_be.domain.custom.service.CustomQueryService;
+import com.example.picknwhip_be.domain.custom.dto.req.CustomReqDTO;
+import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
+import com.example.picknwhip_be.domain.custom.service.command.CustomCommandService;
+import com.example.picknwhip_be.domain.custom.service.query.CustomQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
@@ -58,6 +58,15 @@ public class CustomController {
       @Parameter(description = "삭제할 임시저장 ID", required = true) @PathVariable Long draftId) {
 
     CustomResDTO.DeleteDraftDTO result = customQueryService.deleteDraft(draftId, userId);
+
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
+
+  @Operation(summary = "가게 커스텀 가능 옵션 조회", description = "특정 가게의 커스텀 가능한 옵션을 조회합니다.")
+  @GetMapping("/{shopId}")
+  public ApiResponse<CustomResDTO.GetDesignOptionDTO> getDesignOption(
+      @Parameter(description = "조회할 가게 ID", required = true) @PathVariable Long shopId) {
+    CustomResDTO.GetDesignOptionDTO result = customQueryService.findDesignOption(shopId);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }

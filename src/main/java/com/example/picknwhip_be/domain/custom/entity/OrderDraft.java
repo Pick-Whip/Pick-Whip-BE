@@ -61,6 +61,7 @@ public class OrderDraft extends BaseEntity {
   @Column(name = "reference_image_url")
   private String referenceImageUrl;
 
+  @Builder.Default
   @OneToMany(mappedBy = "orderDraft", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderDraftItem> items = new ArrayList<>();
 

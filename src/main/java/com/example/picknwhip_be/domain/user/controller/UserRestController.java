@@ -1,11 +1,11 @@
 package com.example.picknwhip_be.domain.user.controller;
 
 import com.example.picknwhip_be.domain.user.converter.UserConverter;
-import com.example.picknwhip_be.domain.user.dto.req.UserRequestDTO;
-import com.example.picknwhip_be.domain.user.dto.res.UserResponseDTO;
+import com.example.picknwhip_be.domain.user.dto.req.UserReqDTO;
+import com.example.picknwhip_be.domain.user.dto.res.UserResDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
-import com.example.picknwhip_be.domain.user.service.UserCommandService;
-import com.example.picknwhip_be.domain.user.service.UserQueryService;
+import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
+import com.example.picknwhip_be.domain.user.service.query.UserQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
@@ -26,25 +26,25 @@ public class UserRestController {
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
 
-  @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호를 입력받아 업데이트합니다.")
+  @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호, 생일을 입력받아 업데이트합니다.")
   @PostMapping("/extra/info")
   public ApiResponse<String> createExtraInfo(
-      @ExtractPayload Long userId, @Valid @RequestBody UserRequestDTO.ExtraInfoDTO request) {
+      @ExtractPayload Long userId, @Valid @RequestBody UserReqDTO.ExtraInfoDTO request) {
     userCommandService.updateExtraInfo(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, "정보 저장이 완료되었습니다.");
   }
 
   @Operation(summary = "내 정보 조회 API", description = "로그인된 사용자의 프로필 정보를 조회합니다.")
   @GetMapping("/me")
-  public ApiResponse<UserResponseDTO.UserProfileDTO> getMemberProfile(@ExtractPayload Long userId) {
+  public ApiResponse<UserResDTO.UserProfileDTO> getMemberProfile(@ExtractPayload Long userId) {
     User user = userQueryService.getUser(userId);
     return ApiResponse.of(GeneralSuccessCode.OK, UserConverter.toUserProfileDTO(user));
   }
 
   @Operation(summary = "내 정보 수정 API", description = "로그인된 사용자의 정보를 수정합니다.")
   @PatchMapping("/me")
-  public ApiResponse<UserResponseDTO.UpdateProfileResultDTO> updateMemberProfile(
-      @ExtractPayload Long userId, @RequestBody UserRequestDTO.UpdateProfileDTO request) {
+  public ApiResponse<UserResDTO.UpdateProfileResultDTO> updateMemberProfile(
+      @ExtractPayload Long userId, @RequestBody UserReqDTO.UpdateProfileDTO request) {
     User user = userCommandService.updateProfile(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, UserConverter.toUpdateProfileResultDTO(user));
   }
@@ -52,7 +52,7 @@ public class UserRestController {
   @Operation(summary = "회원 탈퇴 API", description = "로그인된 사용자를 탈퇴 처리합니다.")
   @PostMapping("/withdraw")
   public ApiResponse<String> withdrawMember(
-      @ExtractPayload Long userId, @RequestBody UserRequestDTO.WithdrawalDTO request) {
+      @ExtractPayload Long userId, @RequestBody UserReqDTO.WithdrawalDTO request) {
     userCommandService.withdrawMember(userId, request);
     return ApiResponse.of(GeneralSuccessCode.OK, "탈퇴가 정상적으로 처리되었습니다.");
   }
