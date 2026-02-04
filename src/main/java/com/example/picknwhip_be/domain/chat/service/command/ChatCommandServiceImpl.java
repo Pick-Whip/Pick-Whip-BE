@@ -69,6 +69,10 @@ public class ChatCommandServiceImpl implements ChatCommandService {
       if (!order.getUser().getUserId().equals(customerId)) {
         throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
       }
+
+      if (!order.getShop().getId().equals(shop.getId())) {
+        throw new OrderException(OrderErrorCode.INVALID_ORDER_CONTEXT);
+      }
     }
 
     return ChatConverter.toRoomInfo(room, order);

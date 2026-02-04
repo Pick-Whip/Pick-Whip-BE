@@ -23,7 +23,10 @@ public class ChatConverter {
         .orderId(order.getId())
         .orderCode(order.getOrderCode())
         .cakeSize(order.getShopCakeSize().getSizeName())
-        .pickupDatetime(order.getPickupDatetime().toString())
+        .pickupDatetime(
+            order
+                .getPickupDatetime()
+                .format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         .totalPrice(order.getTotalPrice())
         .status(order.getStatus().name())
         .build();
