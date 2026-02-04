@@ -45,4 +45,12 @@ public class NotificationController {
         GeneralSuccessCode.OK,
         notificationQueryService.getNotificationList(notificationType, cursor, size, userId));
   }
+
+  @Operation(summary = "알림 안 읽음 개수 조회 by 슝/하승연", description = "알림 화면에서 안 읽음 알림 개수를 조회하는 기능입니다. ")
+  @GetMapping("/unread")
+  public ApiResponse<NotiResDTO.UnreadDTO> getUnreadCount(
+      @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, notificationQueryService.searchUnreadCount(userId));
+  }
 }
