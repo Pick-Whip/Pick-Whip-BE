@@ -16,6 +16,20 @@ public class ChatResDTO {
   public static class RoomInfo {
     private Long roomId;
     private String shopName;
+    private OrderSummary orderSummary;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class OrderSummary {
+    private Long orderId;
+    private String orderCode;
+    private String cakeSize;
+    private String pickupDatetime;
+    private int totalPrice;
+    private String status;
   }
 
   @Builder

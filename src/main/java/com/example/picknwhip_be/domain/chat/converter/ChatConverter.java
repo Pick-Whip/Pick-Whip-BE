@@ -4,14 +4,28 @@ import com.example.picknwhip_be.domain.chat.dto.req.ChatReqDTO;
 import com.example.picknwhip_be.domain.chat.dto.res.ChatResDTO;
 import com.example.picknwhip_be.domain.chat.entity.ChatMessage;
 import com.example.picknwhip_be.domain.chat.entity.ChatRoom;
+import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.util.List;
 
 public class ChatConverter {
-  public static ChatResDTO.RoomInfo toRoomInfo(ChatRoom room) {
+  public static ChatResDTO.RoomInfo toRoomInfo(ChatRoom room, Order order) {
     return ChatResDTO.RoomInfo.builder()
         .roomId(room.getChatRoomId())
         .shopName(room.getShop().getShopName())
+        .orderSummary(order != null ? toOrderSummary(order) : null)
+        .build();
+  }
+
+  public static ChatResDTO.OrderSummary toOrderSummary(Order order) {
+    if (order == null) return null;
+    return ChatResDTO.OrderSummary.builder()
+        .orderId(order.getId())
+        .orderCode(order.getOrderCode())
+        .cakeSize(order.getShopCakeSize().getSizeName())
+        .pickupDatetime(order.getPickupDatetime().toString())
+        .totalPrice(order.getTotalPrice())
+        .status(order.getStatus().name())
         .build();
   }
 
