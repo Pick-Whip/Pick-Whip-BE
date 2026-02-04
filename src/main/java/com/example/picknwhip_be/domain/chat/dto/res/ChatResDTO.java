@@ -29,10 +29,7 @@ public class ChatResDTO {
     private String orderCode;
     private String cakeSize;
 
-    @JsonFormat(
-        shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd HH:mm:ss",
-        timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDateTime pickupDatetime;
 
     private int totalPrice;
