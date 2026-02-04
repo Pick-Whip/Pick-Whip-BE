@@ -1,17 +1,11 @@
 ALTER TABLE notification
-    ADD kind VARCHAR(255) NULL;
+    ADD kind VARCHAR(255) NOT NULL;
 
 ALTER TABLE notification
     ADD target_id BIGINT NULL;
 
 ALTER TABLE notification
-    ADD user_id BIGINT NULL;
-
-ALTER TABLE notification
-    MODIFY kind VARCHAR(255) NOT NULL;
-
-ALTER TABLE notification
-    MODIFY user_id BIGINT NOT NULL;
+    ADD user_id BIGINT NOT NULL;
 
 CREATE INDEX idx_notification_user_id_id ON notification (user_id, id);
 

@@ -14,11 +14,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Review", description = "리뷰 API")
 @RestController
 @RequestMapping("/api/reviews")
+@Validated
 @RequiredArgsConstructor
 public class ReviewController {
   private final ReviewCommandService reviewCommandService;
