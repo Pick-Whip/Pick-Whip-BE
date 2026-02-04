@@ -5,5 +5,5 @@ import com.example.picknwhip_be.domain.order.entity.Order;
 import java.util.List;
 
 public interface OrderRepositoryCustom {
-    List<Order> findAllByCursor(Long userId, OrderCursorReqDTO reqDTO);
+  List<Order> findAllByCursor(Long userId, OrderCursorReqDTO reqDTO);
 }

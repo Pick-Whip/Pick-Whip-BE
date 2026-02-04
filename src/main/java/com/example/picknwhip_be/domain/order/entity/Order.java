@@ -13,7 +13,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.*;
 
 @Entity
@@ -96,7 +95,7 @@ public class Order extends BaseEntity {
   @Column(name = "order_code", unique = true, length = 20)
   private String orderCode;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<OrderItem> orderItems = new ArrayList<>();
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  @Builder.Default
+  private List<OrderItem> orderItems = new ArrayList<>();
 }
