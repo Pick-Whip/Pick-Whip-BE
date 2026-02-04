@@ -37,8 +37,8 @@ public class OrderController {
   }
 
   @Operation(
-      summary = "주문 내역 조회 (커서 페이징)",
-      description = "무한 스크롤을 위한 API입니다. type=REQUEST(요청) 또는 COMPLETE(완료)를 선택하세요.")
+      summary = "주문 내역 조회",
+      description = "주문 내역을 조회하기 위한 API입니다. type=REQUEST(요청) 또는 COMPLETE(완료)를 선택하세요.")
   @GetMapping("/history")
   public ApiResponse<CursorResult<OrderHistoryResDTO>> getOrderHistory(
       @ExtractPayload Long userId, @ParameterObject @ModelAttribute OrderCursorReqDTO reqDto) {
