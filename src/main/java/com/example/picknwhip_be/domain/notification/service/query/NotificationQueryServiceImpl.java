@@ -31,6 +31,6 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
   @Override
   public NotiResDTO.UnreadDTO searchUnreadCount(Long userId) {
     Long count = notificationRepository.countByUserUserIdAndIsReadFalse(userId);
-    return NotiResDTO.UnreadDTO.builder().unread(count).build();
+    return new NotiResDTO.UnreadDTO(count);
   }
 }

@@ -62,10 +62,9 @@ public class NotificationController {
   }
 
   @Operation(summary = "알림 하나 읽음 by 슝/하승연", description = "회원이 알림창에서 특정한 알림 하나를 읽음 처리하는 기능입니다.")
-  @PatchMapping("/{id}/read")
-  public ApiResponse<NotiResDTO.readDTO> updateNotificationRead(
-      @PathVariable("id") Long notificationId,
-      @Parameter(hidden = true) @ExtractPayload Long userId) {
+  @PatchMapping("/{notificationId}/read")
+  public ApiResponse<NotiResDTO.ReadDTO> updateNotificationRead(
+      @PathVariable Long notificationId, @Parameter(hidden = true) @ExtractPayload Long userId) {
     return ApiResponse.of(
         GeneralSuccessCode.OK,
         notificationCommandService.updateNotificationRead(notificationId, userId));

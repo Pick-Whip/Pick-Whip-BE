@@ -28,9 +28,7 @@ public class NotiResDTO {
           LocalDateTime createdDate,
       @Schema(description = "읽음 여부", example = "false") boolean isRead) {}
 
-  @Builder
   public record UnreadDTO(@Schema(description = "알림 안 읽음 개수", example = "1") Long unread) {}
 
-  @Builder
-  public record readDTO(@Schema(description = "읽은 알림 ID", example = "1") Long notificationId) {}
+  public record ReadDTO(@Schema(description = "읽은 알림 ID", example = "1") Long notificationId) {}
 }

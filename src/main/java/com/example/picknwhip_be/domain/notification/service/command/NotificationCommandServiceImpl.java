@@ -105,7 +105,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
   @Transactional
   @Override
-  public NotiResDTO.readDTO updateNotificationRead(Long notificationId, Long userId) {
+  public NotiResDTO.ReadDTO updateNotificationRead(Long notificationId, Long userId) {
     Notification notification =
         notificationRepository
             .findByIdAndUserUserId(notificationId, userId)
@@ -114,6 +114,6 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
     notification.markAsRead();
 
-    return NotiResDTO.readDTO.builder().notificationId(notificationId).build();
+    return new NotiResDTO.ReadDTO(notificationId);
   }
 }

@@ -12,5 +12,5 @@ public interface NotificationCommandService {
   void updateNotificationReadAll(Long userId);
 
   @Transactional
-  NotiResDTO.readDTO updateNotificationRead(Long notificationId, Long userId);
+  NotiResDTO.ReadDTO updateNotificationRead(Long notificationId, Long userId);
 }
