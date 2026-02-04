@@ -30,4 +30,7 @@ public class NotiResDTO {
 
   @Builder
   public record UnreadDTO(@Schema(description = "알림 안 읽음 개수", example = "1") Long unread) {}
+
+  @Builder
+  public record readDTO(@Schema(description = "읽은 알림 ID", example = "1") Long notificationId) {}
 }

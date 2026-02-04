@@ -15,8 +15,8 @@ public enum NotificationErrorCode implements BaseErrorCode {
   TARGET_ID_REQUIRED(HttpStatus.FORBIDDEN, "NOTIFICATION403_2", "타겟 ID가 필요한 알림 타입입니다."),
   STORE_NAME_REQUIRED(HttpStatus.FORBIDDEN, "NOTIFICATION403_3", "가게명이 필요한 알림 타입입니다."),
   STORE_NAME_NOT_ALLOWED(HttpStatus.FORBIDDEN, "NOTIFICATION403_4", "가게명이 허용되지 않는 알림 타입입니다."),
-  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404_1", "해당 유저를 찾을 수 없습니다.");
-
+  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404_1", "해당 유저를 찾을 수 없습니다."),
+  NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404_2", "해당 알림을 찾을 수 없습니다.");
   private final HttpStatus status;
   private final String code;
   private final String message;
