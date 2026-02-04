@@ -2,6 +2,7 @@ package com.example.picknwhip_be.domain.order.repository;
 
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
+import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -39,7 +40,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .fetch();
     }
 
-    // 1. 탭 분류
     private BooleanExpression filterByType(String type) {
         if ("REQUEST".equalsIgnoreCase(type)) {
             return order.status.in(Status.CONFIRM_WAIT, Status.PROD_CONFIRM, Status.IMPOSSIBLE);
@@ -61,8 +61,9 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     private NumberExpression<Integer> getStatusScore() {
         return new CaseBuilder()
-                .when(order.status.eq(Status.CONFIRM_WAIT)).then(10)
-                .when(order.status.eq(Status.PROD_CONFIRM)).then(20)
+                .when(order.status.eq(Status.CONFIRM_WAIT)).then(10) // 1단계
+                .when(order.status.eq(Status.PROD_CONFIRM).and(order.paymentStatus.eq(PaymentStatus.WAITING))).then(20)
+                .when(order.status.eq(Status.PROD_CONFIRM).and(order.paymentStatus.ne(PaymentStatus.WAITING))).then(30)
                 .when(order.status.eq(Status.IMPOSSIBLE)).then(30)
                 .when(order.status.eq(Status.MAKING)).then(40)
                 .when(order.status.eq(Status.PICKUP_WAIT)).then(50)
