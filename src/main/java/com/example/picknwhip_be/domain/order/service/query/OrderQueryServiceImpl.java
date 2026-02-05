@@ -62,6 +62,10 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     if (req.getLimit() < 1) {
       req.setLimit(10);
     }
+    if (req.getLastOrderId() != null
+        && (req.getLastStatusScore() == null || req.getLastPickupDatetime() == null)) {
+      throw new OrderException(OrderErrorCode.INVALID_CURSOR_PARAMS);
+    }
   }
 
   private int calculateStatusScore(Order order) {
