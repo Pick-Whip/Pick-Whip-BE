@@ -23,8 +23,8 @@ public enum OrderErrorCode implements BaseErrorCode {
   SHOP_CLOSED_DAY(HttpStatus.CONFLICT, "ORDER409_2", "선택하신 날짜는 가게 휴무일입니다."),
   SHOP_CLOSED_TIME(HttpStatus.CONFLICT, "ORDER409_3", "선택하신 시간은 운영 시간이 아닙니다."),
   ORDER_CODE_GENERATION_FAILED(
-      HttpStatus.INTERNAL_SERVER_ERROR, "ORDER500_1", "주문 코드 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-  ;
+      HttpStatus.INTERNAL_SERVER_ERROR, "ORDER500_1", "주문 코드 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+    CANNOT_CHANGE_FINISHED_ORDER(HttpStatus.BAD_REQUEST, "ORDER400_7", "이미 완료되거나 취소된 주문의 상태는 변경할 수 없습니다.");
 
   private final HttpStatus status;
   private final String code;

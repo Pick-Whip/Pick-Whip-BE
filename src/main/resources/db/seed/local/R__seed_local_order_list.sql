@@ -177,3 +177,24 @@ VALUES
     (206, 2, 'CREAM', '생크림', 1000),
     (207, 2, 'CREAM', '생크림', 1000)
     ON DUPLICATE KEY UPDATE unit_price = VALUES(unit_price);
+
+-- 주문 상세 타임라인 확인용 히스토리 데이터 삽입
+
+-- 1. 주문 201번 (주문서 확인 중) -> 히스토리 1개 (작성)
+INSERT INTO order_histories (order_id, status, created_at, updated_at)
+VALUES (201, 'CONFIRM_WAIT', NOW(), NOW());
+
+-- 2. 주문 203번 (제작 불가 - 이미지 2 케이스) -> 히스토리 3개 (작성 -> 확인 -> 불가)
+-- (시간 차이를 두어 타임라인 순서가 보이게 함)
+INSERT INTO order_histories (order_id, status, created_at, updated_at)
+VALUES
+    (203, 'CONFIRM_WAIT', DATE_SUB(NOW(), INTERVAL 2 HOUR), NOW()),
+    (203, 'PROD_CONFIRM', DATE_SUB(NOW(), INTERVAL 1 HOUR), NOW()), -- 사장님 확인
+    (203, 'IMPOSSIBLE', NOW(), NOW()); -- 제작 불가 (현재)
+
+-- 3. 주문 204번 (제작 중) -> 히스토리 2개
+INSERT INTO order_histories (order_id, status, created_at, updated_at)
+VALUES
+    (204, 'CONFIRM_WAIT', DATE_SUB(NOW(), INTERVAL 3 HOUR), NOW()),
+    (204, 'PROD_CONFIRM', DATE_SUB(NOW(), INTERVAL 2 HOUR), NOW()),
+    (204, 'MAKING', NOW(), NOW());

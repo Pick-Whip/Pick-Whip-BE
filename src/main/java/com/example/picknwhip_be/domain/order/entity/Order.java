@@ -5,6 +5,8 @@ import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
+import com.example.picknwhip_be.domain.order.exception.OrderException;
+import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import com.example.picknwhip_be.domain.user.entity.User;
@@ -102,4 +104,16 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderHistory> histories = new ArrayList<>();
+
+    public void changeStatus(Status newStatus) {
+        if (this.status == Status.COMPLETED || this.status == Status.IMPOSSIBLE) {
+            throw new OrderException(OrderErrorCode.CANNOT_CHANGE_FINISHED_ORDER);
+        }
+        this.status = newStatus;
+    }
+    public void reject(String reason) {
+        changeStatus(Status.IMPOSSIBLE);
+        this.rejectionReason = reason;
+    }
+
 }
