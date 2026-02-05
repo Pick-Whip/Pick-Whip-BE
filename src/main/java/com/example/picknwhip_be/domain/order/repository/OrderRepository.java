@@ -5,7 +5,6 @@ import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,11 +31,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
       @Param("pickupDatetime") LocalDateTime pickupDatetime,
       @Param("impossibleStatus") Status impossibleStatus);
 
-    @Query("SELECT o FROM Order o " +
-            "JOIN FETCH o.shop " +
-            "LEFT JOIN FETCH o.designGallery " +
-            "LEFT JOIN FETCH o.orderItems " +
-            "LEFT JOIN FETCH o.histories " +
-            "WHERE o.id = :orderId")
-    Optional<Order> findDetailById(@Param("orderId") Long orderId);
+  @Query(
+      "SELECT o FROM Order o "
+          + "JOIN FETCH o.shop "
+          + "LEFT JOIN FETCH o.designGallery "
+          + "LEFT JOIN FETCH o.orderItems "
+          + "LEFT JOIN FETCH o.histories "
+          + "WHERE o.id = :orderId")
+  Optional<Order> findDetailById(@Param("orderId") Long orderId);
 }

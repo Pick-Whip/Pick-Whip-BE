@@ -7,5 +7,6 @@ import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 
 public interface OrderQueryService {
   CursorResult<OrderHistoryResDTO> getOrderHistory(Long userId, OrderCursorReqDTO req);
-    OrderDetailResDTO getOrderDetail(Long userId, Long orderId);
+
+  OrderDetailResDTO getOrderDetail(Long userId, Long orderId);
 }

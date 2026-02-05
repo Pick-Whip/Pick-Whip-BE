@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum LetteringAlignment {
-    CENTER("가운데"),
-    CURVE_UP("위로 둥글게"),
-    CURVE_UP_DOWN("위아래 둥글게");
+  CENTER("가운데"),
+  CURVE_UP("위로 둥글게"),
+  CURVE_UP_DOWN("위아래 둥글게");
 
-    private final String description;
+  private final String description;
 }

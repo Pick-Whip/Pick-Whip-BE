@@ -62,13 +62,13 @@ public class OrderController {
     orderDraftCommandService.updatePickupTime(userId, draftId, dto.getPickupDatetime());
     return ApiResponse.of(OrderSuccessCode.PICKUP_UPDATED, "픽업 시간이 변경되었습니다.");
   }
-    @Operation(summary = "주문 상세 조회", description = "주문 완료 후 또는 목록에서 주문의 상세 정보를 조회합니다.")
-    @GetMapping("/{orderId}")
-    public ApiResponse<OrderDetailResDTO> getOrderDetail(
-            @ExtractPayload Long userId,
-            @PathVariable Long orderId) {
 
-        OrderDetailResDTO result = orderQueryService.getOrderDetail(userId, orderId);
-        return ApiResponse.of(GeneralSuccessCode.OK, result);
-    }
+  @Operation(summary = "주문 상세 조회", description = "주문 완료 후 또는 목록에서 주문의 상세 정보를 조회합니다.")
+  @GetMapping("/{orderId}")
+  public ApiResponse<OrderDetailResDTO> getOrderDetail(
+      @ExtractPayload Long userId, @PathVariable Long orderId) {
+
+    OrderDetailResDTO result = orderQueryService.getOrderDetail(userId, orderId);
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 }
