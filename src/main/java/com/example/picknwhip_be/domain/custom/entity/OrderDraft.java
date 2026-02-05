@@ -98,4 +98,8 @@ public class OrderDraft extends BaseEntity {
       return "COMPLETED";
     }
   }
+
+  public void updatePickupDatetime(LocalDateTime pickupDatetime) {
+    this.pickupDatetime = pickupDatetime;
+  }
 }

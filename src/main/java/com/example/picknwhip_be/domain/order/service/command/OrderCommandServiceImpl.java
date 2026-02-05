@@ -2,8 +2,6 @@ package com.example.picknwhip_be.domain.order.service.command;
 
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
-import com.example.picknwhip_be.domain.custom.exception.CustomException;
-import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
@@ -17,8 +15,8 @@ import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.order.repository.DailyShopOrderCounterRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
+import com.example.picknwhip_be.domain.shop.validator.PickupTimeValidator;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,52 +34,46 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final OrderItemRepository orderItemRepository;
   private final OrderDraftRepository orderDraftRepository;
   private final DailyShopOrderCounterRepository counterRepository;
-  // TODO: 추후 Shop 엔티티 필드나 가게별로 조건이 다를 시에 수정하기
-  private static final int SLOT_CAPACITY = 1;
+  private final PickupTimeValidator pickupTimeValidator;
 
   @Override
   public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
     OrderDraft draft =
         orderDraftRepository
             .findById(dto.getDraftId())
-            .orElseThrow(() -> new CustomException(CustomErrorCode.DRAFT_NOT_FOUND));
+            .orElseThrow(() -> new OrderException(OrderErrorCode.DRAFT_NOT_FOUND));
 
     if (!draft.getUser().getUserId().equals(userId)) {
-      throw new CustomException(CustomErrorCode.FORBIDDEN);
+      throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
     }
+    pickupTimeValidator.validate(draft.getShop(), draft.getPickupDatetime());
+    String orderCode =
+        generateOrderCode(draft.getShop().getId(), draft.getPickupDatetime().toLocalDate());
 
-    LocalDateTime pickupDatetime = draft.getPickupDatetime().withSecond(0).withNano(0);
-
-    checkSlotAvailability(draft.getShop().getId(), draft.getPickupDatetime());
-    String orderCode = generateOrderCode(draft.getShop().getId(), LocalDate.now());
-    int estimatedPrice = draft.getShopCakeSize().getPrice();
-    for (OrderDraftItem item : draft.getItems()) {
-      estimatedPrice += item.getCustomOption().getAdditionalPrice();
-    }
-
-    Order order =
+    Order newOrder =
         Order.builder()
             .user(draft.getUser())
-            .customerName(dto.getCustomerName())
-            .customerPhone(dto.getCustomerPhone())
-            .additionalRequest(draft.getAdditionalRequest())
-            .orderAdditionalRequest(dto.getAdditionalRequest())
             .shop(draft.getShop())
             .shopCakeSize(draft.getShopCakeSize())
             .designGallery(draft.getDesignGallery())
             .status(Status.CONFIRM_WAIT)
-            .pickupDatetime(pickupDatetime)
+            .pickupDatetime(draft.getPickupDatetime())
             .letteringText(draft.getLetteringText())
             .letteringLineCount(draft.getLetteringLineCount())
             .letteringAlignment(draft.getLetteringAlignment())
+            .additionalRequest(draft.getAdditionalRequest())
+            .orderAdditionalRequest(dto.getAdditionalRequest())
             .referenceImageUrl(draft.getReferenceImageUrl())
             .paymentMethod("TBD")
             .paymentStatus(PaymentStatus.WAITING)
-            .totalPrice(estimatedPrice)
+            .totalPrice(calculateTotalPrice(draft))
             .orderCode(orderCode)
+            .customerName(dto.getCustomerName())
+            .customerPhone(dto.getCustomerPhone())
             .build();
 
-    Order savedOrder = orderRepository.save(order);
+    Order savedOrder = orderRepository.save(newOrder);
+
     List<OrderItem> orderItems = new ArrayList<>();
     for (OrderDraftItem draftItem : draft.getItems()) {
       orderItems.add(
@@ -102,15 +94,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     return OrderResDTO.from(savedOrder);
   }
 
-  private void checkSlotAvailability(Long shopId, LocalDateTime pickupDatetime) {
-    long currentCount =
-        orderRepository.countByShopAndPickupTime(shopId, pickupDatetime, Status.IMPOSSIBLE);
-
-    if (currentCount >= SLOT_CAPACITY) {
-      throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
-    }
-  }
-
+  /** 주문 코드 생성 로직 (YYMMDD_XXX) */
   private String generateOrderCode(Long shopId, LocalDate date) {
     int maxRetries = 3;
     int retryCount = 0;
@@ -126,16 +110,29 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
         counter.increaseCount();
         counterRepository.save(counter);
+
         String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
         return String.format("%s_%03d", dateStr, counter.getCount());
 
       } catch (DataIntegrityViolationException e) {
         retryCount++;
         if (retryCount >= maxRetries) {
-          throw e;
+          throw new OrderException(OrderErrorCode.ORDER_CODE_GENERATION_FAILED);
         }
       }
     }
-    throw new RuntimeException("Failed to generate order code");
+    throw new OrderException(OrderErrorCode.ORDER_CODE_GENERATION_FAILED);
+  }
+
+  private int calculateTotalPrice(OrderDraft draft) {
+    int basePrice = draft.getShopCakeSize().getPrice();
+    if (draft.getDesignGallery() != null) {
+      basePrice += draft.getDesignGallery().getBasePrice();
+    }
+    int optionPrice =
+        draft.getItems().stream()
+            .mapToInt(item -> item.getCustomOption().getAdditionalPrice())
+            .sum();
+    return basePrice + optionPrice;
   }
 }

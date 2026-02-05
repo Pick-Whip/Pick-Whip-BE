@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.shop.service;
+package com.example.picknwhip_be.domain.shop.service.query;
 
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;

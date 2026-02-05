@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.shop.repository;
 import com.example.picknwhip_be.domain.shop.entity.ShopBusinessHour;
 import com.example.picknwhip_be.domain.shop.entity.enums.ScheduleType;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,7 @@ public interface ShopBusinessHourRepository extends JpaRepository<ShopBusinessHo
   // 요일별 정기 스케줄 조회
   Optional<ShopBusinessHour> findByShopIdAndDayOfWeekAndScheduleType(
       Long shopId, Integer dayOfWeek, ScheduleType scheduleType);
+
+  // 특정 가게의 모든 스케줄을 한 번에 가져와서 메모리에서 필터링
+  List<ShopBusinessHour> findAllByShopId(Long shopId);
 }

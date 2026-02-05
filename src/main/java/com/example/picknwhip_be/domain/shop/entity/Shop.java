@@ -61,6 +61,14 @@ public class Shop {
   @Column(name = "min_price")
   private Integer minPrice;
 
+  @Column(name = "slot_interval_minutes")
+  @Builder.Default
+  private int slotIntervalMinutes = 30; // 픽업 시간 간격
+
+  @Column(name = "max_orders_per_slot")
+  @Builder.Default
+  private int maxOrdersPerSlot = 2; // 슬롯당 최대 가능 주문 수
+
   @Column(name = "pickup_time_guide", columnDefinition = "TEXT")
   private String pickupTimeGuide;
 
