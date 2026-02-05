@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface PickupQueryService {
-    List<PickupResDTO.MonthlyStatusDTO> getMonthlyAvailability(Long shopId, int year, int month);
-    PickupResDTO.DailySlotsDTO getDailySlots(Long shopId, LocalDate date);
+  List<PickupResDTO.MonthlyStatusDTO> getMonthlyAvailability(Long shopId, int year, int month);
+
+  PickupResDTO.DailySlotsDTO getDailySlots(Long shopId, LocalDate date);
 }

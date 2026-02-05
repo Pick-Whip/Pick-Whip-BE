@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class DraftPickupTimeReqDTO {
-    private LocalDateTime pickupDatetime;
+  private LocalDateTime pickupDatetime;
 }

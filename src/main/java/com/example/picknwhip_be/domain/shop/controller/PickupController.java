@@ -18,24 +18,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/shops")
 public class PickupController {
 
-    private final PickupQueryService pickupQueryService;
+  private final PickupQueryService pickupQueryService;
 
-    @Operation(summary = "월간 영업일 조회", description = "해당 월의 날짜별 영업/휴무 여부를 반환합니다.")
-    @GetMapping("/{shopId}/calendar")
-    public ApiResponse<List<PickupResDTO.MonthlyStatusDTO>> getMonthlyStatus(
-            @PathVariable Long shopId,
-            @RequestParam int year,
-            @RequestParam int month) {
-        return ApiResponse.of(GeneralSuccessCode.OK,
-                pickupQueryService.getMonthlyAvailability(shopId, year, month));
-    }
+  @Operation(summary = "월간 영업일 조회", description = "해당 월의 날짜별 영업/휴무 여부를 반환합니다.")
+  @GetMapping("/{shopId}/calendar")
+  public ApiResponse<List<PickupResDTO.MonthlyStatusDTO>> getMonthlyStatus(
+      @PathVariable Long shopId, @RequestParam int year, @RequestParam int month) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, pickupQueryService.getMonthlyAvailability(shopId, year, month));
+  }
 
-    @Operation(summary = "일간 시간 슬롯 조회", description = "특정 날짜의 예약 가능한 시간대(30분 단위)를 반환합니다. (요일 표기 포함)")
-    @GetMapping("/{shopId}/slots")
-    public ApiResponse<PickupResDTO.DailySlotsDTO> getDailySlots(
-            @PathVariable Long shopId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ApiResponse.of(GeneralSuccessCode.OK,
-                pickupQueryService.getDailySlots(shopId, date));
-    }
+  @Operation(summary = "일간 시간 슬롯 조회", description = "특정 날짜의 예약 가능한 시간대(30분 단위)를 반환합니다. (요일 표기 포함)")
+  @GetMapping("/{shopId}/slots")
+  public ApiResponse<PickupResDTO.DailySlotsDTO> getDailySlots(
+      @PathVariable Long shopId,
+      @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    return ApiResponse.of(GeneralSuccessCode.OK, pickupQueryService.getDailySlots(shopId, date));
+  }
 }
