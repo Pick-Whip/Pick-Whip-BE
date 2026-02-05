@@ -60,7 +60,6 @@ public class Review extends BaseEntity {
   @Builder.Default
   private Boolean agreement = true;
 
-  // TODO: 추후 도움이 됐어요 기능이 구현되면 동일한 컬럼명으로 변경
   @Column(name = "helpful_count")
   @ColumnDefault("0")
   private Long helpfulCount = 0L;
@@ -71,12 +70,10 @@ public class Review extends BaseEntity {
     }
   }
 
-  // TODO: 도움이 됐어요 기능 구현 후에 처리 확인
   public void increaseHelpfulCount() {
     this.helpfulCount++;
   }
 
-  // TODO: 도움이 됐어요 기능 구현 후에 처리 확인
   public void decreaseHelpfulCount() {
     if (this.helpfulCount > 0) this.helpfulCount--;
   }
