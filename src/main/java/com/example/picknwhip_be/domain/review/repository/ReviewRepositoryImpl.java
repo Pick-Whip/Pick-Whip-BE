@@ -7,12 +7,15 @@ import com.example.picknwhip_be.domain.review.entity.QReview;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewImage;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewKeyword;
+import com.example.picknwhip_be.domain.review.entity.mapping.QReviewLike;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewReply;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewSelectedKeyword;
 import com.example.picknwhip_be.domain.shop.entity.QShop;
 import com.example.picknwhip_be.domain.user.entity.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
   private static final QUser user = QUser.user;
   private static final QDesignGallery designGallery = QDesignGallery.designGallery;
   private static final QReviewKeyword reviewKeyword = QReviewKeyword.reviewKeyword;
+  private static final QReviewLike reviewLike = QReviewLike.reviewLike;
   private static final QReviewSelectedKeyword reviewSelectedKeyword =
       QReviewSelectedKeyword.reviewSelectedKeyword;
 
@@ -130,19 +134,40 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
    */
   @Override
   public List<Review> findBestHelpfulReviews(int limit) {
-    return queryFactory
-        .selectFrom(review)
-        .join(review.order, order)
-        .fetchJoin()
-        .join(review.user, user)
-        .fetchJoin()
-        .join(order.designGallery, designGallery)
-        .fetchJoin()
-        .where(
-            review.deletedAt.isNull(), review.agreement.isTrue(), order.designGallery.isNotNull())
-        // helpfulCount 컬럼이 Review 엔티티에 추가되어 있어야 합니다.
-        .orderBy(review.helpfulCount.desc(), review.id.desc())
-        .limit(limit)
-        .fetch();
+    List<Long> ids =
+        queryFactory
+            .select(review.id)
+            .from(review)
+            .join(review.order, order)
+            .leftJoin(reviewLike)
+            .on(reviewLike.review.eq(review))
+            .where(
+                review.deletedAt.isNull(),
+                review.agreement.isTrue(),
+                order.designGallery.isNotNull())
+            .groupBy(review.id)
+            .orderBy(reviewLike.count().desc(), review.id.desc())
+            .limit(limit)
+            .fetch();
+
+    if (ids.isEmpty()) {
+      return List.of();
+    }
+
+    List<Review> reviews =
+        queryFactory
+            .selectFrom(review)
+            .join(review.order, order)
+            .fetchJoin()
+            .join(review.user, user)
+            .fetchJoin()
+            .join(order.designGallery, designGallery)
+            .fetchJoin()
+            .where(review.id.in(ids))
+            .fetch();
+
+    Map<Long, Review> reviewMap = reviews.stream().collect(Collectors.toMap(Review::getId, r -> r));
+
+    return ids.stream().map(reviewMap::get).toList();
   }
 }

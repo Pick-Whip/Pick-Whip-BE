@@ -9,6 +9,7 @@ import com.example.picknwhip_be.domain.review.dto.ReviewRow;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
+import com.example.picknwhip_be.domain.review.repository.ReviewLikeRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
@@ -25,6 +26,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   private final S3Service s3Service;
   private final OrderItemRepository orderItemRepository;
   private final ReviewSelectedKeywordRepository reviewSelectedKeywordRepository;
+  private final ReviewLikeRepository reviewLikeRepository;
 
   @Override
   public ReviewResDTO.MyReviewListDTO getMyReviewList(Long cursor, int size, Long userId) {
@@ -80,7 +82,6 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
   @Override
   public ReviewResDTO.BestReviewListDTO getBestCustomReviews() {
-    // 베스트 리뷰 조회
     List<Review> reviews = reviewRepository.findBestHelpfulReviews(5);
 
     if (reviews.isEmpty()) {
@@ -93,6 +94,15 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
     List<ReviewSelectedKeyword> allKeywords =
         reviewSelectedKeywordRepository.findAllByReviewIdIn(reviewIds);
+
+    List<Object[]> likeCountData = reviewLikeRepository.countByReviewIdIn(reviewIds);
+    Map<Long, Long> likeCounts =
+        likeCountData.stream()
+            .collect(
+                Collectors.toMap(
+                    row -> (Long) row[0], // reviewId
+                    row -> (Long) row[1] // count
+                    ));
 
     Map<Long, List<OrderItem>> optionsByOrderId =
         allOrderItems.stream().collect(Collectors.groupingBy(item -> item.getOrder().getId()));
@@ -114,7 +124,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                   List<String> myKeywords =
                       keywordsByReviewId.getOrDefault(review.getId(), Collections.emptyList());
 
-                  return convertToBestReviewItemDTO(review, myOptions, myKeywords);
+                  Long helpfulCount = likeCounts.getOrDefault(review.getId(), 0L);
+
+                  return convertToBestReviewItemDTO(review, myOptions, myKeywords, helpfulCount);
                 })
             .toList();
 
@@ -122,7 +134,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   }
 
   private ReviewResDTO.BestReviewItemDTO convertToBestReviewItemDTO(
-      Review review, List<OrderItem> options, List<String> keywords) {
+      Review review, List<OrderItem> options, List<String> keywords, Long helpfulCount) {
 
     Order order = review.getOrder();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -149,9 +161,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
           creamName = item.getOptionName();
           if (item.getColorRgbCode() != null) creamColor = item.getColorRgbCode();
         }
-        case TOPPING -> {
-          decos.add(item.getOptionName());
-        }
+        case TOPPING -> decos.add(item.getOptionName());
         case ICING -> {
           if (item.getColorRgbCode() != null) icingColor = item.getColorRgbCode();
         }
@@ -186,7 +196,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
         .writerName(review.getUser().getNickname())
         .createdDate(review.getCreatedAt().format(formatter))
         .rating(review.getRating())
-        .helpfulCount(review.getHelpfulCount())
+        .helpfulCount(helpfulCount)
         .content(review.getContent())
         .keywords(keywords)
         .cakeImageUrl(resultImageUrl)

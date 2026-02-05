@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.review.repository;
 
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,8 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
   void deleteByReviewIdAndUserUserId(Long reviewId, Long userId);
 
   long countByReviewId(Long reviewId);
+
+  @Query(
+      "select rl.review.id, count(rl) from ReviewLike rl where rl.review.id in :reviewIds group by rl.review.id")
+  List<Object[]> countByReviewIdIn(@Param("reviewIds") List<Long> reviewIds);
 }
