@@ -15,9 +15,8 @@ import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.order.repository.DailyShopOrderCounterRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
-import com.example.picknwhip_be.domain.shop.entity.Shop;
+import com.example.picknwhip_be.domain.shop.validator.PickupTimeValidator;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final OrderItemRepository orderItemRepository;
   private final OrderDraftRepository orderDraftRepository;
   private final DailyShopOrderCounterRepository counterRepository;
+  private final PickupTimeValidator pickupTimeValidator;
 
   @Override
   public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
@@ -46,7 +46,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     if (!draft.getUser().getUserId().equals(userId)) {
       throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
     }
-    checkSlotAvailability(draft.getShop(), draft.getPickupDatetime());
+    pickupTimeValidator.validate(draft.getShop(), draft.getPickupDatetime());
     String orderCode =
         generateOrderCode(draft.getShop().getId(), draft.getPickupDatetime().toLocalDate());
 
@@ -94,20 +94,6 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     return OrderResDTO.from(savedOrder);
   }
 
-  /** 슬롯 가용성 검사 (최종 방어 로직) */
-  private void checkSlotAvailability(Shop shop, LocalDateTime pickupDatetime) {
-    if (pickupDatetime.isBefore(LocalDateTime.now())) {
-      throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
-    }
-    long currentCount =
-        orderRepository.countByShopAndPickupTime(shop.getId(), pickupDatetime, Status.IMPOSSIBLE);
-    int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;
-
-    if (currentCount >= maxCapacity) {
-      throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
-    }
-  }
-
   /** 주문 코드 생성 로직 (YYMMDD_XXX) */
   private String generateOrderCode(Long shopId, LocalDate date) {
     int maxRetries = 3;
@@ -131,11 +117,11 @@ public class OrderCommandServiceImpl implements OrderCommandService {
       } catch (DataIntegrityViolationException e) {
         retryCount++;
         if (retryCount >= maxRetries) {
-          throw new RuntimeException("주문 코드 생성에 실패했습니다. (Retry limit exceeded)", e);
+          throw new OrderException(OrderErrorCode.ORDER_CODE_GENERATION_FAILED);
         }
       }
     }
-    throw new RuntimeException("주문 코드 생성 중 알 수 없는 오류가 발생했습니다.");
+    throw new OrderException(OrderErrorCode.ORDER_CODE_GENERATION_FAILED);
   }
 
   private int calculateTotalPrice(OrderDraft draft) {

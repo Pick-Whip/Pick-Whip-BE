@@ -56,7 +56,7 @@ public class OrderController {
   public ApiResponse<String> updatePickupTime(
       @ExtractPayload Long userId,
       @PathVariable Long draftId,
-      @RequestBody DraftPickupTimeReqDTO dto) {
+      @Valid @RequestBody DraftPickupTimeReqDTO dto) {
 
     orderDraftCommandService.updatePickupTime(userId, draftId, dto.getPickupDatetime());
     return ApiResponse.of(OrderSuccessCode.PICKUP_UPDATED, "픽업 시간이 변경되었습니다.");
