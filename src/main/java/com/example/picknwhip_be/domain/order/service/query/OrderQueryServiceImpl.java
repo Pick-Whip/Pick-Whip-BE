@@ -20,73 +20,73 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OrderQueryServiceImpl implements OrderQueryService {
 
-    private final OrderRepository orderRepository;
-    private static final int MAX_LIMIT = 50;
+  private final OrderRepository orderRepository;
+  private static final int MAX_LIMIT = 50;
 
-    @Override
-    public CursorResult<OrderHistoryResDTO> getOrderHistory(Long userId, OrderCursorReqDTO req) {
-        validateRequest(req);
-        List<Order> orders = orderRepository.findAllByCursor(userId, req);
+  @Override
+  public CursorResult<OrderHistoryResDTO> getOrderHistory(Long userId, OrderCursorReqDTO req) {
+    validateRequest(req);
+    List<Order> orders = orderRepository.findAllByCursor(userId, req);
 
-        boolean hasNext = false;
-        if (orders.size() > req.getLimit()) {
-            hasNext = true;
-            orders.remove(req.getLimit());
-        }
-
-        List<OrderHistoryResDTO> dtos =
-                orders.stream().map(OrderHistoryResDTO::new).collect(Collectors.toList());
-
-        CursorResult.Cursor nextCursor = null;
-        if (!orders.isEmpty()) {
-            Order lastOrder = orders.get(orders.size() - 1);
-            int score = calculateStatusScore(lastOrder);
-
-            nextCursor =
-                    new CursorResult.Cursor(
-                            score,
-                            lastOrder.getPickupDatetime().toString(), // ISO-8601 포맷
-                            lastOrder.getId());
-        }
-
-        return new CursorResult<>(dtos, hasNext, nextCursor);
+    boolean hasNext = false;
+    if (orders.size() > req.getLimit()) {
+      hasNext = true;
+      orders.remove(req.getLimit());
     }
 
-    private void validateRequest(OrderCursorReqDTO req) {
-        if (!"REQUEST".equalsIgnoreCase(req.getType()) && !"COMPLETE".equalsIgnoreCase(req.getType())) {
-            throw new OrderException(OrderErrorCode.INVALID_ORDER_HISTORY_TYPE);
-        }
-        if (req.getLimit() > MAX_LIMIT) {
-            req.setLimit(MAX_LIMIT);
-        }
-        if (req.getLimit() < 1) {
-            req.setLimit(10);
-        }
+    List<OrderHistoryResDTO> dtos =
+        orders.stream().map(OrderHistoryResDTO::new).collect(Collectors.toList());
+
+    CursorResult.Cursor nextCursor = null;
+    if (!orders.isEmpty()) {
+      Order lastOrder = orders.get(orders.size() - 1);
+      int score = calculateStatusScore(lastOrder);
+
+      nextCursor =
+          new CursorResult.Cursor(
+              score,
+              lastOrder.getPickupDatetime().toString(), // ISO-8601 포맷
+              lastOrder.getId());
     }
 
-    private int calculateStatusScore(Order order) {
-        Status status = order.getStatus();
-        PaymentStatus paymentStatus = order.getPaymentStatus();
+    return new CursorResult<>(dtos, hasNext, nextCursor);
+  }
 
-        switch (status) {
-            case CONFIRM_WAIT:
-                return 10;
-            case PROD_CONFIRM:
-                if (paymentStatus == PaymentStatus.WAITING) {
-                    return 20;
-                } else {
-                    return 30;
-                }
-            case IMPOSSIBLE:
-                return 30;
-            case MAKING:
-                return 40;
-            case PICKUP_WAIT:
-                return 50;
-            case COMPLETED:
-                return 60;
-            default:
-                return 99;
-        }
+  private void validateRequest(OrderCursorReqDTO req) {
+    if (!"REQUEST".equalsIgnoreCase(req.getType()) && !"COMPLETE".equalsIgnoreCase(req.getType())) {
+      throw new OrderException(OrderErrorCode.INVALID_ORDER_HISTORY_TYPE);
     }
+    if (req.getLimit() > MAX_LIMIT) {
+      req.setLimit(MAX_LIMIT);
+    }
+    if (req.getLimit() < 1) {
+      req.setLimit(10);
+    }
+  }
+
+  private int calculateStatusScore(Order order) {
+    Status status = order.getStatus();
+    PaymentStatus paymentStatus = order.getPaymentStatus();
+
+    switch (status) {
+      case CONFIRM_WAIT:
+        return 10;
+      case PROD_CONFIRM:
+        if (paymentStatus == PaymentStatus.WAITING) {
+          return 20;
+        } else {
+          return 30;
+        }
+      case IMPOSSIBLE:
+        return 30;
+      case MAKING:
+        return 40;
+      case PICKUP_WAIT:
+        return 50;
+      case COMPLETED:
+        return 60;
+      default:
+        return 99;
+    }
+  }
 }

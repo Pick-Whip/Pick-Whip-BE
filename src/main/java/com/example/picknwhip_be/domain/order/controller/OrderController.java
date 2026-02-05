@@ -41,7 +41,8 @@ public class OrderController {
       description = "주문 내역을 조회하기 위한 API입니다. type=REQUEST(요청) 또는 COMPLETE(완료)를 선택하세요.")
   @GetMapping("/history")
   public ApiResponse<CursorResult<OrderHistoryResDTO>> getOrderHistory(
-    @Parameter(hidden = true) @ExtractPayload Long userId, @ParameterObject @ModelAttribute OrderCursorReqDTO reqDto) {
+      @Parameter(hidden = true) @ExtractPayload Long userId,
+      @ParameterObject @ModelAttribute OrderCursorReqDTO reqDto) {
     CursorResult<OrderHistoryResDTO> result = orderQueryService.getOrderHistory(userId, reqDto);
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
