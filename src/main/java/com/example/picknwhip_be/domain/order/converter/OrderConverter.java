@@ -4,6 +4,8 @@ import com.example.picknwhip_be.domain.order.dto.res.OrderDetailResDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.order.entity.OrderHistory;
 import com.example.picknwhip_be.domain.order.entity.OrderItem;
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
+import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import java.time.format.DateTimeFormatter;
@@ -31,38 +33,40 @@ public class OrderConverter {
 
   private OrderDetailResDTO.StatusInfo buildStatusInfo(Order order) {
     Status status = order.getStatus();
-    String topMsg = "";
-    String bottomMsg = "";
+    String topMsg;
+    String bottomMsg;
     boolean isImpossible = (status == Status.IMPOSSIBLE);
 
+    // 상태별 멘트 로직 최적화
     switch (status) {
-      case CONFIRM_WAIT:
+      case CONFIRM_WAIT -> {
         topMsg = "주문서 확인 중";
         bottomMsg = "주문서 확인 중";
-        break;
-      case PROD_CONFIRM:
+      }
+      case PROD_CONFIRM -> {
         topMsg = "결제 요청 중";
         bottomMsg = "결제 요청 중";
-        break;
-      case IMPOSSIBLE:
+      }
+      case IMPOSSIBLE -> {
         topMsg = "제작 불가";
         bottomMsg = (order.getRejectionReason() != null) ? "사장님 메세지를 확인해주세요" : "결제 미완료 상태입니다";
-        break;
-      case MAKING:
+      }
+      case MAKING -> {
         topMsg = "제작 중";
         bottomMsg = "제작 중";
-        break;
-      case PICKUP_WAIT:
+      }
+      case PICKUP_WAIT -> {
         topMsg = "픽업 대기 중";
         bottomMsg = "픽업 대기 중";
-        break;
-      case COMPLETED:
+      }
+      case COMPLETED -> {
         topMsg = "픽업 완료";
         bottomMsg = "픽업 완료";
-        break;
-      default:
+      }
+      default -> {
         topMsg = "확인 중";
         bottomMsg = "확인 중";
+      }
     }
 
     return OrderDetailResDTO.StatusInfo.builder()
@@ -87,6 +91,9 @@ public class OrderConverter {
 
   private OrderDetailResDTO.PickupInfo buildPickupInfo(Order order) {
     String startTime = order.getPickupDatetime().toLocalTime().toString();
+    if (startTime.length() > 5) {
+      startTime = startTime.substring(0, 5);
+    }
 
     return OrderDetailResDTO.PickupInfo.builder()
         .pickupDate(order.getPickupDatetime().format(DATE_FMT))
@@ -95,7 +102,7 @@ public class OrderConverter {
   }
 
   private OrderDetailResDTO.ProductInfo buildProductInfo(Order order) {
-    List<String> flavors =
+    String flavors =
         order.getOrderItems().stream()
             .filter(
                 i ->
@@ -103,7 +110,10 @@ public class OrderConverter {
                         || i.getOptionCategory() == OptionCategory.CREAM)
             .map(OrderItem::getOptionName)
             .distinct()
-            .collect(Collectors.toList());
+            .collect(Collectors.joining(" + "));
+
+    if (flavors.isEmpty()) flavors = "-";
+
     String deco =
         order.getOrderItems().stream()
             .filter(
@@ -114,24 +124,21 @@ public class OrderConverter {
             .distinct()
             .collect(Collectors.joining(", "));
 
-    String lettering =
-        String.format(
-            "%s\n%s + %s",
-            order.getLetteringText() != null ? order.getLetteringText() : "",
-            order.getLetteringAlignment() != null
-                ? order.getLetteringAlignment().getDescription()
-                : "",
-            order.getLetteringLineCount() != null
-                ? order.getLetteringLineCount().getDescription()
-                : "");
+    if (deco.isEmpty()) deco = "-";
+
+    String letteringText = order.getLetteringText() != null ? order.getLetteringText() : "";
+    String alignDesc = getAlignmentDescription(order.getLetteringAlignment());
+    String lineDesc = getLineCountDescription(order.getLetteringLineCount());
+
+    String letteringInfo = String.format("%s\n%s + %s", letteringText, alignDesc, lineDesc).trim();
 
     return OrderDetailResDTO.ProductInfo.builder()
         .imageUrl(order.getReferenceImageUrl())
         .designName(
             order.getDesignGallery() != null ? order.getDesignGallery().getDesignName() : "1호 원형")
-        .flavor(flavors.isEmpty() ? "-" : String.join(" + ", flavors))
-        .lettering(lettering)
-        .deco(deco.isEmpty() ? "-" : deco)
+        .flavor(flavors)
+        .lettering(letteringInfo)
+        .deco(deco)
         .additionalRequest(order.getOrderAdditionalRequest())
         .build();
   }
@@ -163,5 +170,23 @@ public class OrderConverter {
         .isCompleted(history.isPresent())
         .isReject(isReject)
         .build();
+  }
+
+  private String getAlignmentDescription(LetteringAlignment alignment) {
+    if (alignment == null) return "";
+    return switch (alignment) {
+      case CENTER -> "가운데";
+      case CURVE_UP -> "위로 둥글게";
+      case CURVE_UP_DOWN -> "위아래 둥글게";
+    };
+  }
+
+  private String getLineCountDescription(LetteringLineCount lineCount) {
+    if (lineCount == null) return "";
+    return switch (lineCount) {
+      case ONE_LINE -> "1줄";
+      case TWO_LINE -> "2줄";
+      case THREE_LINE -> "3줄";
+    };
   }
 }

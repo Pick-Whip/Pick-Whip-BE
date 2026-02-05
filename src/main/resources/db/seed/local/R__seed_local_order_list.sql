@@ -17,8 +17,11 @@ VALUES
     (12, 1, 'TOPPING', '딸기', 3000, NULL),
     (13, 1, 'ICING', '초콜릿 데코', 2500, NULL)
     ON DUPLICATE KEY UPDATE
-                         additional_price = VALUES(additional_price),
-                         option_name = VALUES(option_name);
+                         shop_id = VALUES(shop_id),
+                        category = VALUES(category),
+                        option_name = VALUES(option_name),
+                        additional_price = VALUES(additional_price),
+                        color_rgb_code = VALUES(color_rgb_code);
 
 
 -- ======================================================
