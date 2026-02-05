@@ -1,78 +1,109 @@
 package com.example.picknwhip_be.domain.shop.service.query;
 
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
+import com.example.picknwhip_be.domain.shop.converter.PickupConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.PickupResDTO;
+import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopBusinessHour;
 import com.example.picknwhip_be.domain.shop.entity.enums.ScheduleType;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
+import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PickupQueryServiceImpl implements PickupQueryService {
 
-  private final ShopBusinessHourRepository businessHourRepository;
-  private final OrderRepository orderRepository;
+    private final ShopRepository shopRepository;
+    private final ShopBusinessHourRepository businessHourRepository;
+    private final OrderRepository orderRepository;
+    private final PickupConverter pickupConverter;
 
-  // TODO: 추후에 상황 확인해서 가게마다 다르면 변경하기
-  private static final int SLOT_CAPACITY = 1;
+    @Override
+    public List<PickupResDTO.MonthlyStatusDTO> getMonthlyAvailability(Long shopId, int year, int month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 
-  @Override
-  public PickupResDTO.PickupCalendarDTO getAvailableSlots(Long shopId, LocalDate date) {
-    ShopBusinessHour hour =
-        businessHourRepository
-            .findByShopIdAndDateAndScheduleType(shopId, date, ScheduleType.DATE)
-            .orElseGet(
-                () ->
-                    businessHourRepository
-                        .findByShopIdAndDayOfWeekAndScheduleType(
-                            shopId, date.getDayOfWeek().getValue(), ScheduleType.WEEKLY)
-                        .orElse(null));
+        Map<String, ShopBusinessHour> rules = getRulesMap(shopId);
+        List<PickupResDTO.MonthlyStatusDTO> result = new ArrayList<>();
 
-    if (hour == null || hour.isClosed()) {
-      return PickupResDTO.PickupCalendarDTO.builder()
-          .date(date.toString())
-          .isClosed(true)
-          .slots(Collections.emptyList())
-          .build();
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            boolean isClosed = isDayClosed(rules, current);
+            result.add(pickupConverter.toMonthlyStatus(current, isClosed));
+            current = current.plusDays(1);
+        }
+        return result;
     }
 
-    LocalDateTime startOfDay = date.atStartOfDay();
-    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+    @Override
+    public PickupResDTO.DailySlotsDTO getDailySlots(Long shopId, LocalDate date) {
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
 
-    List<Object[]> counts =
-        orderRepository.countOrdersByShopAndDateRange(shopId, startOfDay, endOfDay);
+        Map<String, ShopBusinessHour> rules = getRulesMap(shopId);
+        ShopBusinessHour hour = getAppliedHour(rules, date);
 
-    Map<LocalTime, Long> reservedCounts =
-        counts.stream()
-            .collect(
-                Collectors.toMap(
-                    obj -> ((LocalDateTime) obj[0]).toLocalTime().withSecond(0).withNano(0),
-                    obj -> (Long) obj[1],
-                    Long::sum));
-    List<PickupResDTO.TimeSlotDTO> slots = new ArrayList<>();
-    LocalTime current = hour.getOpenTime();
+        if (hour == null || hour.isClosed()) {
+            return pickupConverter.toDailySlots(date, true, Collections.emptyList());
+        }
 
-    while (current.isBefore(hour.getCloseTime())) {
-      long currentCount = reservedCounts.getOrDefault(current, 0L);
-      boolean isAvailable = currentCount < SLOT_CAPACITY;
+        List<Object[]> counts = orderRepository.countOrdersByShopAndDateRange(
+                shopId, date.atStartOfDay(), date.atTime(LocalTime.MAX));
 
-      slots.add(new PickupResDTO.TimeSlotDTO(current, isAvailable));
-      current = current.plusMinutes(30);
+        Map<LocalTime, Long> reservedMap = counts.stream().collect(Collectors.toMap(
+                obj -> ((LocalDateTime) obj[0]).toLocalTime().withSecond(0).withNano(0),
+                obj -> (Long) obj[1], Long::sum
+        ));
+
+        List<PickupResDTO.TimeSlotDTO> slotDTOs = new ArrayList<>();
+        LocalTime current = hour.getOpenTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        while (current.isBefore(hour.getCloseTime())) {
+            boolean isPast = LocalDateTime.of(date, current).isBefore(now);
+            long booked = reservedMap.getOrDefault(current, 0L);
+            boolean isFull = booked >= shop.getMaxOrdersPerSlot();
+
+            boolean isAvailable = !isPast && !isFull;
+            String reason = isPast ? "PAST" : (isFull ? "FULL" : "AVAILABLE");
+
+            slotDTOs.add(pickupConverter.toTimeSlot(
+                    current, shop.getSlotIntervalMinutes(), isAvailable, reason));
+
+            current = current.plusMinutes(shop.getSlotIntervalMinutes());
+        }
+
+        return pickupConverter.toDailySlots(date, false, slotDTOs);
+    }
+    private Map<String, ShopBusinessHour> getRulesMap(Long shopId) {
+        List<ShopBusinessHour> hours = businessHourRepository.findAllByShopId(shopId);
+        Map<String, ShopBusinessHour> map = new HashMap<>();
+        for (ShopBusinessHour h : hours) {
+            if (h.getScheduleType() == ScheduleType.DATE) map.put("DATE:" + h.getDate(), h);
+            else map.put("WEEKLY:" + h.getDayOfWeek(), h);
+        }
+        return map;
     }
 
-    return PickupResDTO.PickupCalendarDTO.builder()
-        .date(date.toString())
-        .isClosed(false)
-        .slots(slots)
-        .build();
-  }
+    private ShopBusinessHour getAppliedHour(Map<String, ShopBusinessHour> rules, LocalDate date) {
+        if (rules.containsKey("DATE:" + date)) return rules.get("DATE:" + date);
+        return rules.get("WEEKLY:" + date.getDayOfWeek().getValue());
+    }
+
+    private boolean isDayClosed(Map<String, ShopBusinessHour> rules, LocalDate date) {
+        ShopBusinessHour hour = getAppliedHour(rules, date);
+        return hour == null || hour.isClosed();
+    }
 }

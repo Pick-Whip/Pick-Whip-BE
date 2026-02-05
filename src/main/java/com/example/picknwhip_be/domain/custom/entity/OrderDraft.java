@@ -21,81 +21,84 @@ import lombok.*;
 @Table(name = "orders_drafts")
 public class OrderDraft extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "shop_id", nullable = false)
-  private Shop shop;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "shop_id", nullable = false)
+    private Shop shop;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "shop_cake_size_id", nullable = false)
-  private ShopCakeSize shopCakeSize;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "shop_cake_size_id", nullable = false)
+    private ShopCakeSize shopCakeSize;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "design_id")
-  private DesignGallery designGallery;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "design_id")
+    private DesignGallery designGallery;
 
-  @Column(name = "pickup_datetime")
-  private LocalDateTime pickupDatetime;
+    @Column(name = "pickup_datetime")
+    private LocalDateTime pickupDatetime;
 
-  @Column(name = "lettering_text", length = 30)
-  private String letteringText;
+    @Column(name = "lettering_text", length = 30)
+    private String letteringText;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "lettering_line_count")
-  private LetteringLineCount letteringLineCount;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lettering_line_count")
+    private LetteringLineCount letteringLineCount;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "lettering_alignment")
-  private LetteringAlignment letteringAlignment;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lettering_alignment")
+    private LetteringAlignment letteringAlignment;
 
-  @Column(name = "additional_request")
-  private String additionalRequest;
+    @Column(name = "additional_request")
+    private String additionalRequest;
 
-  @Column(name = "reference_image_url")
-  private String referenceImageUrl;
+    @Column(name = "reference_image_url")
+    private String referenceImageUrl;
 
-  @Builder.Default
-  @OneToMany(mappedBy = "orderDraft", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<OrderDraftItem> items = new ArrayList<>();
+    @Builder.Default
+    @OneToMany(mappedBy = "orderDraft", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDraftItem> items = new ArrayList<>();
 
-  public Long calculateProgress() {
-    long progress = 0;
+    public Long calculateProgress() {
+        long progress = 0;
 
-    if (this.shopCakeSize != null) {
-      progress += 25;
+        if (this.shopCakeSize != null) {
+            progress += 25;
+        }
+        if (this.pickupDatetime != null) {
+            progress += 25;
+        }
+        if (this.items != null && !this.items.isEmpty()) {
+            progress += 25;
+        }
+        if (this.letteringText != null) {
+            progress += 15;
+        }
+
+        return progress;
     }
-    if (this.pickupDatetime != null) {
-      progress += 25;
-    }
-    if (this.items != null && !this.items.isEmpty()) {
-      progress += 25;
-    }
-    if (this.letteringText != null) {
-      progress += 15;
-    }
 
-    return progress;
-  }
+    public String calculateStatus() {
 
-  public String calculateStatus() {
-
-    if (calculateProgress() == 0) {
-      return "EMPTY";
-    } else if (calculateProgress() == 25) {
-      return "STEP1";
-    } else if (calculateProgress() == 50) {
-      return "STEP2";
-    } else if (calculateProgress() == 75) {
-      return "STEP3";
-    } else {
-      return "COMPLETED";
+        if (calculateProgress() == 0) {
+            return "EMPTY";
+        } else if (calculateProgress() == 25) {
+            return "STEP1";
+        } else if (calculateProgress() == 50) {
+            return "STEP2";
+        } else if (calculateProgress() == 75) {
+            return "STEP3";
+        } else {
+            return "COMPLETED";
+        }
     }
-  }
+    public void updatePickupDatetime(LocalDateTime pickupDatetime) {
+        this.pickupDatetime = pickupDatetime;
+    }
 }
