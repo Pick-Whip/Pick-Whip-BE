@@ -25,8 +25,9 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
   private final OrderQueryService orderQueryService;
   private final OrderCommandService orderCommandService;
+    private final OrderDraftCommandService orderDraftCommandService;
 
-  @Operation(summary = "주문 생성하기", description = "작성된 주문서(Draft)를 바탕으로 실제 주문을 생성합니다.")
+    @Operation(summary = "주문 생성하기", description = "작성된 주문서(Draft)를 바탕으로 실제 주문을 생성합니다.")
   @PostMapping("")
   public ApiResponse<OrderResDTO.OrderCompleteDTO> createOrder(
       @Parameter(hidden = true) @ExtractPayload Long userId,

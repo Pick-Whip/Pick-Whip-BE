@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.shop.service;
+package com.example.picknwhip_be.domain.shop.service.command;
 
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;

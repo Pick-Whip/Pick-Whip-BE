@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.shop.service;
+package com.example.picknwhip_be.domain.shop.service.query;
 
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.shop.dto.res.PickupResDTO;
