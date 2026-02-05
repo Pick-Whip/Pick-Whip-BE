@@ -11,6 +11,8 @@ import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -85,11 +87,15 @@ public class Order extends BaseEntity {
   private int totalPrice;
 
   @Column(name = "deposit_amount")
-  private int depositAmount;
+  private Integer depositAmount;
 
   @Column(name = "rejection_reason")
   private String rejectionReason;
 
   @Column(name = "order_code", unique = true, length = 20)
   private String orderCode;
+
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  @Builder.Default
+  private List<OrderItem> orderItems = new ArrayList<>();
 }
