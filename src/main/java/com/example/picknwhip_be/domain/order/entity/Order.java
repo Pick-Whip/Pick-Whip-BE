@@ -8,6 +8,8 @@ import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.global.entity.BaseEntity;
@@ -97,13 +99,15 @@ public class Order extends BaseEntity {
   @Column(name = "order_code", unique = true, length = 20)
   private String orderCode;
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-  @Builder.Default
-  private List<OrderItem> orderItems = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OrderBy("id ASC")
+    @Builder.Default
+    private Set<OrderItem> orderItems = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OrderBy("createdAt ASC")
     @Builder.Default
-    private List<OrderHistory> histories = new ArrayList<>();
+    private Set<OrderHistory> histories = new LinkedHashSet<>();
 
     public void changeStatus(Status newStatus) {
         if (this.status == Status.COMPLETED || this.status == Status.IMPOSSIBLE) {

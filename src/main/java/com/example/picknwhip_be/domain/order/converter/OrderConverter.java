@@ -88,21 +88,22 @@ public class OrderConverter {
         List<String> flavors = order.getOrderItems().stream()
                 .filter(i -> i.getOptionCategory() == OptionCategory.SHEET || i.getOptionCategory() == OptionCategory.CREAM)
                 .map(OrderItem::getOptionName)
+                .distinct()
                 .collect(Collectors.toList());
-
         String deco = order.getOrderItems().stream()
-                .filter(i -> i.getOptionCategory() == OptionCategory.TOPPING || i.getOptionCategory() == OptionCategory.ICING) // 카테고리 확인 필요
+                .filter(i -> i.getOptionCategory() == OptionCategory.TOPPING || i.getOptionCategory() == OptionCategory.ICING)
                 .map(OrderItem::getOptionName)
+                .distinct()
                 .collect(Collectors.joining(", "));
 
         String lettering = String.format("%s\n%s + %s",
                 order.getLetteringText() != null ? order.getLetteringText() : "",
-                order.getLetteringAlignment(),
-                order.getLetteringLineCount());
+                order.getLetteringAlignment() != null ? order.getLetteringAlignment().getDescription() : "",
+                order.getLetteringLineCount() != null ? order.getLetteringLineCount().getDescription() : "");
 
         return OrderDetailResDTO.ProductInfo.builder()
                 .imageUrl(order.getReferenceImageUrl())
-                .designName(order.getDesignGallery() != null ? order.getDesignGallery().getDesignName() : "1호 원형") // 임시 로직
+                .designName(order.getDesignGallery() != null ? order.getDesignGallery().getDesignName() : "1호 원형")
                 .flavor(flavors.isEmpty() ? "-" : String.join(" + ", flavors))
                 .lettering(lettering)
                 .deco(deco.isEmpty() ? "-" : deco)
@@ -115,7 +116,7 @@ public class OrderConverter {
             return null;
         }
 
-        List<OrderHistory> histories = order.getHistories();
+        Collection<OrderHistory> histories = order.getHistories();
         List<OrderDetailResDTO.TimelineItem> timeline = new ArrayList<>();
 
         timeline.add(createTimelineItem("주문서 작성", histories, Status.CONFIRM_WAIT, false));
@@ -125,7 +126,8 @@ public class OrderConverter {
         return timeline;
     }
 
-    private OrderDetailResDTO.TimelineItem createTimelineItem(String name, List<OrderHistory> histories, Status targetStatus, boolean isReject) {
+    private OrderDetailResDTO.TimelineItem createTimelineItem(String name, Collection<OrderHistory> histories, Status targetStatus, boolean isReject) {
+
         Optional<OrderHistory> history = histories.stream()
                 .filter(h -> h.getStatus() == targetStatus)
                 .findFirst();
