@@ -7,12 +7,15 @@ import com.example.picknwhip_be.domain.review.entity.QReview;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewImage;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewKeyword;
+import com.example.picknwhip_be.domain.review.entity.mapping.QReviewLike;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewReply;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewSelectedKeyword;
 import com.example.picknwhip_be.domain.shop.entity.QShop;
 import com.example.picknwhip_be.domain.user.entity.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
   private static final QUser user = QUser.user;
   private static final QDesignGallery designGallery = QDesignGallery.designGallery;
   private static final QReviewKeyword reviewKeyword = QReviewKeyword.reviewKeyword;
+  private static final QReviewLike reviewLike = QReviewLike.reviewLike;
   private static final QReviewSelectedKeyword reviewSelectedKeyword =
       QReviewSelectedKeyword.reviewSelectedKeyword;
 
@@ -130,19 +134,43 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
    */
   @Override
   public List<Review> findBestHelpfulReviews(int limit) {
-    return queryFactory
-        .selectFrom(review)
-        .join(review.order, order)
-        .fetchJoin()
-        .join(review.user, user)
-        .fetchJoin()
-        .join(order.designGallery, designGallery)
-        .fetchJoin()
-        .where(
-            review.deletedAt.isNull(), review.agreement.isTrue(), order.designGallery.isNotNull())
-        // helpfulCount 컬럼이 Review 엔티티에 추가되어 있어야 합니다.
-        .orderBy(review.helpfulCount.desc(), review.id.desc())
-        .limit(limit)
-        .fetch();
+    // 1단계: 좋아요 많은 순으로 '리뷰 ID'만 조회 (Covering Index 활용 & 가벼운 쿼리)
+    List<Long> ids =
+        queryFactory
+            .select(review.id)
+            .from(review)
+            .join(review.order, order)
+            .leftJoin(reviewLike)
+            .on(reviewLike.review.eq(review)) // [추가] 좋아요 테이블 조인
+            .where(
+                review.deletedAt.isNull(),
+                review.agreement.isTrue(),
+                order.designGallery.isNotNull())
+            .groupBy(review.id) // [추가] 리뷰별로 그룹화하여 카운트
+            .orderBy(reviewLike.count().desc(), review.id.desc()) // [수정] 좋아요 개수 내림차순 정렬
+            .limit(limit)
+            .fetch();
+
+    if (ids.isEmpty()) {
+      return List.of();
+    }
+
+    // 2단계: 뽑힌 ID로 실제 엔티티 조회 (Fetch Join으로 데이터 한번에 로딩하여 N+1 방지)
+    List<Review> reviews =
+        queryFactory
+            .selectFrom(review)
+            .join(review.order, order)
+            .fetchJoin()
+            .join(review.user, user)
+            .fetchJoin()
+            .join(order.designGallery, designGallery)
+            .fetchJoin()
+            .where(review.id.in(ids))
+            .fetch();
+
+    // 3단계: 2단계 결과는 ID 순서가 섞일 수 있으므로, 1단계의 순서(좋아요 순)대로 재정렬
+    Map<Long, Review> reviewMap = reviews.stream().collect(Collectors.toMap(Review::getId, r -> r));
+
+    return ids.stream().map(reviewMap::get).toList();
   }
 }
