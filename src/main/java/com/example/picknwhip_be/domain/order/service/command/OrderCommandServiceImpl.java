@@ -125,7 +125,10 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   }
 
   private int calculateTotalPrice(OrderDraft draft) {
-    int basePrice = draft.getShopCakeSize().getPrice() + draft.getDesignGallery().getBasePrice();
+    int basePrice = draft.getShopCakeSize().getPrice();
+    if (draft.getDesignGallery() != null) {
+      basePrice += draft.getDesignGallery().getBasePrice();
+    }
     int optionPrice =
         draft.getItems().stream()
             .mapToInt(item -> item.getCustomOption().getAdditionalPrice())

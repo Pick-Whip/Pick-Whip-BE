@@ -4,8 +4,7 @@ import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
-import com.example.picknwhip_be.domain.order.repository.OrderRepository;
-import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
+import com.example.picknwhip_be.domain.shop.validator.PickupTimeValidator;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderDraftCommandServiceImpl implements OrderDraftCommandService {
 
   private final OrderDraftRepository orderDraftRepository;
-  private final ShopBusinessHourRepository shopBusinessHourRepository;
-  private final OrderRepository orderRepository;
+  private final PickupTimeValidator pickupTimeValidator;
 
   @Override
   public void updatePickupTime(Long userId, Long draftId, LocalDateTime newPickupTime) {
@@ -30,6 +28,7 @@ public class OrderDraftCommandServiceImpl implements OrderDraftCommandService {
     if (!draft.getUser().getUserId().equals(userId)) {
       throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
     }
+    pickupTimeValidator.validate(draft.getShop(), newPickupTime);
     draft.updatePickupDatetime(newPickupTime);
   }
 }
