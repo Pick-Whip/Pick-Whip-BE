@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.global.common;
+package com.example.picknwhip_be.domain.order.cursor;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

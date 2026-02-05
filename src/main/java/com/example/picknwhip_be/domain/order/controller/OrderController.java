@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.order.controller;
 
+import com.example.picknwhip_be.domain.order.cursor.CursorResult;
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
@@ -9,7 +10,6 @@ import com.example.picknwhip_be.domain.order.service.query.OrderQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
-import com.example.picknwhip_be.global.common.CursorResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

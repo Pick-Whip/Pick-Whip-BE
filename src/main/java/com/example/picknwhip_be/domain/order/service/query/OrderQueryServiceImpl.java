@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.order.service.query;
 
+import com.example.picknwhip_be.domain.order.cursor.CursorResult;
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
@@ -8,7 +9,6 @@ import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
-import com.example.picknwhip_be.global.common.CursorResult;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
