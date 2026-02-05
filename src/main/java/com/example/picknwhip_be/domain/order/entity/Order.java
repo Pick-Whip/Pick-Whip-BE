@@ -98,4 +98,8 @@ public class Order extends BaseEntity {
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
   @Builder.Default
   private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<OrderHistory> histories = new ArrayList<>();
 }
