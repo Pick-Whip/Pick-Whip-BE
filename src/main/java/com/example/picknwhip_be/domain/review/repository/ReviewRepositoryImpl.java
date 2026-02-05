@@ -134,20 +134,19 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
    */
   @Override
   public List<Review> findBestHelpfulReviews(int limit) {
-    // 1단계: 좋아요 많은 순으로 '리뷰 ID'만 조회 (Covering Index 활용 & 가벼운 쿼리)
     List<Long> ids =
         queryFactory
             .select(review.id)
             .from(review)
             .join(review.order, order)
             .leftJoin(reviewLike)
-            .on(reviewLike.review.eq(review)) // [추가] 좋아요 테이블 조인
+            .on(reviewLike.review.eq(review))
             .where(
                 review.deletedAt.isNull(),
                 review.agreement.isTrue(),
                 order.designGallery.isNotNull())
-            .groupBy(review.id) // [추가] 리뷰별로 그룹화하여 카운트
-            .orderBy(reviewLike.count().desc(), review.id.desc()) // [수정] 좋아요 개수 내림차순 정렬
+            .groupBy(review.id)
+            .orderBy(reviewLike.count().desc(), review.id.desc())
             .limit(limit)
             .fetch();
 
@@ -155,7 +154,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
       return List.of();
     }
 
-    // 2단계: 뽑힌 ID로 실제 엔티티 조회 (Fetch Join으로 데이터 한번에 로딩하여 N+1 방지)
     List<Review> reviews =
         queryFactory
             .selectFrom(review)
@@ -168,7 +166,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
             .where(review.id.in(ids))
             .fetch();
 
-    // 3단계: 2단계 결과는 ID 순서가 섞일 수 있으므로, 1단계의 순서(좋아요 순)대로 재정렬
     Map<Long, Review> reviewMap = reviews.stream().collect(Collectors.toMap(Review::getId, r -> r));
 
     return ids.stream().map(reviewMap::get).toList();
