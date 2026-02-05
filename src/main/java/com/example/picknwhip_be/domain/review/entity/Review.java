@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -60,22 +59,10 @@ public class Review extends BaseEntity {
   @Builder.Default
   private Boolean agreement = true;
 
-  @Column(name = "helpful_count")
-  @ColumnDefault("0")
-  private Long helpfulCount = 0L;
-
   public void softDelete(LocalDateTime now) {
     if (this.deletedAt == null) {
       this.deletedAt = now;
     }
-  }
-
-  public void increaseHelpfulCount() {
-    this.helpfulCount++;
-  }
-
-  public void decreaseHelpfulCount() {
-    if (this.helpfulCount > 0) this.helpfulCount--;
   }
 
   public boolean isDeleted() {
