@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
@@ -21,6 +22,7 @@ public class OrderCursorReqDTO {
   private Integer lastStatusScore;
 
   @Schema(description = "마지막으로 조회된 주문의 픽업 일시 (응답의 nextCursor.pickupDatetime)", nullable = true)
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastPickupDatetime;
 
   @Schema(description = "마지막으로 조회된 주문의 ID (응답의 nextCursor.orderId)", nullable = true)
