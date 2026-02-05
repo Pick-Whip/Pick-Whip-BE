@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.notification.exception.code;
+package com.example.picknwhip_be.domain.notification.exception;
 
 import com.example.picknwhip_be.global.apiPayload.code.BaseErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;

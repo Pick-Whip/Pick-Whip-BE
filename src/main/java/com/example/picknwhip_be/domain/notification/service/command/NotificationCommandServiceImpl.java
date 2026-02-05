@@ -2,11 +2,12 @@ package com.example.picknwhip_be.domain.notification.service.command;
 
 import static com.example.picknwhip_be.domain.notification.enums.NotificationKind.EVENT;
 
+import com.example.picknwhip_be.domain.notification.dto.res.NotiResDTO;
 import com.example.picknwhip_be.domain.notification.entity.Notification;
 import com.example.picknwhip_be.domain.notification.enums.NotificationKind;
 import com.example.picknwhip_be.domain.notification.event.CreateNotificationEvent;
+import com.example.picknwhip_be.domain.notification.exception.NotificationException;
 import com.example.picknwhip_be.domain.notification.exception.code.NotificationErrorCode;
-import com.example.picknwhip_be.domain.notification.exception.code.NotificationException;
 import com.example.picknwhip_be.domain.notification.repository.NotificationRepository;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
@@ -94,5 +95,25 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
       return template;
     }
     return template.replace("${storeName}", storeName);
+  }
+
+  @Transactional
+  @Override
+  public void updateNotificationReadAll(Long userId) {
+    notificationRepository.markAllAsRead(userId);
+  }
+
+  @Transactional
+  @Override
+  public NotiResDTO.ReadDTO updateNotificationRead(Long notificationId, Long userId) {
+    Notification notification =
+        notificationRepository
+            .findByIdAndUserUserId(notificationId, userId)
+            .orElseThrow(
+                () -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+
+    notification.markAsRead();
+
+    return new NotiResDTO.ReadDTO(notificationId);
   }
 }

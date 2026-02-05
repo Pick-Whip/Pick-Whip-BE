@@ -27,4 +27,8 @@ public class NotiResDTO {
           @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
           LocalDateTime createdDate,
       @Schema(description = "읽음 여부", example = "false") boolean isRead) {}
+
+  public record UnreadDTO(@Schema(description = "알림 안 읽음 개수", example = "1") Long unread) {}
+
+  public record ReadDTO(@Schema(description = "읽은 알림 ID", example = "1") Long notificationId) {}
 }
