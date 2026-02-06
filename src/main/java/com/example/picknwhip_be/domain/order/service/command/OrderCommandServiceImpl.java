@@ -100,6 +100,64 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     return OrderResDTO.from(savedOrder);
   }
 
+  @Override
+  public void acceptOrder(Long userId, Long orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+    // 권한 체크: 해당 가게의 사장님인지 확인
+    if (!order.getShop().getOwner().getUserId().equals(userId)) {
+      throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
+    }
+
+    order.accept(); // Entity 상태 변경
+    saveHistory(order, Status.PAYMENT_WAIT); // History 저장
+  }
+
+  @Override
+  public void rejectOrder(Long userId, Long orderId, String reason) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+    if (!order.getShop().getOwner().getUserId().equals(userId)) {
+      throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
+    }
+
+    order.reject(reason);
+    saveHistory(order, Status.CANCELED_BY_SHOP);
+  }
+
+  @Override
+  public void handlePaymentSuccess(Long orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+    order.paymentSuccess();
+    saveHistory(order, Status.PROD_CONFIRM);
+  }
+
+  @Override
+  public void handlePaymentFailure(Long orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+    order.paymentFail();
+    saveHistory(order, Status.PAYMENT_FAILED);
+  }
+
+  private void saveHistory(Order order, Status status) {
+    OrderHistory history = OrderHistory.builder().order(order).status(status).build();
+    orderHistoryRepository.save(history);
+  }
+
   /** 주문 코드 생성 로직 (YYMMDD_XXX) */
   private String generateOrderCode(Long shopId, LocalDate date) {
     int maxRetries = 3;

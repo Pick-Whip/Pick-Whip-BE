@@ -31,7 +31,7 @@ public class OrderConverter {
         .build();
   }
 
-  public OrderDetailResDTO.StatusInfo buildStatusInfo(Order order) {
+  private OrderDetailResDTO.StatusInfo buildStatusInfo(Order order) {
     Status status = order.getStatus();
     String topMsg;
     String bottomMsg;
@@ -54,7 +54,6 @@ public class OrderConverter {
       case PAYMENT_FAILED -> {
         topMsg = "제작 불가";
         bottomMsg = "결제 미완료 상태입니다";
-        isImpossible = true;
       }
       case PROD_CONFIRM -> {
         topMsg = "제작 확정";
@@ -160,51 +159,44 @@ public class OrderConverter {
 
     Collection<OrderHistory> histories = order.getHistories();
     List<OrderDetailResDTO.TimelineItem> timeline = new ArrayList<>();
-    timeline.add(createTimelineItem("주문서 작성", histories, Status.CONFIRM_WAIT, false));
-
+    timeline.add(createTimelineItemFromHistory("주문서 작성", histories, Status.CONFIRM_WAIT, false));
     Optional<OrderHistory> checkHistory =
         histories.stream().filter(h -> h.getStatus() == Status.PAYMENT_WAIT).findFirst();
 
     String checkTime;
-
     if (checkHistory.isPresent()) {
       checkTime = checkHistory.get().getCreatedAt().format(TIME_FMT);
     } else {
       checkTime = order.getUpdatedAt().format(TIME_FMT);
     }
+    timeline.add(createItem("사장님 확인", checkTime, true, false));
 
-    timeline.add(
-        OrderDetailResDTO.TimelineItem.builder()
-            .stepName("사장님 확인")
-            .time(checkTime)
-            .isCompleted(true)
-            .isReject(false)
-            .build());
     String errorTime = order.getUpdatedAt().format(TIME_FMT);
-
-    timeline.add(
-        OrderDetailResDTO.TimelineItem.builder()
-            .stepName("제작 불가")
-            .time(errorTime)
-            .isCompleted(true)
-            .isReject(true)
-            .build());
+    timeline.add(createItem("제작 불가", errorTime, true, true));
 
     return timeline;
   }
 
-  private OrderDetailResDTO.TimelineItem createTimelineItem(
+  private OrderDetailResDTO.TimelineItem createItem(
+      String stepName, String time, boolean isCompleted, boolean isReject) {
+    return OrderDetailResDTO.TimelineItem.builder()
+        .stepName(stepName)
+        .time(time)
+        .isCompleted(isCompleted)
+        .isReject(isReject)
+        .build();
+  }
+
+  private OrderDetailResDTO.TimelineItem createTimelineItemFromHistory(
       String name, Collection<OrderHistory> histories, Status targetStatus, boolean isReject) {
 
     Optional<OrderHistory> history =
         histories.stream().filter(h -> h.getStatus() == targetStatus).findFirst();
 
-    return OrderDetailResDTO.TimelineItem.builder()
-        .stepName(name)
-        .time(history.map(h -> h.getCreatedAt().format(TIME_FMT)).orElse("-"))
-        .isCompleted(history.isPresent())
-        .isReject(isReject)
-        .build();
+    String time = history.map(h -> h.getCreatedAt().format(TIME_FMT)).orElse("-");
+    boolean isCompleted = history.isPresent();
+
+    return createItem(name, time, isCompleted, isReject);
   }
 
   private String getAlignmentDescription(LetteringAlignment alignment) {

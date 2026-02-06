@@ -124,6 +124,12 @@ public class Order extends BaseEntity {
     this.rejectionReason = reason;
   }
 
+  private void validatePaymentProcessable() {
+    if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
+      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+    }
+  }
+
   public void accept() {
     if (this.status != Status.CONFIRM_WAIT) {
       throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
@@ -132,17 +138,13 @@ public class Order extends BaseEntity {
   }
 
   public void paymentFail() {
-    if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
-      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
-    }
+    validatePaymentProcessable();
     this.status = Status.PAYMENT_FAILED;
     this.paymentStatus = PaymentStatus.WAITING;
   }
 
   public void paymentSuccess() {
-    if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
-      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
-    }
+    validatePaymentProcessable();
     this.status = Status.PROD_CONFIRM;
     this.paymentStatus = PaymentStatus.PAID;
   }

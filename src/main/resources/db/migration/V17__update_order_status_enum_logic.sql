@@ -34,12 +34,23 @@ WHERE status = 'IMPOSSIBLE' AND rejection_reason IS NULL;
 
 
 -- -----------------------------------------------------------------------------
--- 3. [OrderHistories 테이블] 데이터 마이그레이션 (현재 VARCHAR이므로 바로 UPDATE 가능)
+-- 3. [OrderHistories 테이블] 데이터 마이그레이션
+-- [수정] orders 테이블과 조인하여 status 일관성 유지 (rejection_reason 체크)
 -- -----------------------------------------------------------------------------
--- 히스토리는 거절 사유 컬럼이 없으므로 일괄적으로 'CANCELED_BY_SHOP'으로 변경하여 타임라인 에러 방지
-UPDATE order_histories
-SET status = 'CANCELED_BY_SHOP'
-WHERE status = 'IMPOSSIBLE';
+
+-- 3-1. 사장님 거절(CANCELED_BY_SHOP)로 매핑될 히스토리 업데이트
+UPDATE order_histories oh
+    JOIN orders o ON oh.order_id = o.id
+    SET oh.status = 'CANCELED_BY_SHOP'
+WHERE oh.status = 'IMPOSSIBLE'
+  AND o.rejection_reason IS NOT NULL;
+
+-- 3-2. 결제 실패(PAYMENT_FAILED)로 매핑될 히스토리 업데이트
+UPDATE order_histories oh
+    JOIN orders o ON oh.order_id = o.id
+    SET oh.status = 'PAYMENT_FAILED'
+WHERE oh.status = 'IMPOSSIBLE'
+  AND o.rejection_reason IS NULL;
 
 
 -- -----------------------------------------------------------------------------
@@ -60,9 +71,8 @@ ALTER TABLE orders
 
 -- -----------------------------------------------------------------------------
 -- 5. [OrderHistories 테이블] 컬럼 타입 변경 (VARCHAR -> ENUM)
+-- [주의] 위에서 데이터 마이그레이션이 완벽하게 되지 않으면 여기서 에러 발생 가능함
 -- -----------------------------------------------------------------------------
--- orders 테이블과 정합성을 맞추기 위해 VARCHAR를 ENUM으로 변경합니다.
--- 위에서 데이터를 이미 다 바꿨으므로 안전하게 변환됩니다.
 ALTER TABLE order_histories
     MODIFY COLUMN status ENUM(
     'CONFIRM_WAIT',
