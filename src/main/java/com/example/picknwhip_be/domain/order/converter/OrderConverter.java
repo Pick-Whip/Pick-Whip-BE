@@ -31,52 +31,63 @@ public class OrderConverter {
         .build();
   }
 
-  private OrderDetailResDTO.StatusInfo buildStatusInfo(Order order) {
-    Status status = order.getStatus();
-    String topMsg;
-    String bottomMsg;
-    boolean isImpossible = (status == Status.IMPOSSIBLE);
+    public OrderDetailResDTO.StatusInfo buildStatusInfo(Order order) {
+        Status status = order.getStatus();
+        String topMsg;
+        String bottomMsg;
+        boolean isImpossible = (status == Status.CANCELED_BY_SHOP || status == Status.PAYMENT_FAILED);
+        String rejectReason = null;
 
-    // 상태별 멘트 로직 최적화
-    switch (status) {
-      case CONFIRM_WAIT -> {
-        topMsg = "주문서 확인 중";
-        bottomMsg = "주문서 확인 중";
-      }
-      case PROD_CONFIRM -> {
-        topMsg = "결제 요청 중";
-        bottomMsg = "결제 요청 중";
-      }
-      case IMPOSSIBLE -> {
-        topMsg = "제작 불가";
-        bottomMsg = (order.getRejectionReason() != null) ? "사장님 메세지를 확인해주세요" : "결제 미완료 상태입니다";
-      }
-      case MAKING -> {
-        topMsg = "제작 중";
-        bottomMsg = "제작 중";
-      }
-      case PICKUP_WAIT -> {
-        topMsg = "픽업 대기 중";
-        bottomMsg = "픽업 대기 중";
-      }
-      case COMPLETED -> {
-        topMsg = "픽업 완료";
-        bottomMsg = "픽업 완료";
-      }
-      default -> {
-        topMsg = "확인 중";
-        bottomMsg = "확인 중";
-      }
+        switch (status) {
+            case CONFIRM_WAIT -> {
+                topMsg = "주문서 확인 중";
+                bottomMsg = "주문서 확인 중";
+            }
+            case PAYMENT_WAIT -> {
+                topMsg = "결제 요청 중";
+                bottomMsg = "결제 요청 중";
+            }
+            // [Case A] 사장님 거절 -> UI상 '제작 불가'로 표시, 이유 포함
+            case CANCELED_BY_SHOP -> {
+                topMsg = "제작 불가";
+                bottomMsg = "사장님 메세지를 확인해주세요";
+            }
+            // [Case B] 결제 실패 -> UI상 '제작 불가'로 표시
+            case PAYMENT_FAILED -> {
+                topMsg = "제작 불가";
+                bottomMsg = "결제 미완료 상태입니다";
+                isImpossible = true;
+            }
+            case PROD_CONFIRM -> {
+                topMsg = "제작 확정";
+                bottomMsg = "제작 확정";
+            }
+            case MAKING -> {
+                topMsg = "제작 중";
+                bottomMsg = "제작 중";
+            }
+            case PICKUP_WAIT -> {
+                topMsg = "픽업 대기 중";
+                bottomMsg = "픽업 대기 중";
+            }
+            case COMPLETED -> {
+                topMsg = "픽업 완료";
+                bottomMsg = "픽업 완료";
+            }
+            default -> {
+                topMsg = "확인 중";
+                bottomMsg = "확인 중";
+            }
+        }
+
+        return OrderDetailResDTO.StatusInfo.builder()
+                .status(status)
+                .topMessage(topMsg)
+                .bottomMessage(bottomMsg)
+                .rejectReason(isImpossible ? order.getRejectionReason() : null)
+                .isImpossible(isImpossible)
+                .build();
     }
-
-    return OrderDetailResDTO.StatusInfo.builder()
-        .status(status)
-        .topMessage(topMsg)
-        .bottomMessage(bottomMsg)
-        .rejectReason(isImpossible ? order.getRejectionReason() : null)
-        .isImpossible(isImpossible)
-        .build();
-  }
 
   private OrderDetailResDTO.ShopInfo buildShopInfo(Order order) {
     String productName =
@@ -143,34 +154,77 @@ public class OrderConverter {
         .build();
   }
 
-  private List<OrderDetailResDTO.TimelineItem> buildTimeline(Order order) {
-    if (order.getStatus() != Status.IMPOSSIBLE) {
-      return null;
+    private List<OrderDetailResDTO.TimelineItem> buildTimeline(Order order) {
+        // 1. 제작 불가 상태가 아니면 Timeline은 null
+        if (order.getStatus() != Status.CANCELED_BY_SHOP && order.getStatus() != Status.PAYMENT_FAILED) {
+            return null;
+        }
+
+        Collection<OrderHistory> histories = order.getHistories();
+        List<OrderDetailResDTO.TimelineItem> timeline = new ArrayList<>();
+
+        // -------------------------------------------------------------------------
+        // Step 1. 주문서 작성 (CONFIRM_WAIT)
+        // -------------------------------------------------------------------------
+        // 주문서 완료는 무조건 있어야 하는 단계
+        timeline.add(createTimelineItem("주문서 작성", histories, Status.CONFIRM_WAIT, false));
+
+
+        // -------------------------------------------------------------------------
+        // Step 2. 사장님 확인 (PAYMENT_WAIT or Rejection Time)
+        // -------------------------------------------------------------------------
+        // [로직] 사장님이 확인을 했으니 거절을 한 것임. 따라서 무조건 Completed true.
+        // 시간은 "결제요청" 히스토리가 있으면 그 시간, 없으면 "거절된 시간(현재)"을 사용.
+
+        Optional<OrderHistory> checkHistory = histories.stream()
+                .filter(h -> h.getStatus() == Status.PAYMENT_WAIT)
+                .findFirst();
+
+        String checkTime;
+
+        if (checkHistory.isPresent()) {
+            checkTime = checkHistory.get().getCreatedAt().format(TIME_FMT);
+        } else {
+            // 바로 거절한 경우: 거절된 시간(=확인한 시간)으로 간주
+            checkTime = order.getUpdatedAt().format(TIME_FMT);
+        }
+
+        timeline.add(OrderDetailResDTO.TimelineItem.builder()
+                .stepName("사장님 확인")
+                .time(checkTime)
+                .isCompleted(true) // 거절이어도 확인은 한 것이므로 True
+                .isReject(false)
+                .build());
+
+
+        // -------------------------------------------------------------------------
+        // Step 3. 제작 불가 (Current Status Time)
+        // -------------------------------------------------------------------------
+        String errorTime = order.getUpdatedAt().format(TIME_FMT);
+
+        timeline.add(OrderDetailResDTO.TimelineItem.builder()
+                .stepName("제작 불가")
+                .time(errorTime)
+                .isCompleted(true)
+                .isReject(true) // 빨간색 표시
+                .build());
+
+        return timeline;
     }
 
-    Collection<OrderHistory> histories = order.getHistories();
-    List<OrderDetailResDTO.TimelineItem> timeline = new ArrayList<>();
+    private OrderDetailResDTO.TimelineItem createTimelineItem(
+            String name, Collection<OrderHistory> histories, Status targetStatus, boolean isReject) {
 
-    timeline.add(createTimelineItem("주문서 작성", histories, Status.CONFIRM_WAIT, false));
-    timeline.add(createTimelineItem("사장님 확인", histories, Status.PROD_CONFIRM, false));
-    timeline.add(createTimelineItem("제작 불가", histories, Status.IMPOSSIBLE, true));
+        Optional<OrderHistory> history =
+                histories.stream().filter(h -> h.getStatus() == targetStatus).findFirst();
 
-    return timeline;
-  }
-
-  private OrderDetailResDTO.TimelineItem createTimelineItem(
-      String name, Collection<OrderHistory> histories, Status targetStatus, boolean isReject) {
-
-    Optional<OrderHistory> history =
-        histories.stream().filter(h -> h.getStatus() == targetStatus).findFirst();
-
-    return OrderDetailResDTO.TimelineItem.builder()
-        .stepName(name)
-        .time(history.map(h -> h.getCreatedAt().format(TIME_FMT)).orElse("-"))
-        .isCompleted(history.isPresent())
-        .isReject(isReject)
-        .build();
-  }
+        return OrderDetailResDTO.TimelineItem.builder()
+                .stepName(name)
+                .time(history.map(h -> h.getCreatedAt().format(TIME_FMT)).orElse("-"))
+                .isCompleted(history.isPresent())
+                .isReject(isReject)
+                .build();
+    }
 
   private String getAlignmentDescription(LetteringAlignment alignment) {
     if (alignment == null) return "";

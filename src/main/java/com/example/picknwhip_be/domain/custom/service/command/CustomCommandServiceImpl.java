@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -118,41 +119,43 @@ public class CustomCommandServiceImpl implements CustomCommandService {
     return new CustomResDTO.CustomCreateDTO(savedDraft.getId(), savedDraft.getCreatedAt());
   }
 
-  private void validatePickupTime(Shop shop, LocalDateTime pickupDatetime) {
-    if (pickupDatetime.isBefore(LocalDateTime.now())) {
-      throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
+    private void validatePickupTime(Shop shop, LocalDateTime pickupDatetime) {
+        if (pickupDatetime.isBefore(LocalDateTime.now())) {
+            throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
+        }
+
+        LocalDate date = pickupDatetime.toLocalDate();
+        LocalTime time = pickupDatetime.toLocalTime();
+
+        ShopBusinessHour hour =
+                shopBusinessHourRepository
+                        .findByShopIdAndDateAndScheduleType(shop.getId(), date, ScheduleType.DATE)
+                        .orElseGet(
+                                () ->
+                                        shopBusinessHourRepository
+                                                .findByShopIdAndDayOfWeekAndScheduleType(
+                                                        shop.getId(), date.getDayOfWeek().getValue(), ScheduleType.WEEKLY)
+                                                .orElse(null));
+
+        if (hour == null || hour.isClosed()) {
+            throw new OrderException(OrderErrorCode.SHOP_CLOSED_DAY);
+        }
+
+        if (time.isBefore(hour.getOpenTime()) || !time.isBefore(hour.getCloseTime())) {
+            throw new OrderException(OrderErrorCode.SHOP_CLOSED_TIME);
+        }
+
+        List<Status> excludedStatuses = Arrays.asList(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
+
+        long currentOrders =
+                orderRepository.countByShopAndPickupTime(shop.getId(), pickupDatetime, excludedStatuses);
+
+        int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;
+
+        if (currentOrders >= maxCapacity) {
+            throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
+        }
     }
-
-    LocalDate date = pickupDatetime.toLocalDate();
-    LocalTime time = pickupDatetime.toLocalTime();
-
-    ShopBusinessHour hour =
-        shopBusinessHourRepository
-            .findByShopIdAndDateAndScheduleType(shop.getId(), date, ScheduleType.DATE)
-            .orElseGet(
-                () ->
-                    shopBusinessHourRepository
-                        .findByShopIdAndDayOfWeekAndScheduleType(
-                            shop.getId(), date.getDayOfWeek().getValue(), ScheduleType.WEEKLY)
-                        .orElse(null));
-
-    if (hour == null || hour.isClosed()) {
-      throw new OrderException(OrderErrorCode.SHOP_CLOSED_DAY);
-    }
-
-    if (time.isBefore(hour.getOpenTime()) || !time.isBefore(hour.getCloseTime())) {
-      throw new OrderException(OrderErrorCode.SHOP_CLOSED_TIME);
-    }
-
-    long currentOrders =
-        orderRepository.countByShopAndPickupTime(shop.getId(), pickupDatetime, Status.IMPOSSIBLE);
-
-    int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;
-
-    if (currentOrders >= maxCapacity) {
-      throw new OrderException(OrderErrorCode.SLOT_ALREADY_FULL);
-    }
-  }
 
   private OrderDraftItem createDraftItem(
       OrderDraft draft, CustomOption option, Double x, Double y) {

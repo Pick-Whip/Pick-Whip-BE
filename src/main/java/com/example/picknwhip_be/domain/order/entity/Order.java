@@ -107,15 +107,42 @@ public class Order extends BaseEntity {
   @Builder.Default
   private Set<OrderHistory> histories = new LinkedHashSet<>();
 
-  public void changeStatus(Status newStatus) {
-    if (this.status == Status.COMPLETED || this.status == Status.IMPOSSIBLE) {
-      throw new OrderException(OrderErrorCode.CANNOT_CHANGE_FINISHED_ORDER);
+    public void changeStatus(Status newStatus) {
+        if (this.status == Status.COMPLETED ||
+                this.status == Status.CANCELED_BY_SHOP ||
+                this.status == Status.PAYMENT_FAILED) {
+            throw new OrderException(OrderErrorCode.CANNOT_CHANGE_FINISHED_ORDER);
+        }
+        this.status = newStatus;
     }
-    this.status = newStatus;
-  }
 
-  public void reject(String reason) {
-    changeStatus(Status.IMPOSSIBLE);
-    this.rejectionReason = reason;
-  }
+    public void reject(String reason) {
+        if (this.status != Status.CONFIRM_WAIT) {
+            throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+        }
+        this.status = Status.CANCELED_BY_SHOP;
+        this.rejectionReason = reason;
+    }
+
+    public void accept() {
+        if (this.status != Status.CONFIRM_WAIT) {
+            throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+        }
+        this.status = Status.PAYMENT_WAIT;
+    }
+
+    public void paymentFail() {
+        if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
+            throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+        }
+        this.status = Status.PAYMENT_FAILED;
+        this.paymentStatus = PaymentStatus.WAITING;
+    }
+    public void paymentSuccess() {
+        if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
+            throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+        }
+        this.status = Status.PROD_CONFIRM;
+        this.paymentStatus = PaymentStatus.PAID;
+    }
 }
