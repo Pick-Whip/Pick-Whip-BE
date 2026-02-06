@@ -4,6 +4,7 @@ import com.example.picknwhip_be.domain.order.cursor.CursorResult;
 import com.example.picknwhip_be.domain.order.dto.req.DraftPickupTimeReqDTO;
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
+import com.example.picknwhip_be.domain.order.dto.res.OrderDetailResDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
 import com.example.picknwhip_be.domain.order.exception.code.OrderSuccessCode;
@@ -60,5 +61,14 @@ public class OrderController {
 
     orderDraftCommandService.updatePickupTime(userId, draftId, dto.getPickupDatetime());
     return ApiResponse.of(OrderSuccessCode.PICKUP_UPDATED, "픽업 시간이 변경되었습니다.");
+  }
+
+  @Operation(summary = "주문 상세 조회", description = "주문 완료 후 또는 목록에서 주문의 상세 정보를 조회합니다.")
+  @GetMapping("/{orderId}")
+  public ApiResponse<OrderDetailResDTO> getOrderDetail(
+      @ExtractPayload Long userId, @PathVariable Long orderId) {
+
+    OrderDetailResDTO result = orderQueryService.getOrderDetail(userId, orderId);
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 }

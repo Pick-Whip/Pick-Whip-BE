@@ -1,7 +1,9 @@
 package com.example.picknwhip_be.domain.order.service.query;
 
+import com.example.picknwhip_be.domain.order.converter.OrderConverter;
 import com.example.picknwhip_be.domain.order.cursor.CursorResult;
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
+import com.example.picknwhip_be.domain.order.dto.res.OrderDetailResDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderQueryServiceImpl implements OrderQueryService {
 
   private final OrderRepository orderRepository;
+  private final OrderConverter orderConverter;
   private static final int MAX_LIMIT = 50;
 
   @Override
@@ -92,5 +95,17 @@ public class OrderQueryServiceImpl implements OrderQueryService {
       default:
         return 99;
     }
+  }
+
+  public OrderDetailResDTO getOrderDetail(Long userId, Long orderId) {
+    Order order =
+        orderRepository
+            .findDetailById(orderId)
+            .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
+
+    if (!order.getUser().getUserId().equals(userId)) {
+      throw new OrderException(OrderErrorCode.FORBIDDEN_ACCESS);
+    }
+    return orderConverter.toDetailDto(order);
   }
 }

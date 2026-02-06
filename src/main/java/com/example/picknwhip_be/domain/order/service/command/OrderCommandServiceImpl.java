@@ -1,24 +1,24 @@
 package com.example.picknwhip_be.domain.order.service.command;
 
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
-import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
 import com.example.picknwhip_be.domain.order.entity.DailyShopOrderCounter;
 import com.example.picknwhip_be.domain.order.entity.Order;
+import com.example.picknwhip_be.domain.order.entity.OrderHistory;
 import com.example.picknwhip_be.domain.order.entity.OrderItem;
 import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
 import com.example.picknwhip_be.domain.order.repository.DailyShopOrderCounterRepository;
+import com.example.picknwhip_be.domain.order.repository.OrderHistoryRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.shop.validator.PickupTimeValidator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,6 +35,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final OrderDraftRepository orderDraftRepository;
   private final DailyShopOrderCounterRepository counterRepository;
   private final PickupTimeValidator pickupTimeValidator;
+  private final OrderHistoryRepository orderHistoryRepository;
 
   @Override
   public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
@@ -73,24 +74,29 @@ public class OrderCommandServiceImpl implements OrderCommandService {
             .build();
 
     Order savedOrder = orderRepository.save(newOrder);
+    OrderHistory initialHistory =
+        OrderHistory.builder().order(savedOrder).status(Status.CONFIRM_WAIT).build();
+    orderHistoryRepository.save(initialHistory);
+    if (draft.getItems() != null && !draft.getItems().isEmpty()) {
+      List<OrderItem> orderItems =
+          draft.getItems().stream()
+              .map(
+                  item ->
+                      OrderItem.builder()
+                          .order(savedOrder)
+                          .customOption(item.getCustomOption())
+                          .optionCategory(item.getCustomOption().getCategory())
+                          .optionName(item.getCustomOption().getOptionName())
+                          .unitPrice(item.getCustomOption().getAdditionalPrice())
+                          .colorRgbCode(item.getCustomOption().getColorRgbCode())
+                          .positionX(item.getPositionX())
+                          .positionY(item.getPositionY())
+                          .build())
+              .toList();
 
-    List<OrderItem> orderItems = new ArrayList<>();
-    for (OrderDraftItem draftItem : draft.getItems()) {
-      orderItems.add(
-          OrderItem.builder()
-              .order(savedOrder)
-              .customOption(draftItem.getCustomOption())
-              .optionCategory(draftItem.getCustomOption().getCategory())
-              .optionName(draftItem.getCustomOption().getOptionName())
-              .unitPrice(draftItem.getCustomOption().getAdditionalPrice())
-              .colorRgbCode(draftItem.getCustomOption().getColorRgbCode())
-              .positionX(draftItem.getPositionX())
-              .positionY(draftItem.getPositionY())
-              .build());
+      orderItemRepository.saveAll(orderItems);
     }
-    orderItemRepository.saveAll(orderItems);
     orderDraftRepository.delete(draft);
-
     return OrderResDTO.from(savedOrder);
   }
 
@@ -129,10 +135,12 @@ public class OrderCommandServiceImpl implements OrderCommandService {
     if (draft.getDesignGallery() != null) {
       basePrice += draft.getDesignGallery().getBasePrice();
     }
-    int optionPrice =
-        draft.getItems().stream()
-            .mapToInt(item -> item.getCustomOption().getAdditionalPrice())
-            .sum();
-    return basePrice + optionPrice;
+    if (draft.getItems() != null) {
+      basePrice +=
+          draft.getItems().stream()
+              .mapToInt(item -> item.getCustomOption().getAdditionalPrice())
+              .sum();
+    }
+    return basePrice;
   }
 }
