@@ -6,7 +6,6 @@ import static com.example.picknwhip_be.domain.shop.entity.QShop.shop;
 
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
-import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -40,23 +39,15 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         .fetch();
   }
 
-    private BooleanExpression filterByType(String type) {
-        if ("REQUEST".equalsIgnoreCase(type)) {
-            return order.status.in(
-                    Status.CONFIRM_WAIT,
-                    Status.PAYMENT_WAIT,
-                    Status.CANCELED_BY_SHOP,
-                    Status.PAYMENT_FAILED
-            );
-        } else {
-            return order.status.in(
-                    Status.PROD_CONFIRM,
-                    Status.MAKING,
-                    Status.PICKUP_WAIT,
-                    Status.COMPLETED
-            );
-        }
+  private BooleanExpression filterByType(String type) {
+    if ("REQUEST".equalsIgnoreCase(type)) {
+      return order.status.in(
+          Status.CONFIRM_WAIT, Status.PAYMENT_WAIT, Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
+    } else {
+      return order.status.in(
+          Status.PROD_CONFIRM, Status.MAKING, Status.PICKUP_WAIT, Status.COMPLETED);
     }
+  }
 
   private BooleanExpression cursorCondition(
       OrderCursorReqDTO req, NumberExpression<Integer> statusScore) {
@@ -75,23 +66,31 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .and(order.id.gt(req.getLastOrderId())));
   }
 
-    private NumberExpression<Integer> getStatusScore() {
-        return new CaseBuilder()
-                // 1단계
-                .when(order.status.eq(Status.CONFIRM_WAIT)).then(10)
-                // 2단계 (진행중)
-                .when(order.status.eq(Status.PAYMENT_WAIT)).then(20)
-                // 2단계 (실패 - UI상 중요하므로 25점)
-                .when(order.status.eq(Status.CANCELED_BY_SHOP)).then(25)
-                .when(order.status.eq(Status.PAYMENT_FAILED)).then(25)
-                // 3단계
-                .when(order.status.eq(Status.PROD_CONFIRM)).then(30)
-                // 4단계
-                .when(order.status.eq(Status.MAKING)).then(40)
-                // 5단계
-                .when(order.status.eq(Status.PICKUP_WAIT)).then(50)
-                // 완료
-                .when(order.status.eq(Status.COMPLETED)).then(60)
-                .otherwise(99);
-    }
+  private NumberExpression<Integer> getStatusScore() {
+    return new CaseBuilder()
+        // 1단계
+        .when(order.status.eq(Status.CONFIRM_WAIT))
+        .then(10)
+        // 2단계 (진행중)
+        .when(order.status.eq(Status.PAYMENT_WAIT))
+        .then(20)
+        // 2단계 (실패 - UI상 중요하므로 25점)
+        .when(order.status.eq(Status.CANCELED_BY_SHOP))
+        .then(25)
+        .when(order.status.eq(Status.PAYMENT_FAILED))
+        .then(25)
+        // 3단계
+        .when(order.status.eq(Status.PROD_CONFIRM))
+        .then(30)
+        // 4단계
+        .when(order.status.eq(Status.MAKING))
+        .then(40)
+        // 5단계
+        .when(order.status.eq(Status.PICKUP_WAIT))
+        .then(50)
+        // 완료
+        .when(order.status.eq(Status.COMPLETED))
+        .then(60)
+        .otherwise(99);
+  }
 }

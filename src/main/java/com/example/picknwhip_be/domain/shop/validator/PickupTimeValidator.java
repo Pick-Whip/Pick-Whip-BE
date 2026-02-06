@@ -51,7 +51,7 @@ public class PickupTimeValidator {
       throw new OrderException(OrderErrorCode.SHOP_CLOSED_TIME);
     }
 
-      List<Status> excludedStatuses = Arrays.asList(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
+    List<Status> excludedStatuses = Arrays.asList(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
 
     long currentOrders =
         orderRepository.countByShopAndPickupTime(shop.getId(), pickupTime, excludedStatuses);

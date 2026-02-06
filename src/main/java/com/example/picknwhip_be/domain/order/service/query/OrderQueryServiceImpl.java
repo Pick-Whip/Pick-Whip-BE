@@ -6,7 +6,6 @@ import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderDetailResDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderHistoryResDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
-import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
@@ -71,20 +70,28 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     }
   }
 
-    private int calculateStatusScore(Order order) {
-        Status status = order.getStatus();
+  private int calculateStatusScore(Order order) {
+    Status status = order.getStatus();
 
-        switch (status) {
-            case CONFIRM_WAIT: return 10;
-            case PAYMENT_WAIT: return 20;
-            case CANCELED_BY_SHOP:
-            case PAYMENT_FAILED: return 25;
-            case PROD_CONFIRM: return 30;
-            case MAKING: return 40;
-            case PICKUP_WAIT: return 50;
-            case COMPLETED: return 60;
-            default: return 99;
-        }
+    switch (status) {
+      case CONFIRM_WAIT:
+        return 10;
+      case PAYMENT_WAIT:
+        return 20;
+      case CANCELED_BY_SHOP:
+      case PAYMENT_FAILED:
+        return 25;
+      case PROD_CONFIRM:
+        return 30;
+      case MAKING:
+        return 40;
+      case PICKUP_WAIT:
+        return 50;
+      case COMPLETED:
+        return 60;
+      default:
+        return 99;
+    }
   }
 
   public OrderDetailResDTO getOrderDetail(Long userId, Long orderId) {
