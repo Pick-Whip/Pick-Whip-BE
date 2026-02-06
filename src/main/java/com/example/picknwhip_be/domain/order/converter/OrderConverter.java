@@ -47,12 +47,10 @@ public class OrderConverter {
         topMsg = "결제 요청 중";
         bottomMsg = "결제 요청 중";
       }
-        // [Case A] 사장님 거절 -> UI상 '제작 불가'로 표시, 이유 포함
       case CANCELED_BY_SHOP -> {
         topMsg = "제작 불가";
         bottomMsg = "사장님 메세지를 확인해주세요";
       }
-        // [Case B] 결제 실패 -> UI상 '제작 불가'로 표시
       case PAYMENT_FAILED -> {
         topMsg = "제작 불가";
         bottomMsg = "결제 미완료 상태입니다";
@@ -155,7 +153,6 @@ public class OrderConverter {
   }
 
   private List<OrderDetailResDTO.TimelineItem> buildTimeline(Order order) {
-    // 1. 제작 불가 상태가 아니면 Timeline은 null
     if (order.getStatus() != Status.CANCELED_BY_SHOP
         && order.getStatus() != Status.PAYMENT_FAILED) {
       return null;
@@ -163,18 +160,7 @@ public class OrderConverter {
 
     Collection<OrderHistory> histories = order.getHistories();
     List<OrderDetailResDTO.TimelineItem> timeline = new ArrayList<>();
-
-    // -------------------------------------------------------------------------
-    // Step 1. 주문서 작성 (CONFIRM_WAIT)
-    // -------------------------------------------------------------------------
-    // 주문서 완료는 무조건 있어야 하는 단계
     timeline.add(createTimelineItem("주문서 작성", histories, Status.CONFIRM_WAIT, false));
-
-    // -------------------------------------------------------------------------
-    // Step 2. 사장님 확인 (PAYMENT_WAIT or Rejection Time)
-    // -------------------------------------------------------------------------
-    // [로직] 사장님이 확인을 했으니 거절을 한 것임. 따라서 무조건 Completed true.
-    // 시간은 "결제요청" 히스토리가 있으면 그 시간, 없으면 "거절된 시간(현재)"을 사용.
 
     Optional<OrderHistory> checkHistory =
         histories.stream().filter(h -> h.getStatus() == Status.PAYMENT_WAIT).findFirst();
@@ -184,7 +170,6 @@ public class OrderConverter {
     if (checkHistory.isPresent()) {
       checkTime = checkHistory.get().getCreatedAt().format(TIME_FMT);
     } else {
-      // 바로 거절한 경우: 거절된 시간(=확인한 시간)으로 간주
       checkTime = order.getUpdatedAt().format(TIME_FMT);
     }
 
@@ -192,13 +177,9 @@ public class OrderConverter {
         OrderDetailResDTO.TimelineItem.builder()
             .stepName("사장님 확인")
             .time(checkTime)
-            .isCompleted(true) // 거절이어도 확인은 한 것이므로 True
+            .isCompleted(true)
             .isReject(false)
             .build());
-
-    // -------------------------------------------------------------------------
-    // Step 3. 제작 불가 (Current Status Time)
-    // -------------------------------------------------------------------------
     String errorTime = order.getUpdatedAt().format(TIME_FMT);
 
     timeline.add(
@@ -206,7 +187,7 @@ public class OrderConverter {
             .stepName("제작 불가")
             .time(errorTime)
             .isCompleted(true)
-            .isReject(true) // 빨간색 표시
+            .isReject(true)
             .build());
 
     return timeline;
