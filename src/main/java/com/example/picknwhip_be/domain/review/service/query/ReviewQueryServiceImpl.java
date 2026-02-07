@@ -23,6 +23,7 @@ import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     Long nextCursor = null;
     if (hasNext && !pageRows.isEmpty()) {
-      nextCursor = pageRows.get(pageRows.size() - 1).reviewId();
+      nextCursor = pageRows.getLast().reviewId();
     }
 
     List<Long> reviewIds = pageRows.stream().map(ReviewRow.MyReviewRow::reviewId).toList();
@@ -107,7 +108,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     ReviewCursor cursor;
     try {
       cursor = cursorCodec.decode(sort, dto.cursor());
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | DateTimeParseException e) {
       throw new ReviewException(ReviewErrorCode.INVALID_CURSOR);
     }
 

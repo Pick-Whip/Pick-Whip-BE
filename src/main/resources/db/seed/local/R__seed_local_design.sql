@@ -61,7 +61,14 @@ insert into design_gallery (
     null,
     null,
     null
-);
+)
+AS new
+ON DUPLICATE KEY UPDATE
+    design_name = new.design_name,
+    base_price  = new.base_price,
+    image_url   = new.image_url;
+
+DELETE FROM design_gallery_keywords WHERE design_gallery_id IN (2, 3, 4);
 
 insert into design_gallery_keywords (
     design_gallery_id,
