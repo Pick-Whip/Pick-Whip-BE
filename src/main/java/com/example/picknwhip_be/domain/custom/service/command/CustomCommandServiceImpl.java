@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -144,8 +145,10 @@ public class CustomCommandServiceImpl implements CustomCommandService {
       throw new OrderException(OrderErrorCode.SHOP_CLOSED_TIME);
     }
 
+    List<Status> excludedStatuses = Arrays.asList(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
+
     long currentOrders =
-        orderRepository.countByShopAndPickupTime(shop.getId(), pickupDatetime, Status.IMPOSSIBLE);
+        orderRepository.countByShopAndPickupTime(shop.getId(), pickupDatetime, excludedStatuses);
 
     int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;
 

@@ -11,6 +11,7 @@ import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepositor
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class PickupTimeValidator {
     if (pickupTime.getMinute() % interval != 0
         || pickupTime.getSecond() != 0
         || pickupTime.getNano() != 0) {
-      throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME); // 정합성 오류
+      throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
     }
 
     LocalDate date = pickupTime.toLocalDate();
@@ -50,8 +51,10 @@ public class PickupTimeValidator {
       throw new OrderException(OrderErrorCode.SHOP_CLOSED_TIME);
     }
 
+    List<Status> excludedStatuses = Arrays.asList(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
+
     long currentOrders =
-        orderRepository.countByShopAndPickupTime(shop.getId(), pickupTime, Status.IMPOSSIBLE);
+        orderRepository.countByShopAndPickupTime(shop.getId(), pickupTime, excludedStatuses);
 
     int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;
 

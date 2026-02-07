@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
       "SELECT o.pickupDatetime, COUNT(o) FROM Order o "
           + "WHERE o.shop.id = :shopId "
           + "AND o.pickupDatetime BETWEEN :startOfDay AND :endOfDay "
-          + "AND o.status != 'IMPOSSIBLE' "
+          + "AND o.status NOT IN :excludedStatuses "
           + "GROUP BY o.pickupDatetime")
   List<Object[]> countOrdersByShopAndDateRange(
       @Param("shopId") Long shopId,
@@ -25,11 +25,11 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
       "SELECT COUNT(o) FROM Order o "
           + "WHERE o.shop.id = :shopId "
           + "AND o.pickupDatetime = :pickupDatetime "
-          + "AND o.status != :impossibleStatus")
+          + "AND o.status NOT IN :excludedStatuses")
   long countByShopAndPickupTime(
       @Param("shopId") Long shopId,
       @Param("pickupDatetime") LocalDateTime pickupDatetime,
-      @Param("impossibleStatus") Status impossibleStatus);
+      @Param("excludedStatuses") List<Status> excludedStatuses);
 
   @Query(
       "SELECT o FROM Order o "

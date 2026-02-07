@@ -6,7 +6,6 @@ import static com.example.picknwhip_be.domain.shop.entity.QShop.shop;
 
 import com.example.picknwhip_be.domain.order.dto.req.OrderCursorReqDTO;
 import com.example.picknwhip_be.domain.order.entity.Order;
-import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -42,9 +41,11 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
   private BooleanExpression filterByType(String type) {
     if ("REQUEST".equalsIgnoreCase(type)) {
-      return order.status.in(Status.CONFIRM_WAIT, Status.PROD_CONFIRM, Status.IMPOSSIBLE);
+      return order.status.in(
+          Status.CONFIRM_WAIT, Status.PAYMENT_WAIT, Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
     } else {
-      return order.status.in(Status.MAKING, Status.PICKUP_WAIT, Status.COMPLETED);
+      return order.status.in(
+          Status.PROD_CONFIRM, Status.MAKING, Status.PICKUP_WAIT, Status.COMPLETED);
     }
   }
 
@@ -69,13 +70,11 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     return new CaseBuilder()
         .when(order.status.eq(Status.CONFIRM_WAIT))
         .then(10)
-        .when(
-            order.status.eq(Status.PROD_CONFIRM).and(order.paymentStatus.eq(PaymentStatus.WAITING)))
+        .when(order.status.eq(Status.PAYMENT_WAIT))
         .then(20)
-        .when(
-            order.status.eq(Status.PROD_CONFIRM).and(order.paymentStatus.ne(PaymentStatus.WAITING)))
-        .then(30)
-        .when(order.status.eq(Status.IMPOSSIBLE))
+        .when(order.status.in(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED))
+        .then(25)
+        .when(order.status.eq(Status.PROD_CONFIRM))
         .then(30)
         .when(order.status.eq(Status.MAKING))
         .then(40)

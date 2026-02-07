@@ -2,7 +2,6 @@ package com.example.picknwhip_be.domain.order.dto.res;
 
 import com.example.picknwhip_be.domain.order.entity.Order;
 import com.example.picknwhip_be.domain.order.entity.OrderItem;
-import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -77,7 +76,6 @@ public class OrderHistoryResDTO {
 
   private void mapStatusToUi(Order order) {
     Status status = order.getStatus();
-    PaymentStatus paymentStatus = order.getPaymentStatus();
 
     this.stepStatus = "DEFAULT";
     this.rejectReason = null;
@@ -89,26 +87,31 @@ public class OrderHistoryResDTO {
         this.bottomMessage = "주문서 확인 중";
         break;
 
-      case PROD_CONFIRM:
-        if (paymentStatus == PaymentStatus.WAITING) {
-          this.currentStep = 2;
-          this.topMessage = "결제 요청 중";
-          this.bottomMessage = "결제 요청 중";
-        } else {
-          this.currentStep = 3;
-          this.stepStatus = "ERROR";
-          this.topMessage = "제작 불가";
-          this.bottomMessage = "결제 미완료 상태입니다";
-          this.rejectReason = null;
-        }
+      case PAYMENT_WAIT:
+        this.currentStep = 2;
+        this.topMessage = "결제 요청 중";
+        this.bottomMessage = "결제 요청 중";
         break;
 
-      case IMPOSSIBLE:
+      case CANCELED_BY_SHOP:
         this.currentStep = 3;
         this.stepStatus = "ERROR";
         this.topMessage = "제작 불가";
         this.bottomMessage = "사장님 메세지를 확인해주세요";
         this.rejectReason = order.getRejectionReason();
+        break;
+
+      case PAYMENT_FAILED:
+        this.currentStep = 3;
+        this.stepStatus = "ERROR";
+        this.topMessage = "제작 불가";
+        this.bottomMessage = "결제 미완료 상태입니다";
+        break;
+
+      case PROD_CONFIRM:
+        this.currentStep = 3;
+        this.topMessage = "제작 확정";
+        this.bottomMessage = "제작 확정";
         break;
 
       case MAKING:

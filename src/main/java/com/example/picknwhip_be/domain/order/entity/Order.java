@@ -47,8 +47,8 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "shop_cake_size_id", nullable = false)
   private ShopCakeSize shopCakeSize;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "design_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "design_id", nullable = true)
   private DesignGallery designGallery;
 
   @Enumerated(EnumType.STRING)
@@ -108,14 +108,44 @@ public class Order extends BaseEntity {
   private Set<OrderHistory> histories = new LinkedHashSet<>();
 
   public void changeStatus(Status newStatus) {
-    if (this.status == Status.COMPLETED || this.status == Status.IMPOSSIBLE) {
+    if (this.status == Status.COMPLETED
+        || this.status == Status.CANCELED_BY_SHOP
+        || this.status == Status.PAYMENT_FAILED) {
       throw new OrderException(OrderErrorCode.CANNOT_CHANGE_FINISHED_ORDER);
     }
     this.status = newStatus;
   }
 
   public void reject(String reason) {
-    changeStatus(Status.IMPOSSIBLE);
+    if (this.status != Status.CONFIRM_WAIT) {
+      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+    }
+    this.status = Status.CANCELED_BY_SHOP;
     this.rejectionReason = reason;
+  }
+
+  private void validatePaymentProcessable() {
+    if (this.status != Status.PAYMENT_WAIT && this.status != Status.PAYMENT_FAILED) {
+      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+    }
+  }
+
+  public void accept() {
+    if (this.status != Status.CONFIRM_WAIT) {
+      throw new OrderException(OrderErrorCode.INVALID_ORDER_STATUS);
+    }
+    this.status = Status.PAYMENT_WAIT;
+  }
+
+  public void paymentFail() {
+    validatePaymentProcessable();
+    this.status = Status.PAYMENT_FAILED;
+    this.paymentStatus = PaymentStatus.WAITING;
+  }
+
+  public void paymentSuccess() {
+    validatePaymentProcessable();
+    this.status = Status.PROD_CONFIRM;
+    this.paymentStatus = PaymentStatus.PAID;
   }
 }
