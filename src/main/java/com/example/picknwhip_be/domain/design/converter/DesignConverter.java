@@ -5,6 +5,7 @@ import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
+import com.example.picknwhip_be.domain.design.enums.Style;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ public class DesignConverter {
         .cakeName(designGallery.getDesignName())
         .price(designGallery.getBasePrice())
         .imageUrl(designGallery.getImageUrl())
-        .keywords(designGallery.getKeywords())
+        .keywords(designGallery.getKeywords().stream().map(Style::getLabel).toList())
         .build();
   }
 
@@ -59,7 +60,7 @@ public class DesignConverter {
         .letteringText(design.getLetteringText())
         .letteringAlignment(design.getLetteringAlignment())
         .letteringLineCount(design.getLetteringLineCount())
-        .keywords(design.getKeywords())
+        .keywords(design.getKeywords().stream().map(Style::getLabel).toList())
         .toppings(toppings)
         .options(options)
         .build();
