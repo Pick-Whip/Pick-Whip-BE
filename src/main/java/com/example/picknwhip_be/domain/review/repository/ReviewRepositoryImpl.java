@@ -47,7 +47,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
   @Override
   public ReviewRow.ReviewSummaryRow fetchMyReviewSummary(Long userId) {
     return queryFactory
-        .select(new QReviewRow_MyReviewSummaryRow(review.id.count(), review.rating.avg()))
+        .select(new QReviewRow_ReviewSummaryRow(review.id.count(), review.rating.avg()))
         .from(review)
         .where(review.user.userId.eq(userId), review.deletedAt.isNull())
         .fetchOne();
@@ -302,7 +302,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
   @Override
   public ReviewRow.ReviewSummaryRow fetchShopReviewSummary(Long shopId) {
     return queryFactory
-        .select(new QReviewRow_MyReviewSummaryRow(review.id.count(), review.rating.avg()))
+        .select(new QReviewRow_ReviewSummaryRow(review.id.count(), review.rating.avg()))
         .from(review)
         .where(review.shop.id.eq(shopId), review.deletedAt.isNull())
         .fetchOne();
