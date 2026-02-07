@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ReviewConverter {
   public static ReviewResDTO.WriteDTO toWriteDTO(Long reviewId) {
@@ -100,6 +101,40 @@ public class ReviewConverter {
         .keywords(keywords)
         .createdDate(createdDate)
         .reply(reply)
+        .build();
+  }
+
+  public static ReviewResDTO.ShopReviewListDTO toShopReviewListDTO(
+      List<ReviewRow.ShopReviewRow> rows,
+      Map<Long, List<String>> imageUrlsByReviewId,
+      Map<Long, List<ReviewResDTO.KeywordDTO>> keywordsByReviewId,
+      Set<Long> likedReviewIds,
+      String nextCursor,
+      boolean hasNext) {
+
+    List<ReviewResDTO.ShopReviewItemDTO> items =
+        rows.stream()
+            .map(
+                r ->
+                    ReviewResDTO.ShopReviewItemDTO.builder()
+                        .reviewId(r.reviewId())
+                        .nickname(r.nickname())
+                        .profileUrl(r.profileUrl())
+                        .rating(r.rating())
+                        .option(r.option())
+                        .content(r.content())
+                        .imageUrls(imageUrlsByReviewId.getOrDefault(r.reviewId(), List.of()))
+                        .keywords(keywordsByReviewId.getOrDefault(r.reviewId(), List.of()))
+                        .isLike(likedReviewIds.contains(r.reviewId()))
+                        .likeCount((long) r.likeCount())
+                        .createdDate(r.createdDate())
+                        .build())
+            .toList();
+
+    return ReviewResDTO.ShopReviewListDTO.builder()
+        .items(items)
+        .nextCursor(nextCursor)
+        .hasNext(hasNext)
         .build();
   }
 }

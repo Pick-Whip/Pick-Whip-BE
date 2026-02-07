@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.review.dto.req;
 
+import com.example.picknwhip_be.domain.design.enums.Style;
+import com.example.picknwhip_be.domain.review.enums.ReviewSort;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.util.List;
@@ -20,4 +22,16 @@ public class ReviewReqDTO {
           @Size(max = 5)
           List<String> imageKeys,
       @Schema(description = "옵션 공개 동의 여부", example = "true") Boolean agreement) {}
+
+  // 가게 리뷰 목록 조회 DTO
+  public record ShopReviewListDTO(
+      @Schema(description = "정렬 방식", example = "LATEST", defaultValue = "LATEST") ReviewSort sort,
+      @Schema(description = "디자인 갤러리 필터(디자인 ID)", example = "[\"1\", \"3\"]") List<Long> designIds,
+      @Schema(description = "스타일 필터", example = "[\"MINIMAL\",\"ROUND\",\"IDOL\"]")
+          List<Style> styles,
+      @Schema(description = "커서(NextCursor). 첫 조회는 생략") String cursor,
+      @Schema(description = "조회 개수(기본 20, 최대 50)", example = "20", defaultValue = "20")
+          @Min(1)
+          @Max(50)
+          Integer size) {}
 }

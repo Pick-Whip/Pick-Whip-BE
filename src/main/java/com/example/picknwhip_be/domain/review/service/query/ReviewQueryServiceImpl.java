@@ -6,13 +6,22 @@ import com.example.picknwhip_be.domain.order.entity.OrderItem;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.review.converter.ReviewConverter;
 import com.example.picknwhip_be.domain.review.dto.ReviewRow;
+import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
+import com.example.picknwhip_be.domain.review.enums.ReviewSort;
+import com.example.picknwhip_be.domain.review.exception.ReviewException;
+import com.example.picknwhip_be.domain.review.exception.code.ReviewErrorCode;
 import com.example.picknwhip_be.domain.review.repository.ReviewLikeRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
+import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursor;
+import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursorCodec;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
+import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,6 +36,8 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   private final OrderItemRepository orderItemRepository;
   private final ReviewSelectedKeywordRepository reviewSelectedKeywordRepository;
   private final ReviewLikeRepository reviewLikeRepository;
+  private final ReviewCursorCodec cursorCodec;
+  private final ShopRepository shopRepository;
 
   @Override
   public ReviewResDTO.MyReviewListDTO getMyReviewList(Long cursor, int size, Long userId) {
@@ -60,6 +71,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   @Override
   public ReviewResDTO.ReviewDetailDTO getReviewDetail(Long reviewId) {
     ReviewRow.ReviewDetailRow review = reviewRepository.fetchReviewDetail(reviewId);
+    if (review == null) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND);
+    }
     List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewDetailKeywords(reviewId);
     List<ReviewRow.MyReviewImageRow> imageRows =
         reviewRepository.fetchMyReviewImages(List.of(reviewId));
@@ -78,6 +92,60 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
         review.nickname(),
         review.profileUrl(),
         keywords);
+  }
+
+  @Override
+  public ReviewResDTO.ShopReviewListDTO searchShopReviews(
+      Long shopId, ReviewReqDTO.ShopReviewListDTO dto, Long userId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+
+    ReviewSort sort = dto.sort() != null ? dto.sort() : ReviewSort.LATEST;
+    int size = dto.size() != null ? dto.size() : 20;
+
+    ReviewCursor cursor;
+    try {
+      cursor = cursorCodec.decode(sort, dto.cursor());
+    } catch (IllegalArgumentException e) {
+      throw new ReviewException(ReviewErrorCode.INVALID_CURSOR);
+    }
+
+    int limit = size + 1;
+
+    List<ReviewRow.ShopReviewRow> rows =
+        reviewRepository.fetchShopReviewRows(
+            shopId, sort, dto.designIds(), dto.styles(), cursor, limit);
+
+    boolean hasNext = rows.size() > size;
+    List<ReviewRow.ShopReviewRow> page = hasNext ? rows.subList(0, size) : rows;
+
+    String nextCursor = null;
+    if (hasNext && !page.isEmpty()) {
+      ReviewRow.ShopReviewRow last = page.getLast();
+      nextCursor = cursorCodec.encode(sort, ReviewCursor.fromRow(sort, last));
+    }
+
+    List<Long> reviewIds = page.stream().map(ReviewRow.ShopReviewRow::reviewId).toList();
+
+    // 배치 조회: 이미지, 키워드, 좋아요 여부
+    List<ReviewRow.MyReviewImageRow> imageRows = reviewRepository.fetchMyReviewImages(reviewIds);
+    Map<Long, List<String>> imageUrlsByReviewId = groupImageUrlsByReviewId(imageRows);
+
+    List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewKeywords(reviewIds);
+    Map<Long, List<ReviewResDTO.KeywordDTO>> keywordsByReviewId =
+        keywordRows.stream()
+            .collect(
+                Collectors.groupingBy(
+                    ReviewRow.KeywordRow::reviewId,
+                    Collectors.mapping(
+                        k -> new ReviewResDTO.KeywordDTO(k.code(), k.label()),
+                        Collectors.toList())));
+
+    Set<Long> likedReviewIds = reviewRepository.fetchLikedReviewIds(userId, reviewIds);
+
+    return ReviewConverter.toShopReviewListDTO(
+        page, imageUrlsByReviewId, keywordsByReviewId, likedReviewIds, nextCursor, hasNext);
   }
 
   @Override
