@@ -151,18 +151,18 @@ public class ReviewConverter {
 
     ReviewResDTO.KeywordRankingDTO keywordRankingDTO =
         ReviewResDTO.KeywordRankingDTO.builder()
-            .DESIGN_SATISFACTION(
+            .designSatisfaction(
                 countMap.getOrDefault(KeywordCategory.DESIGN_SATISFACTION, 0L).intValue())
-            .SAME_AS_RESULT(countMap.getOrDefault(KeywordCategory.SAME_AS_RESULT, 0L).intValue())
-            .TASTE(countMap.getOrDefault(KeywordCategory.TASTE, 0L).intValue())
-            .COMMUNICATION(countMap.getOrDefault(KeywordCategory.COMMUNICATION, 0L).intValue())
-            .PICKUP(countMap.getOrDefault(KeywordCategory.PICKUP, 0L).intValue())
+            .sameAsResult(countMap.getOrDefault(KeywordCategory.SAME_AS_RESULT, 0L).intValue())
+            .taste(countMap.getOrDefault(KeywordCategory.TASTE, 0L).intValue())
+            .communication(countMap.getOrDefault(KeywordCategory.COMMUNICATION, 0L).intValue())
+            .pickup(countMap.getOrDefault(KeywordCategory.PICKUP, 0L).intValue())
             .build();
 
     return ReviewResDTO.ShopReviewSummaryDTO.builder()
         .rating(rating)
         .count(count)
-        .keywordRanking(List.of(keywordRankingDTO))
+        .keywordRanking(keywordRankingDTO)
         .build();
   }
 }

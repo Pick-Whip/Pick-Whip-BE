@@ -88,14 +88,4 @@ public class ReviewController {
   public ApiResponse<ReviewResDTO.ReviewDetailDTO> getReviewDetail(@PathVariable Long reviewId) {
     return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getReviewDetail(reviewId));
   }
-
-  @Operation(
-      summary = "가게 리뷰 통계 조회 by 슝/하승연",
-      description = "가게 리뷰 상단에서 평균 별점과 리뷰 개수, 키워드별 순위를 조회하는 기능입니다. ")
-  @GetMapping("/{shopId}/summary")
-  public ApiResponse<ReviewResDTO.ShopReviewSummaryDTO> getShopReviewSummary(
-      @PathVariable Long shopId) {
-    return ApiResponse.of(
-        GeneralSuccessCode.OK, reviewQueryService.searchShopReviewSummary(shopId));
-  }
 }
