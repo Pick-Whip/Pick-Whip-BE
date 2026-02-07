@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ReviewRepositoryCustom {
-  ReviewRow.MyReviewSummaryRow fetchMyReviewSummary(Long userId);
+  ReviewRow.ReviewSummaryRow fetchMyReviewSummary(Long userId);
 
   List<ReviewRow.MyReviewRow> fetchMyReviews(Long userId, Long cursor, int limit);
 
@@ -34,4 +34,8 @@ public interface ReviewRepositoryCustom {
       int limit);
 
   Set<Long> fetchLikedReviewIds(Long userId, List<Long> reviewIds);
+
+  ReviewRow.ReviewSummaryRow fetchShopReviewSummary(Long shopId);
+
+  List<ReviewRow.KeywordCategoryCountRow> fetchShopKeywordCategoryCounts(Long shopId);
 }

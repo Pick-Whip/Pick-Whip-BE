@@ -6,12 +6,14 @@ import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
+import com.example.picknwhip_be.domain.review.enums.KeywordCategory;
 import com.example.picknwhip_be.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ReviewConverter {
   public static ReviewResDTO.WriteDTO toWriteDTO(Long reviewId) {
@@ -135,6 +137,32 @@ public class ReviewConverter {
         .items(items)
         .nextCursor(nextCursor)
         .hasNext(hasNext)
+        .build();
+  }
+
+  public static ReviewResDTO.ShopReviewSummaryDTO toShopReviewSummaryDTO(
+      double rating, int count, List<ReviewRow.KeywordCategoryCountRow> categoryCounts) {
+    Map<KeywordCategory, Long> countMap =
+        categoryCounts.stream()
+            .collect(
+                Collectors.toMap(
+                    ReviewRow.KeywordCategoryCountRow::category,
+                    ReviewRow.KeywordCategoryCountRow::count));
+
+    ReviewResDTO.KeywordRankingDTO keywordRankingDTO =
+        ReviewResDTO.KeywordRankingDTO.builder()
+            .DESIGN_SATISFACTION(
+                countMap.getOrDefault(KeywordCategory.DESIGN_SATISFACTION, 0L).intValue())
+            .SAME_AS_RESULT(countMap.getOrDefault(KeywordCategory.SAME_AS_RESULT, 0L).intValue())
+            .TASTE(countMap.getOrDefault(KeywordCategory.TASTE, 0L).intValue())
+            .COMMUNICATION(countMap.getOrDefault(KeywordCategory.COMMUNICATION, 0L).intValue())
+            .PICKUP(countMap.getOrDefault(KeywordCategory.PICKUP, 0L).intValue())
+            .build();
+
+    return ReviewResDTO.ShopReviewSummaryDTO.builder()
+        .rating(rating)
+        .count(count)
+        .keywordRanking(List.of(keywordRankingDTO))
         .build();
   }
 }
