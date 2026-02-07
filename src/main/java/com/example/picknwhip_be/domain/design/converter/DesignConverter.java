@@ -65,4 +65,9 @@ public class DesignConverter {
         .options(options)
         .build();
   }
+
+  public static DesignResDTO.DesignListDTO toShopDesignNameListDTO(
+      List<DesignResDTO.DesignNameDTO> items) {
+    return DesignResDTO.DesignListDTO.builder().items(items).build();
+  }
 }

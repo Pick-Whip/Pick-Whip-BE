@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
+import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
 import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.service.query.ReviewQueryService;
@@ -32,6 +34,7 @@ public class ShopController {
   private final ShopService shopService;
   private final ShopQueryService shopQueryService;
   private final ReviewQueryService reviewQueryService;
+  private final DesignQueryService designQueryService;
 
   @Operation(
       summary = "내 주변 가게 조회",
@@ -85,11 +88,19 @@ public class ShopController {
 
   @Operation(
       summary = "가게 리뷰 통계 조회 by 슝/하승연",
-      description = "가게 리뷰 상단에서 평균 별점과 리뷰 개수, 키워드별 순위를 조회하는 기능입니다. ")
+      description = "가게 리뷰 상단에서 평균 별점과 리뷰 개수, 키워드별 순위를 조회하는 기능입니다.")
   @GetMapping("/{shopId}/reviews/summary")
   public ApiResponse<ReviewResDTO.ShopReviewSummaryDTO> getShopReviewSummary(
       @PathVariable Long shopId) {
     return ApiResponse.of(
         GeneralSuccessCode.OK, reviewQueryService.searchShopReviewSummary(shopId));
+  }
+
+  @Operation(
+      summary = "가게 리뷰 필터 디자인 목록 조회 by 슝/하승연",
+      description = "가게 리뷰 필터에서 디자인 갤러리의 디자인 명단을 조회하는 기능입니다.")
+  @GetMapping("/{shopId}/designs")
+  public ApiResponse<DesignResDTO.DesignListDTO> getShopDesignNameList(@PathVariable Long shopId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, designQueryService.findShopDesignNameList(shopId));
   }
 }
