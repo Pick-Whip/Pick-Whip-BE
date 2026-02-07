@@ -47,8 +47,8 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "shop_cake_size_id", nullable = false)
   private ShopCakeSize shopCakeSize;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "design_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "design_id", nullable = true)
   private DesignGallery designGallery;
 
   @Enumerated(EnumType.STRING)
