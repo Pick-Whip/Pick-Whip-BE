@@ -156,8 +156,8 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     }
 
     ReviewRow.ReviewSummaryRow summary = reviewRepository.fetchShopReviewSummary(shopId);
-    double rating = roundTo1Decimal(summary.averageRating());
-    int count = (int) summary.count();
+    double rating = roundTo1Decimal(summary == null ? null : summary.averageRating());
+    int count = summary == null ? 0 : (int) summary.count();
 
     List<ReviewRow.KeywordCategoryCountRow> categoryCounts = Collections.emptyList();
     if (count > 0) {
