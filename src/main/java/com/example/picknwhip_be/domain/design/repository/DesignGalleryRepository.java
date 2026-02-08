@@ -6,7 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DesignGalleryRepository extends JpaRepository<DesignGallery, Long> {
+public interface DesignGalleryRepository
+    extends JpaRepository<DesignGallery, Long>, DesignGalleryRepositoryCustom {
 
   @EntityGraph(attributePaths = {"options", "options.customOption", "shopCakeSize", "keywords"})
   Optional<DesignGallery> findDesignGalleryById(Long id);
