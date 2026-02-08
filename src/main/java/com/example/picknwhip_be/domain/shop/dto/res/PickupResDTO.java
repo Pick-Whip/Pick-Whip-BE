@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.shop.dto.res;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.*;
@@ -11,8 +11,18 @@ public class PickupResDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class PickupCalendarDTO {
+  public static class MonthlyStatusDTO {
+    private LocalDate date;
+    private boolean isClosed;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class DailySlotsDTO {
     private String date;
+    private String formattedDate;
     private boolean isClosed;
     private List<TimeSlotDTO> slots;
   }
@@ -22,9 +32,9 @@ public class PickupResDTO {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class TimeSlotDTO {
-    @JsonFormat(pattern = "HH:mm")
     private LocalTime time;
-
+    private String timeLabel;
     private boolean isAvailable;
+    private String reason;
   }
 }

@@ -6,13 +6,24 @@ import com.example.picknwhip_be.domain.order.entity.OrderItem;
 import com.example.picknwhip_be.domain.order.repository.OrderItemRepository;
 import com.example.picknwhip_be.domain.review.converter.ReviewConverter;
 import com.example.picknwhip_be.domain.review.dto.ReviewRow;
+import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
+import com.example.picknwhip_be.domain.review.enums.ReviewSort;
+import com.example.picknwhip_be.domain.review.exception.ReviewException;
+import com.example.picknwhip_be.domain.review.exception.code.ReviewErrorCode;
+import com.example.picknwhip_be.domain.review.repository.ReviewLikeRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
+import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursor;
+import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursorCodec;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
+import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +36,13 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   private final S3Service s3Service;
   private final OrderItemRepository orderItemRepository;
   private final ReviewSelectedKeywordRepository reviewSelectedKeywordRepository;
+  private final ReviewLikeRepository reviewLikeRepository;
+  private final ReviewCursorCodec cursorCodec;
+  private final ShopRepository shopRepository;
 
   @Override
   public ReviewResDTO.MyReviewListDTO getMyReviewList(Long cursor, int size, Long userId) {
-    ReviewRow.MyReviewSummaryRow summary = reviewRepository.fetchMyReviewSummary(userId);
+    ReviewRow.ReviewSummaryRow summary = reviewRepository.fetchMyReviewSummary(userId);
     long count = (summary == null) ? 0L : summary.count();
     double avgRating = roundTo1Decimal(summary == null ? null : summary.averageRating());
 
@@ -40,7 +54,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     Long nextCursor = null;
     if (hasNext && !pageRows.isEmpty()) {
-      nextCursor = pageRows.get(pageRows.size() - 1).reviewId();
+      nextCursor = pageRows.getLast().reviewId();
     }
 
     List<Long> reviewIds = pageRows.stream().map(ReviewRow.MyReviewRow::reviewId).toList();
@@ -58,6 +72,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   @Override
   public ReviewResDTO.ReviewDetailDTO getReviewDetail(Long reviewId) {
     ReviewRow.ReviewDetailRow review = reviewRepository.fetchReviewDetail(reviewId);
+    if (review == null) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND);
+    }
     List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewDetailKeywords(reviewId);
     List<ReviewRow.MyReviewImageRow> imageRows =
         reviewRepository.fetchMyReviewImages(List.of(reviewId));
@@ -79,8 +96,79 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   }
 
   @Override
+  public ReviewResDTO.ShopReviewListDTO searchShopReviews(
+      Long shopId, ReviewReqDTO.ShopReviewListDTO dto, Long userId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+
+    ReviewSort sort = dto.sort() != null ? dto.sort() : ReviewSort.LATEST;
+    int size = dto.size() != null ? dto.size() : 20;
+
+    ReviewCursor cursor;
+    try {
+      cursor = cursorCodec.decode(sort, dto.cursor());
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      throw new ReviewException(ReviewErrorCode.INVALID_CURSOR);
+    }
+
+    int limit = size + 1;
+
+    List<ReviewRow.ShopReviewRow> rows =
+        reviewRepository.fetchShopReviewRows(
+            shopId, sort, dto.designIds(), dto.styles(), cursor, limit);
+
+    boolean hasNext = rows.size() > size;
+    List<ReviewRow.ShopReviewRow> page = hasNext ? rows.subList(0, size) : rows;
+
+    String nextCursor = null;
+    if (hasNext && !page.isEmpty()) {
+      ReviewRow.ShopReviewRow last = page.getLast();
+      nextCursor = cursorCodec.encode(sort, ReviewCursor.fromRow(sort, last));
+    }
+
+    List<Long> reviewIds = page.stream().map(ReviewRow.ShopReviewRow::reviewId).toList();
+
+    // 배치 조회: 이미지, 키워드, 좋아요 여부
+    List<ReviewRow.MyReviewImageRow> imageRows = reviewRepository.fetchMyReviewImages(reviewIds);
+    Map<Long, List<String>> imageUrlsByReviewId = groupImageUrlsByReviewId(imageRows);
+
+    List<ReviewRow.KeywordRow> keywordRows = reviewRepository.fetchReviewKeywords(reviewIds);
+    Map<Long, List<ReviewResDTO.KeywordDTO>> keywordsByReviewId =
+        keywordRows.stream()
+            .collect(
+                Collectors.groupingBy(
+                    ReviewRow.KeywordRow::reviewId,
+                    Collectors.mapping(
+                        k -> new ReviewResDTO.KeywordDTO(k.code(), k.label()),
+                        Collectors.toList())));
+
+    Set<Long> likedReviewIds = reviewRepository.fetchLikedReviewIds(userId, reviewIds);
+
+    return ReviewConverter.toShopReviewListDTO(
+        page, imageUrlsByReviewId, keywordsByReviewId, likedReviewIds, nextCursor, hasNext);
+  }
+
+  @Override
+  public ReviewResDTO.ShopReviewSummaryDTO searchShopReviewSummary(Long shopId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+
+    ReviewRow.ReviewSummaryRow summary = reviewRepository.fetchShopReviewSummary(shopId);
+    double rating = roundTo1Decimal(summary == null ? null : summary.averageRating());
+    int count = summary == null ? 0 : (int) summary.count();
+
+    List<ReviewRow.KeywordCategoryCountRow> categoryCounts = Collections.emptyList();
+    if (count > 0) {
+      categoryCounts = reviewRepository.fetchShopKeywordCategoryCounts(shopId);
+    }
+
+    return ReviewConverter.toShopReviewSummaryDTO(rating, count, categoryCounts);
+  }
+
+  @Override
   public ReviewResDTO.BestReviewListDTO getBestCustomReviews() {
-    // 베스트 리뷰 조회
     List<Review> reviews = reviewRepository.findBestHelpfulReviews(5);
 
     if (reviews.isEmpty()) {
@@ -93,6 +181,15 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
     List<ReviewSelectedKeyword> allKeywords =
         reviewSelectedKeywordRepository.findAllByReviewIdIn(reviewIds);
+
+    List<Object[]> likeCountData = reviewLikeRepository.countByReviewIdIn(reviewIds);
+    Map<Long, Long> likeCounts =
+        likeCountData.stream()
+            .collect(
+                Collectors.toMap(
+                    row -> (Long) row[0], // reviewId
+                    row -> (Long) row[1] // count
+                    ));
 
     Map<Long, List<OrderItem>> optionsByOrderId =
         allOrderItems.stream().collect(Collectors.groupingBy(item -> item.getOrder().getId()));
@@ -114,7 +211,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                   List<String> myKeywords =
                       keywordsByReviewId.getOrDefault(review.getId(), Collections.emptyList());
 
-                  return convertToBestReviewItemDTO(review, myOptions, myKeywords);
+                  Long helpfulCount = likeCounts.getOrDefault(review.getId(), 0L);
+
+                  return convertToBestReviewItemDTO(review, myOptions, myKeywords, helpfulCount);
                 })
             .toList();
 
@@ -122,7 +221,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
   }
 
   private ReviewResDTO.BestReviewItemDTO convertToBestReviewItemDTO(
-      Review review, List<OrderItem> options, List<String> keywords) {
+      Review review, List<OrderItem> options, List<String> keywords, Long helpfulCount) {
 
     Order order = review.getOrder();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -149,9 +248,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
           creamName = item.getOptionName();
           if (item.getColorRgbCode() != null) creamColor = item.getColorRgbCode();
         }
-        case TOPPING -> {
-          decos.add(item.getOptionName());
-        }
+        case TOPPING -> decos.add(item.getOptionName());
         case ICING -> {
           if (item.getColorRgbCode() != null) icingColor = item.getColorRgbCode();
         }
@@ -186,7 +283,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
         .writerName(review.getUser().getNickname())
         .createdDate(review.getCreatedAt().format(formatter))
         .rating(review.getRating())
-        .helpfulCount(review.getHelpfulCount())
+        .helpfulCount(helpfulCount)
         .content(review.getContent())
         .keywords(keywords)
         .cakeImageUrl(resultImageUrl)

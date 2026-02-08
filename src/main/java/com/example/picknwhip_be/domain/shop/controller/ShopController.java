@@ -1,29 +1,40 @@
 package com.example.picknwhip_be.domain.shop.controller;
 
+import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
+import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
+import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
+import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
+import com.example.picknwhip_be.domain.review.service.query.ReviewQueryService;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
-import com.example.picknwhip_be.domain.shop.service.ShopQueryService;
-import com.example.picknwhip_be.domain.shop.service.ShopService;
+import com.example.picknwhip_be.domain.shop.service.command.ShopService;
+import com.example.picknwhip_be.domain.shop.service.query.ShopQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/shops")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Shop API", description = "가게 관련 API")
 public class ShopController {
 
   private final ShopService shopService;
   private final ShopQueryService shopQueryService;
+  private final ReviewQueryService reviewQueryService;
+  private final DesignQueryService designQueryService;
 
   @Operation(
       summary = "내 주변 가게 조회",
@@ -61,5 +72,35 @@ public class ShopController {
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
       @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
     return ResponseEntity.ok(shopService.getShopDetail(shopId, lat, lon));
+  }
+
+  @Operation(
+      summary = "가게 리뷰 목록 조회 by 슝/하승연",
+      description = "가게 리뷰를 최신순/도움순/별점높은순/별점낮은순으로 정렬하여 조회하는 기능입니다.")
+  @GetMapping("/{shopId}/reviews")
+  public ApiResponse<ReviewResDTO.ShopReviewListDTO> getShopReviewList(
+      @PathVariable Long shopId,
+      @ParameterObject @Valid @ModelAttribute ReviewReqDTO.ShopReviewListDTO dto,
+      @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewQueryService.searchShopReviews(shopId, dto, userId));
+  }
+
+  @Operation(
+      summary = "가게 리뷰 통계 조회 by 슝/하승연",
+      description = "가게 리뷰 상단에서 평균 별점과 리뷰 개수, 키워드별 순위를 조회하는 기능입니다.")
+  @GetMapping("/{shopId}/reviews/summary")
+  public ApiResponse<ReviewResDTO.ShopReviewSummaryDTO> getShopReviewSummary(
+      @PathVariable Long shopId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewQueryService.searchShopReviewSummary(shopId));
+  }
+
+  @Operation(
+      summary = "가게 리뷰 필터 디자인 목록 조회 by 슝/하승연",
+      description = "가게 리뷰 필터에서 디자인 갤러리의 디자인 명단을 조회하는 기능입니다.")
+  @GetMapping("/{shopId}/designs")
+  public ApiResponse<DesignResDTO.DesignListDTO> getShopDesignNameList(@PathVariable Long shopId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, designQueryService.findShopDesignNameList(shopId));
   }
 }

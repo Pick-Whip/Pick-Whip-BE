@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.shop.service;
+package com.example.picknwhip_be.domain.shop.service.command;
 
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true) // 읽기 전용 트랜잭션으로 조회 성능 최적화
+@Transactional(readOnly = true)
 public class ShopServiceImpl implements ShopService {
 
   private static final double MAX_RADIUS_M = 3000.0;
@@ -48,7 +48,6 @@ public class ShopServiceImpl implements ShopService {
           .map(shopConverter::toPreviewDto)
           .toList();
     } catch (Exception e) {
-      // 실제 운영 시엔 e.printStackTrace() 대신 로그(log.error)를 남겨야 함
       throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
     }
   }
@@ -56,8 +55,6 @@ public class ShopServiceImpl implements ShopService {
   @Override
   public ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon) {
     validateCoordinate(lat, lon);
-
-    // Repository에서 Native Query로 한 번에 조회
     return shopRepository
         .findShopDetailById(shopId, lat, lon)
         .map(shopConverter::toDetailDto)
