@@ -45,7 +45,7 @@ public class ShopServiceImpl implements ShopService {
               radius,
               DEFAULT_LIMIT)
           .stream()
-          .map(shopConverter::toPreviewDto)
+          .map(info -> shopConverter.toPreviewDto(info, lat, lon))
           .toList();
     } catch (Exception e) {
       throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
@@ -57,7 +57,7 @@ public class ShopServiceImpl implements ShopService {
     validateCoordinate(lat, lon);
     return shopRepository
         .findShopDetailById(shopId, lat, lon)
-        .map(shopConverter::toDetailDto)
+        .map(info -> shopConverter.toPreviewDto(info, lat, lon))
         .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
   }
 

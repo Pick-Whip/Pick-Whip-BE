@@ -61,6 +61,9 @@ public class Shop {
   @Column(name = "min_price")
   private Integer minPrice;
 
+  @Column(name = "max_price")
+  private Integer maxPrice;
+
   @Column(name = "slot_interval_minutes")
   @Builder.Default
   private int slotIntervalMinutes = 30; // 픽업 시간 간격

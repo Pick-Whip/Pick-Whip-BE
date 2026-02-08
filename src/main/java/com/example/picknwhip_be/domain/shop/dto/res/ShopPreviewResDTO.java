@@ -12,6 +12,9 @@ public class ShopPreviewResDTO {
   private String shopImageUrl;
   private Double averageRating;
   private Integer minPrice;
-  private Integer distance;
+  private Integer maxPrice;
+  private Double distance;
   private List<String> tags;
+    private Double lat;
+    private Double lon;
 }

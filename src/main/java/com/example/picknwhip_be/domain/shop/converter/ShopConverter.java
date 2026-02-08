@@ -36,19 +36,24 @@ public class ShopConverter {
     }
   }
 
-  public ShopPreviewResDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
-    return ShopPreviewResDTO.builder()
-        .shopId(info.getShopId())
-        .shopName(info.getShopName())
-        .shopImageUrl(info.getShopImageUrl())
-        .averageRating(info.getAverageRating())
-        .minPrice(info.getMinPrice())
-        .distance(info.getDistance())
-        .tags(parseTags(info.getTags()))
-        .build();
-  }
+    public ShopPreviewResDTO toPreviewDto(ShopRepository.ShopPreviewInfo info, double lat, double lon) {
+        Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
-  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
+        return ShopPreviewResDTO.builder()
+                .shopId(info.getShopId())
+                .shopName(info.getShopName())
+                .shopImageUrl(info.getShopImageUrl())
+                .averageRating(info.getAverageRating())
+                .minPrice(info.getMinPrice())
+                .maxPrice(info.getMaxPrice())
+                .distance(distanceInKm)
+                .lat(lat)
+                .lon(lon
+                .tags(parseTags(info.getTags()))
+                .build();
+    }
+
+  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info,double lat, double lon) {
     Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
     return ShopDetailResDTO.builder()
@@ -59,6 +64,8 @@ public class ShopConverter {
         .reviewCount(info.getReviewCount())
         .distance(distanceInKm)
         .address(info.getAddress())
+            .lat(lat)
+            .lon(lon
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
         .build();
