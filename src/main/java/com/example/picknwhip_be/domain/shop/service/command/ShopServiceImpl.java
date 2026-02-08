@@ -57,7 +57,7 @@ public class ShopServiceImpl implements ShopService {
     validateCoordinate(lat, lon);
     return shopRepository
         .findShopDetailById(shopId, lat, lon)
-        .map(info -> shopConverter.toPreviewDto(info, lat, lon))
+        .map(info -> shopConverter.toDetailDto(info, lat, lon))
         .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
   }
 

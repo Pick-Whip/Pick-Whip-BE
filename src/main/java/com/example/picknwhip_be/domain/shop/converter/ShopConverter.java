@@ -48,7 +48,7 @@ public class ShopConverter {
                 .maxPrice(info.getMaxPrice())
                 .distance(distanceInKm)
                 .lat(lat)
-                .lon(lon
+                .lon(lon)
                 .tags(parseTags(info.getTags()))
                 .build();
     }
@@ -65,7 +65,7 @@ public class ShopConverter {
         .distance(distanceInKm)
         .address(info.getAddress())
             .lat(lat)
-            .lon(lon
+            .lon(lon)
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
         .build();
