@@ -1,4 +1,4 @@
-package com.example.picknwhip_be.domain.design.service;
+package com.example.picknwhip_be.domain.design.service.query;
 
 import com.example.picknwhip_be.domain.design.converter.DesignConverter;
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
@@ -6,7 +6,6 @@ import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.exception.DesignException;
 import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
-import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteDesign;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignRepository;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
@@ -65,5 +64,15 @@ public class DesignQueryServiceImpl implements DesignQueryService {
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
     return DesignConverter.toDesignDetailDTO(design);
+  }
+
+  @Override
+  @Transactional
+  public DesignResDTO.DesignListDTO findShopDesignNameList(Long shopId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+    List<DesignResDTO.DesignNameDTO> items = designRepository.fetchDesignNamesByShopId(shopId);
+    return DesignConverter.toShopDesignNameListDTO(items);
   }
 }

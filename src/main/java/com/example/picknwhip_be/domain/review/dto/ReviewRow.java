@@ -1,9 +1,10 @@
 package com.example.picknwhip_be.domain.review.dto;
 
+import com.example.picknwhip_be.domain.review.enums.KeywordCategory;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 
-// 작성한 리뷰 목록 조회 응답을 위한 중간 조회 전용 DTO 모음
+// 중간 조회 전용 DTO 모음
 public class ReviewRow {
   public record MyReviewRow(
       Long reviewId,
@@ -26,9 +27,9 @@ public class ReviewRow {
     public MyReviewReplyRow {}
   }
 
-  public record MyReviewSummaryRow(long count, Double averageRating) {
+  public record ReviewSummaryRow(long count, Double averageRating) {
     @QueryProjection
-    public MyReviewSummaryRow {}
+    public ReviewSummaryRow {}
   }
 
   public record ReviewDetailRow(
@@ -46,5 +47,23 @@ public class ReviewRow {
   public record KeywordRow(Long reviewId, String code, String label) {
     @QueryProjection
     public KeywordRow {}
+  }
+
+  public record ShopReviewRow(
+      Long reviewId,
+      String nickname,
+      String profileUrl,
+      int rating,
+      String option,
+      String content,
+      int likeCount,
+      LocalDateTime createdDate) {
+    @QueryProjection
+    public ShopReviewRow {}
+  }
+
+  public record KeywordCategoryCountRow(KeywordCategory category, long count) {
+    @QueryProjection
+    public KeywordCategoryCountRow {}
   }
 }

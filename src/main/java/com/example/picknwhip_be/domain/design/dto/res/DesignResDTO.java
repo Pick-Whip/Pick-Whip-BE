@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.design.dto.res;
 import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +50,12 @@ public class DesignResDTO {
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
   }
+
+  @Builder
+  public record DesignNameDTO(
+      @Schema(description = "디자인 ID", example = "1") Long designId,
+      @Schema(description = "디자인 이름", example = "크리스마스 케이크") String designName) {}
+
+  @Builder
+  public record DesignListDTO(@Schema(description = "디자인 목록") List<DesignNameDTO> items) {}
 }
