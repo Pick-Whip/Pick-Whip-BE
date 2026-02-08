@@ -67,19 +67,12 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   }
 
   @Override
+  @Transactional
   public DesignResDTO.DesignListDTO findShopDesignNameList(Long shopId) {
     if (!shopRepository.existsById(shopId)) {
       throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
     }
-    List<DesignResDTO.DesignNameDTO> items =
-        designRepository.findByShopId(shopId).stream()
-            .map(
-                d ->
-                    DesignResDTO.DesignNameDTO.builder()
-                        .designId(d.getId())
-                        .designName(d.getDesignName()) // 필드명: designName
-                        .build())
-            .toList();
+    List<DesignResDTO.DesignNameDTO> items = designRepository.fetchDesignNamesByShopId(shopId);
     return DesignConverter.toShopDesignNameListDTO(items);
   }
 }
