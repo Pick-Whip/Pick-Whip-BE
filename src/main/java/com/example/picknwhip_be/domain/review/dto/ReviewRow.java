@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.review.dto;
 
+import com.example.picknwhip_be.domain.review.enums.KeywordCategory;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 
@@ -26,9 +27,9 @@ public class ReviewRow {
     public MyReviewReplyRow {}
   }
 
-  public record MyReviewSummaryRow(long count, Double averageRating) {
+  public record ReviewSummaryRow(long count, Double averageRating) {
     @QueryProjection
-    public MyReviewSummaryRow {}
+    public ReviewSummaryRow {}
   }
 
   public record ReviewDetailRow(
@@ -59,5 +60,10 @@ public class ReviewRow {
       LocalDateTime createdDate) {
     @QueryProjection
     public ShopReviewRow {}
+  }
+
+  public record KeywordCategoryCountRow(KeywordCategory category, long count) {
+    @QueryProjection
+    public KeywordCategoryCountRow {}
   }
 }

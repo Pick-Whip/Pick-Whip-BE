@@ -90,6 +90,20 @@ public class ReviewResDTO {
           @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
           LocalDateTime createdDate) {}
 
+  @Builder
+  public record ShopReviewSummaryDTO(
+      @Schema(description = "평균 별점", example = "4.8") double rating,
+      @Schema(description = "리뷰 개수", example = "342") int count,
+      @Schema(description = "키워드 순위") KeywordRankingDTO keywordRanking) {}
+
+  @Builder
+  public record KeywordRankingDTO(
+      @Schema(description = "디자인만족", example = "50") int designSatisfaction,
+      @Schema(description = "결과물통일", example = "35") int sameAsResult,
+      @Schema(description = "맛", example = "28") int taste,
+      @Schema(description = "소통", example = "17") int communication,
+      @Schema(description = "픽업진행", example = "3") int pickup) {}
+
   // 홈화면 - 베스트 커스텀 옵션 리뷰 조회 DTO
   @Builder
   public record BestReviewListDTO(

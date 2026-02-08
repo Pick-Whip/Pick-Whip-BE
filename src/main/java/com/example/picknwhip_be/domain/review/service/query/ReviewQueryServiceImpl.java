@@ -42,7 +42,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
   @Override
   public ReviewResDTO.MyReviewListDTO getMyReviewList(Long cursor, int size, Long userId) {
-    ReviewRow.MyReviewSummaryRow summary = reviewRepository.fetchMyReviewSummary(userId);
+    ReviewRow.ReviewSummaryRow summary = reviewRepository.fetchMyReviewSummary(userId);
     long count = (summary == null) ? 0L : summary.count();
     double avgRating = roundTo1Decimal(summary == null ? null : summary.averageRating());
 
@@ -147,6 +147,24 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     return ReviewConverter.toShopReviewListDTO(
         page, imageUrlsByReviewId, keywordsByReviewId, likedReviewIds, nextCursor, hasNext);
+  }
+
+  @Override
+  public ReviewResDTO.ShopReviewSummaryDTO searchShopReviewSummary(Long shopId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+
+    ReviewRow.ReviewSummaryRow summary = reviewRepository.fetchShopReviewSummary(shopId);
+    double rating = roundTo1Decimal(summary == null ? null : summary.averageRating());
+    int count = summary == null ? 0 : (int) summary.count();
+
+    List<ReviewRow.KeywordCategoryCountRow> categoryCounts = Collections.emptyList();
+    if (count > 0) {
+      categoryCounts = reviewRepository.fetchShopKeywordCategoryCounts(shopId);
+    }
+
+    return ReviewConverter.toShopReviewSummaryDTO(rating, count, categoryCounts);
   }
 
   @Override

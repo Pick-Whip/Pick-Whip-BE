@@ -11,5 +11,7 @@ public interface ReviewQueryService {
   ReviewResDTO.ShopReviewListDTO searchShopReviews(
       Long shopId, ReviewReqDTO.ShopReviewListDTO dto, Long userId);
 
+  ReviewResDTO.ShopReviewSummaryDTO searchShopReviewSummary(Long shopId);
+
   ReviewResDTO.BestReviewListDTO getBestCustomReviews();
 }

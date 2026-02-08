@@ -6,7 +6,6 @@ import com.example.picknwhip_be.domain.order.entity.QOrder;
 import com.example.picknwhip_be.domain.review.dto.*;
 import com.example.picknwhip_be.domain.review.entity.QReview;
 import com.example.picknwhip_be.domain.review.entity.Review;
-import com.example.picknwhip_be.domain.review.entity.mapping.*;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewImage;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewKeyword;
 import com.example.picknwhip_be.domain.review.entity.mapping.QReviewLike;
@@ -46,9 +45,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
       QReviewSelectedKeyword.reviewSelectedKeyword;
 
   @Override
-  public ReviewRow.MyReviewSummaryRow fetchMyReviewSummary(Long userId) {
+  public ReviewRow.ReviewSummaryRow fetchMyReviewSummary(Long userId) {
     return queryFactory
-        .select(new QReviewRow_MyReviewSummaryRow(review.id.count(), review.rating.avg()))
+        .select(new QReviewRow_ReviewSummaryRow(review.id.count(), review.rating.avg()))
         .from(review)
         .where(review.user.userId.eq(userId), review.deletedAt.isNull())
         .fetchOne();
@@ -298,6 +297,29 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
       case RATING_HIGH -> new OrderSpec(review.rating.desc(), review.id.desc());
       case RATING_LOW -> new OrderSpec(review.rating.asc(), review.id.asc());
     };
+  }
+
+  @Override
+  public ReviewRow.ReviewSummaryRow fetchShopReviewSummary(Long shopId) {
+    return queryFactory
+        .select(new QReviewRow_ReviewSummaryRow(review.id.count(), review.rating.avg()))
+        .from(review)
+        .where(review.shop.id.eq(shopId), review.deletedAt.isNull())
+        .fetchOne();
+  }
+
+  @Override
+  public List<ReviewRow.KeywordCategoryCountRow> fetchShopKeywordCategoryCounts(Long shopId) {
+    return queryFactory
+        .select(
+            new QReviewRow_KeywordCategoryCountRow(
+                reviewKeyword.category, reviewSelectedKeyword.id.count()))
+        .from(reviewSelectedKeyword)
+        .join(reviewSelectedKeyword.keyword, reviewKeyword)
+        .join(reviewSelectedKeyword.review, review)
+        .where(review.shop.id.eq(shopId), review.deletedAt.isNull())
+        .groupBy(reviewKeyword.category)
+        .fetch();
   }
 
   /** 비집계 정렬(LATEST, RATING_HIGH, RATING_LOW)에 대한 커서 조건. HELPFUL은 having에서 처리. */
