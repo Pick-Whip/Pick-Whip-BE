@@ -15,6 +15,6 @@ public class ShopPreviewResDTO {
   private Integer maxPrice;
   private Double distance;
   private List<String> tags;
-    private Double lat;
-    private Double lon;
+  private Double lat;
+  private Double lon;
 }

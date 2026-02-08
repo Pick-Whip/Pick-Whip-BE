@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -60,6 +59,6 @@ public class ShopController {
       @PathVariable Long shopId,
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
       @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
-      return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon));
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon));
   }
 }

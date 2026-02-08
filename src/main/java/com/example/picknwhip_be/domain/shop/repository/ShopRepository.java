@@ -29,20 +29,28 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
   // 상세 조회용
   interface ShopDetailInfo {
-      Long getShopId();
-      String getShopName();
-      String getShopImageUrl();
-      Double getAverageRating();
-      Integer getReviewCount();
-      Double getDistance();
-      String getAddress();
-      String getPhone();
-      String getKeywords();
+    Long getShopId();
+
+    String getShopName();
+
+    String getShopImageUrl();
+
+    Double getAverageRating();
+
+    Integer getReviewCount();
+
+    Double getDistance();
+
+    String getAddress();
+
+    String getPhone();
+
+    String getKeywords();
   }
 
-    @Query(
-            value =
-                    """
+  @Query(
+      value =
+          """
                 SELECT s.shop_id as shopId,
                        s.shop_name as shopName,
                        s.shop_image_url as shopImageUrl,
@@ -77,7 +85,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
                 ORDER BY distance ASC
                 LIMIT :limit
                 """,
-            nativeQuery = true)
+      nativeQuery = true)
   List<ShopPreviewInfo> findNearbyShops(
       @Param("lat") double lat,
       @Param("lon") double lon,

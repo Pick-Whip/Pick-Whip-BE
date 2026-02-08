@@ -16,6 +16,6 @@ public class ShopDetailResDTO {
   private String address;
   private String phone;
   private List<String> keywords;
-    private Double lat;
-    private Double lon;
+  private Double lat;
+  private Double lon;
 }
