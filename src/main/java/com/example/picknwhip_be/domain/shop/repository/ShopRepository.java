@@ -9,52 +9,56 @@ import org.springframework.data.repository.query.Param;
 
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
-    interface ShopPreviewInfo {
-        Long getShopId();
+  interface ShopPreviewInfo {
+    Long getShopId();
 
-        String getShopName();
+    String getShopName();
 
-        String getShopImageUrl();
+    String getShopImageUrl();
 
-        Double getAverageRating();
+    Double getAverageRating();
 
-        Integer getMaxPrice();
+    Integer getMaxPrice();
 
-        Integer getMinPrice();
+    Integer getMinPrice();
 
-        Double getDistance();
+    Double getDistance();
 
-        String getTags();
-        Double getLat();
-        Double getLon();
-    }
+    String getTags();
 
-    // 상세 조회용
-    interface ShopDetailInfo {
-        Long getShopId();
+    Double getLat();
 
-        String getShopName();
+    Double getLon();
+  }
 
-        String getShopImageUrl();
+  // 상세 조회용
+  interface ShopDetailInfo {
+    Long getShopId();
 
-        Double getAverageRating();
+    String getShopName();
 
-        Integer getReviewCount();
+    String getShopImageUrl();
 
-        Double getDistance();
+    Double getAverageRating();
 
-        String getAddress();
+    Integer getReviewCount();
 
-        String getPhone();
+    Double getDistance();
 
-        String getKeywords();
-        Double getLat();
-        Double getLon();
-    }
+    String getAddress();
 
-    @Query(
-            value =
-                    """
+    String getPhone();
+
+    String getKeywords();
+
+    Double getLat();
+
+    Double getLon();
+  }
+
+  @Query(
+      value =
+          """
                           SELECT s.shop_id as shopId,
                                  s.shop_name as shopName,
                                  s.shop_image_url as shopImageUrl,
@@ -91,34 +95,34 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
                           ORDER BY distance ASC
                           LIMIT :limit
                           """,
-            nativeQuery = true)
-    List<ShopPreviewInfo> findNearbyShops(
-            @Param("lat") double lat,
-            @Param("lon") double lon,
-            @Param("minLat") double minLat,
-            @Param("maxLat") double maxLat,
-            @Param("minLon") double minLon,
-            @Param("maxLon") double maxLon,
-            @Param("radius") double radius,
-            @Param("limit") int limit);
+      nativeQuery = true)
+  List<ShopPreviewInfo> findNearbyShops(
+      @Param("lat") double lat,
+      @Param("lon") double lon,
+      @Param("minLat") double minLat,
+      @Param("maxLat") double maxLat,
+      @Param("minLon") double minLon,
+      @Param("maxLon") double maxLon,
+      @Param("radius") double radius,
+      @Param("limit") int limit);
 
-    @Query(
-            value =
-                    "SELECT * FROM shops s "
-                            + "WHERE s.status = 'ACTIVE' "
-                            + "AND ST_SRID(s.location) = 4326 "
-                            + "AND MBRContains(ST_SRID(ST_MakeEnvelope(POINT(:lowLon, :lowLat), POINT(:highLon, :highLat)), 4326), s.location)",
-            nativeQuery = true)
-    List<Shop> findShopsInBoundary(
-            @Param("lowLat") Double lowLat,
-            @Param("highLat") Double highLat,
-            @Param("lowLon") Double lowLon,
-            @Param("highLon") Double highLon);
+  @Query(
+      value =
+          "SELECT * FROM shops s "
+              + "WHERE s.status = 'ACTIVE' "
+              + "AND ST_SRID(s.location) = 4326 "
+              + "AND MBRContains(ST_SRID(ST_MakeEnvelope(POINT(:lowLon, :lowLat), POINT(:highLon, :highLat)), 4326), s.location)",
+      nativeQuery = true)
+  List<Shop> findShopsInBoundary(
+      @Param("lowLat") Double lowLat,
+      @Param("highLat") Double highLat,
+      @Param("lowLon") Double lowLon,
+      @Param("highLon") Double highLon);
 
-    // 가게 상세 조회
-    @Query(
-            value =
-                    """
+  // 가게 상세 조회
+  @Query(
+      value =
+          """
                 SELECT s.shop_id as shopId,
                        s.shop_name as shopName,
                        s.shop_image_url as shopImageUrl,
@@ -139,7 +143,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
                 WHERE s.shop_id = :shopId AND s.status = 'ACTIVE'
                 GROUP BY s.shop_id
                 """,
-            nativeQuery = true)
-    Optional<ShopDetailInfo> findShopDetailById(
-            @Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
+      nativeQuery = true)
+  Optional<ShopDetailInfo> findShopDetailById(
+      @Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
 }

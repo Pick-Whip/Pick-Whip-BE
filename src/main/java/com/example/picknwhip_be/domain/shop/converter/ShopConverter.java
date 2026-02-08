@@ -36,8 +36,7 @@ public class ShopConverter {
     }
   }
 
-  public ShopPreviewResDTO toPreviewDto(
-      ShopRepository.ShopPreviewInfo info) {
+  public ShopPreviewResDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
     Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
     return ShopPreviewResDTO.builder()
@@ -48,8 +47,8 @@ public class ShopConverter {
         .minPrice(info.getMinPrice())
         .maxPrice(info.getMaxPrice())
         .distance(distanceInKm)
-            .lat(info.getLat())
-            .lon(info.getLon())
+        .lat(info.getLat())
+        .lon(info.getLon())
         .tags(parseTags(info.getTags()))
         .build();
   }
@@ -65,8 +64,8 @@ public class ShopConverter {
         .reviewCount(info.getReviewCount())
         .distance(distanceInKm)
         .address(info.getAddress())
-            .lat(info.getLat())
-            .lon(info.getLon())
+        .lat(info.getLat())
+        .lon(info.getLon())
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
         .build();
