@@ -14,11 +14,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Review", description = "리뷰 API")
 @RestController
 @RequestMapping("/api/reviews")
+@Validated
 @RequiredArgsConstructor
 public class ReviewController {
   private final ReviewCommandService reviewCommandService;
@@ -57,5 +59,33 @@ public class ReviewController {
       @Parameter(hidden = true) @ExtractPayload Long userId) {
     return ApiResponse.of(
         GeneralSuccessCode.OK, reviewQueryService.getMyReviewList(cursor, size, userId));
+  }
+
+  @Operation(summary = "BEST 커스텀 옵션 조회", description = "도움이 많이 된 리뷰 순으로 커스텀 케이크 정보를 조회합니다. (최대 5개)")
+  @GetMapping("/best")
+  public ApiResponse<ReviewResDTO.BestReviewListDTO> getBestReviews() {
+    return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getBestCustomReviews());
+  }
+
+  @Operation(summary = "리뷰 도움 선택 by 슝/하승연", description = "리뷰에 ‘도움이 됐어요’를 선택하는 기능입니다.")
+  @PutMapping("/{reviewId}/likes")
+  public ApiResponse<ReviewResDTO.ReviewLikeDTO> updateReviewLike(
+      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewCommandService.saveReviewLike(reviewId, userId));
+  }
+
+  @Operation(summary = "리뷰 도움 취소 by 슝/하승연", description = "리뷰에 ‘도움이 됐어요’를 취소하는 기능입니다.")
+  @DeleteMapping("/{reviewId}/likes")
+  public ApiResponse<ReviewResDTO.ReviewLikeDTO> deleteReviewLike(
+      @PathVariable Long reviewId, @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, reviewCommandService.deleteReviewLike(reviewId, userId));
+  }
+
+  @Operation(summary = "리뷰 상세 조회 by 슝/하승연", description = "특정 리뷰의 정보를 상세 조회하는 기능입니다.")
+  @GetMapping("/{reviewId}")
+  public ApiResponse<ReviewResDTO.ReviewDetailDTO> getReviewDetail(@PathVariable Long reviewId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, reviewQueryService.getReviewDetail(reviewId));
   }
 }

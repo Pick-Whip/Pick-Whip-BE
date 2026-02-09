@@ -28,6 +28,7 @@ public class CustomOption {
   @Column(name = "option_name", nullable = false)
   private String optionName;
 
+  @Builder.Default
   @Column(name = "additional_price")
   private int additionalPrice = 0;
 

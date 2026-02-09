@@ -108,6 +108,7 @@ public class Shop {
     this.owner = owner;
     this.shopName = shopName;
     this.phone = phone;
+    this.address = address;
     this.location = location;
   }
 }

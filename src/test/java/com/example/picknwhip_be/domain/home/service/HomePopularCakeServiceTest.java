@@ -9,8 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
-import com.example.picknwhip_be.domain.favorite.service.DesignMyPickChecker;
-import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResponseDto;
+import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
+import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResDTO;
 import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
 import com.example.picknwhip_be.domain.home.exception.HomeException;
 import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
@@ -32,7 +32,7 @@ class HomePopularCakeServiceTest {
 
   @Mock private PopularCakeRankingRepository rankingRepository;
 
-  @Mock private DesignMyPickChecker designMyPickChecker;
+  @Mock private DesignMyPickCheckerService designMyPickChecker;
 
   @Test
   @DisplayName("인기 케이크 Top5 조회 성공 - 로그인 유저 (마이픽 포함)")
@@ -68,7 +68,7 @@ class HomePopularCakeServiceTest {
     given(designMyPickChecker.findPickedDesignIds(eq(userId), anyList()))
         .willReturn(Set.of(pickedDesignId));
 
-    List<PopularCakeResponseDto> result = homePopularCakeService.getPopularCakesTop5(userId);
+    List<PopularCakeResDTO> result = homePopularCakeService.getPopularCakesTop5(userId);
 
     assertThat(result).hasSize(2);
 
@@ -97,7 +97,7 @@ class HomePopularCakeServiceTest {
 
     given(rankingRepository.findTop5WithDesignAndShop()).willReturn(List.of(ranking));
 
-    List<PopularCakeResponseDto> result = homePopularCakeService.getPopularCakesTop5(userId);
+    List<PopularCakeResDTO> result = homePopularCakeService.getPopularCakesTop5(userId);
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0).isMyPick()).isFalse();

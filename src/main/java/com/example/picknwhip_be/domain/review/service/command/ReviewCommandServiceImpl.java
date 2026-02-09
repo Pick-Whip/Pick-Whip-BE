@@ -10,11 +10,16 @@ import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.entity.Review;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewImage;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewKeyword;
+import com.example.picknwhip_be.domain.review.entity.mapping.ReviewLike;
 import com.example.picknwhip_be.domain.review.entity.mapping.ReviewSelectedKeyword;
 import com.example.picknwhip_be.domain.review.exception.ReviewException;
 import com.example.picknwhip_be.domain.review.exception.code.ReviewErrorCode;
 import com.example.picknwhip_be.domain.review.repository.*;
 import com.example.picknwhip_be.domain.review.validator.ReviewImageKeyValidator;
+import com.example.picknwhip_be.domain.user.entity.User;
+import com.example.picknwhip_be.domain.user.exception.UserException;
+import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
+import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -38,6 +43,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
   private final ReviewReplyRepository reviewReplyRepository;
   private final Clock clock;
   private final ReviewLikeRepository reviewLikeRepository;
+  private final UserRepository userRepository;
 
   @Override
   @Transactional
@@ -118,5 +124,47 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     reviewLikeRepository.deleteByReviewId(reviewId);
 
     return null;
+  }
+
+  @Override
+  @Transactional
+  public ReviewResDTO.ReviewLikeDTO saveReviewLike(Long reviewId, Long userId) {
+    if (!reviewRepository.existsById(reviewId)) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND);
+    }
+    if (!userRepository.existsById(userId)) {
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
+    }
+
+    boolean alreadyLiked = reviewLikeRepository.existsByReviewIdAndUserUserId(reviewId, userId);
+    if (!alreadyLiked) {
+      try {
+        Review reviewRef = reviewRepository.getReferenceById(reviewId);
+        User userRef = userRepository.getReferenceById(userId);
+
+        ReviewLike reviewLike = ReviewConverter.toReviewLike(reviewRef, userRef);
+        reviewLikeRepository.save(reviewLike);
+      } catch (DataIntegrityViolationException e) {
+        // 동시성으로 이미 생성된 경우: PUT(존재 보장)이므로 성공으로 간주
+      }
+    }
+    long likeCount = reviewLikeRepository.countByReviewId(reviewId);
+
+    return ReviewConverter.toReviewLikeDTO(reviewId, true, likeCount);
+  }
+
+  @Override
+  @Transactional
+  public ReviewResDTO.ReviewLikeDTO deleteReviewLike(Long reviewId, Long userId) {
+    if (!reviewRepository.existsById(reviewId)) {
+      throw new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND);
+    }
+    if (!userRepository.existsById(userId)) {
+      throw new UserException(UserErrorCode.USER_NOT_FOUND);
+    }
+
+    reviewLikeRepository.deleteByReviewIdAndUserUserId(reviewId, userId);
+    long likeCount = reviewLikeRepository.countByReviewId(reviewId);
+    return ReviewConverter.toReviewLikeDTO(reviewId, false, likeCount);
   }
 }

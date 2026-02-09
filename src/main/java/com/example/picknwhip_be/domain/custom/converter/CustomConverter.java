@@ -1,6 +1,6 @@
 package com.example.picknwhip_be.domain.custom.converter;
 
-import com.example.picknwhip_be.domain.custom.dto.CustomResDTO;
+import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
 import com.example.picknwhip_be.domain.shop.entity.CustomOption;
