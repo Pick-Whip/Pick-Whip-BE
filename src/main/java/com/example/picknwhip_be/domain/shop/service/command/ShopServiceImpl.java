@@ -13,7 +13,6 @@ import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.*;
 import com.example.picknwhip_be.global.apiPayload.util.GeoUtils;
-
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +29,11 @@ public class ShopServiceImpl implements ShopService {
 
   private final ShopRepository shopRepository;
   private final ShopConverter shopConverter;
-    // [추가된 의존성]
-    private final ShopCakeSizeRepository shopCakeSizeRepository;
-    private final ShopBusinessHourRepository shopBusinessHourRepository;
-    private final ShopEventRepository shopEventRepository;
-    private final BankAccountRepository bankAccountRepository; // 계좌 확인용 (없다면 추가 필요)
-    private final ShopInfoConverter shopInfoConverter;
+  private final ShopCakeSizeRepository shopCakeSizeRepository;
+  private final ShopBusinessHourRepository shopBusinessHourRepository;
+  private final ShopEventRepository shopEventRepository;
+  private final BankAccountRepository bankAccountRepository;
+  private final ShopInfoConverter shopInfoConverter;
 
   @Override
   public List<ShopPreviewResDTO> getNearbyShops(double lat, double lon, double radius) {
@@ -75,19 +73,21 @@ public class ShopServiceImpl implements ShopService {
         .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
   }
 
-    @Override
-    public ShopInfoResDTO getShopInfoTab(Long shopId) {
-        Shop shop = shopRepository.findById(shopId)
-                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
+  @Override
+  public ShopInfoResDTO getShopInfoTab(Long shopId) {
+    Shop shop =
+        shopRepository
+            .findById(shopId)
+            .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
 
-        List<ShopCakeSize> sizes = shopCakeSizeRepository.findByShopId(shopId);
-        List<ShopBusinessHour> hours = shopBusinessHourRepository.findAllByShopId(shopId);
-        boolean hasBankAccount = !bankAccountRepository.findByShopId(shopId).isEmpty();
+    List<ShopCakeSize> sizes = shopCakeSizeRepository.findByShopId(shopId);
+    List<ShopBusinessHour> hours = shopBusinessHourRepository.findAllByShopId(shopId);
+    boolean hasBankAccount = !bankAccountRepository.findByShopId(shopId).isEmpty();
 
-        ShopEvent activeEvent = shopEventRepository.findFirstActiveEvent(shopId, LocalDate.now())
-                .orElse(null);
-        return shopInfoConverter.toInfoResDTO(shop, sizes, hours, hasBankAccount, activeEvent);
-    }
+    ShopEvent activeEvent =
+        shopEventRepository.findFirstActiveEvent(shopId, LocalDate.now()).orElse(null);
+    return shopInfoConverter.toInfoResDTO(shop, sizes, hours, hasBankAccount, activeEvent);
+  }
 
   private void validateCoordinate(double lat, double lon) {
     if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {

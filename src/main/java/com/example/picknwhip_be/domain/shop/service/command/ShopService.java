@@ -11,5 +11,6 @@ public interface ShopService {
 
   // 가게 상세 조회
   ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon);
-    ShopInfoResDTO getShopInfoTab(Long shopId);
+
+  ShopInfoResDTO getShopInfoTab(Long shopId);
 }

@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -105,12 +106,15 @@ public class ShopController {
     return ApiResponse.of(GeneralSuccessCode.OK, designQueryService.findShopDesignNameList(shopId));
   }
 
-    @Operation(
-            summary = "가게 매장 정보 탭 조회",
-            description = "가게 상세 페이지의 '매장 정보' 탭 데이터(가격/사이즈/픽업/결제/이벤트)를 조회합니다."
-    )
-    @GetMapping("/{shopId}/info")
-    public ApiResponse<ShopInfoResDTO> getShopInfoTab(@PathVariable Long shopId) {
-        return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopInfoTab(shopId));
-    }
+  @Operation(
+      summary = "가게 매장 정보 탭 조회",
+      description = "가게 상세 페이지의 '매장 정보' 탭 데이터(가격/사이즈/픽업/결제/이벤트)를 조회합니다.")
+  @GetMapping("/{shopId}/info")
+  public ApiResponse<ShopInfoResDTO> getShopInfoTab(
+      @Parameter(description = "가게 ID", required = true, example = "1")
+          @PathVariable
+          @Positive(message = "가게 ID는 양수여야 합니다.")
+          Long shopId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopInfoTab(shopId));
+  }
 }
