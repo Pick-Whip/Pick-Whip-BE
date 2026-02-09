@@ -7,6 +7,7 @@ import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.service.query.ReviewQueryService;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopInfoResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.command.ShopService;
 import com.example.picknwhip_be.domain.shop.service.query.ShopQueryService;
@@ -103,4 +104,13 @@ public class ShopController {
   public ApiResponse<DesignResDTO.DesignListDTO> getShopDesignNameList(@PathVariable Long shopId) {
     return ApiResponse.of(GeneralSuccessCode.OK, designQueryService.findShopDesignNameList(shopId));
   }
+
+    @Operation(
+            summary = "가게 매장 정보 탭 조회",
+            description = "가게 상세 페이지의 '매장 정보' 탭 데이터(가격/사이즈/픽업/결제/이벤트)를 조회합니다."
+    )
+    @GetMapping("/{shopId}/info")
+    public ApiResponse<ShopInfoResDTO> getShopInfoTab(@PathVariable Long shopId) {
+        return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopInfoTab(shopId));
+    }
 }
