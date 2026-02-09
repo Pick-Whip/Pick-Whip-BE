@@ -32,12 +32,12 @@ public class ShopInfoConverter {
   }
 
   private List<ShopInfoResDTO.PriceGuideDTO> toPriceGuides(List<ShopCakeSize> sizes) {
-    if (sizes.isEmpty()) return new ArrayList<>();
+    if (sizes == null || sizes.isEmpty()) return new ArrayList<>();
 
     List<ShopCakeSize> sortedSizes =
         sizes.stream().sorted(Comparator.comparingInt(ShopCakeSize::getPrice)).toList();
 
-    int basePrice = sortedSizes.get(0).getPrice(); // 기준가
+    int basePrice = sortedSizes.get(0).getPrice();
 
     return sortedSizes.stream()
         .map(
@@ -58,6 +58,7 @@ public class ShopInfoConverter {
   }
 
   private List<ShopInfoResDTO.SizeGuideDTO> toSizeGuides(List<ShopCakeSize> sizes) {
+    if (sizes == null || sizes.isEmpty()) return new ArrayList<>();
     return sizes.stream()
         .sorted(Comparator.comparingInt(ShopCakeSize::getPrice))
         .map(
@@ -172,10 +173,21 @@ public class ShopInfoConverter {
 
   private ShopInfoResDTO.EventDTO toEventDTO(ShopEvent event) {
     if (event == null) return null;
+
+    String startStr = event.getStartDate() != null ? event.getStartDate().format(DATE_FMT) : "";
+    String endStr = event.getEndDate() != null ? event.getEndDate().format(DATE_FMT) : "";
+    String period = "";
+
+    if (!startStr.isEmpty() && !endStr.isEmpty()) {
+      period = startStr + " - " + endStr;
+    } else if (!startStr.isEmpty()) {
+      period = startStr + " ~";
+    }
+
     return ShopInfoResDTO.EventDTO.builder()
         .title(event.getTitle())
         .content(event.getContent())
-        .period(event.getStartDate().format(DATE_FMT) + " - " + event.getEndDate().format(DATE_FMT))
+        .period(period)
         .build();
   }
 }
