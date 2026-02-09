@@ -5,10 +5,7 @@ import com.example.picknwhip_be.domain.shop.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -80,15 +77,71 @@ public class ShopInfoConverter {
 
     private String formatOperationHours(List<ShopBusinessHour> hours) {
         if (hours == null || hours.isEmpty()) return "운영 시간 정보 없음";
-        ShopBusinessHour hour = hours.get(0);
-        return String.format("매일 %s - %s",
-                hour.getOpenTime().format(TIME_FMT),
-                hour.getCloseTime().format(TIME_FMT));
+
+        Map<String, List<Integer>> timeGroup = new LinkedHashMap<>();
+
+        hours.stream()
+                .sorted(Comparator.comparingInt(ShopBusinessHour::getDayOfWeek))
+                .forEach(h -> {
+                    if (h.isClosed()) return;
+
+                    String timeStr = String.format("%s - %s",
+                            h.getOpenTime().format(TIME_FMT),
+                            h.getCloseTime().format(TIME_FMT));
+
+                    timeGroup.computeIfAbsent(timeStr, k -> new ArrayList<>()).add(h.getDayOfWeek());
+                });
+
+        if (timeGroup.isEmpty()) return "휴무";
+
+        List<String> resultLines = new ArrayList<>();
+
+        for (Map.Entry<String, List<Integer>> entry : timeGroup.entrySet()) {
+            String timeRange = entry.getKey();
+            List<Integer> days = entry.getValue();
+            String dayStr = formatDays(days);
+
+            resultLines.add(dayStr + " " + timeRange);
+        }
+
+        return String.join("\n", resultLines);
+    }
+    private String formatDays(List<Integer> days) {
+        if (days.size() == 7) return "매일";
+
+        boolean isConsecutive = true;
+        for (int i = 0; i < days.size() - 1; i++) {
+            if (days.get(i) + 1 != days.get(i + 1)) {
+                isConsecutive = false;
+                break;
+            }
+        }
+
+        if (isConsecutive && days.size() >= 3) {
+            return getDayName(days.get(0)) + "~" + getDayName(days.get(days.size() - 1));
+        } else {
+            return days.stream()
+                    .map(this::getDayName)
+                    .collect(Collectors.joining(","));
+        }
+    }
+
+    private String getDayName(int dayOfWeek) {
+        return switch (dayOfWeek) {
+            case 1 -> "월";
+            case 2 -> "화";
+            case 3 -> "수";
+            case 4 -> "목";
+            case 5 -> "금";
+            case 6 -> "토";
+            case 7 -> "일";
+            default -> "";
+        };
     }
 
     private ShopInfoResDTO.PaymentInfoDTO toPaymentInfo(Shop shop, boolean hasBankAccount) {
         List<String> methods = new ArrayList<>();
-        methods.add("CARD"); // 기본 지원
+        methods.add("CARD");
         if (hasBankAccount) {
             methods.add("TRANSFER");
         }

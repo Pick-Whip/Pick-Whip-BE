@@ -58,5 +58,19 @@ INSERT INTO bank_accounts (shop_id, bank_name, account_number, account_holder, i
 -- 6. 진행 중인 이벤트 (오늘 날짜 포함)
 DELETE FROM shop_events WHERE shop_id = 10;
 INSERT INTO shop_events (shop_id, title, content, start_date, end_date, is_active) VALUES
-                                                                                       (10, '🔥 11월 특별 할인', '레터링 케이크 주문 시 10% 할인해드립니다!', CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 10 DAY), true),
+                                                                                       (10, '11월 특별 할인', '레터링 케이크 주문 시 10% 할인해드립니다!', CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 10 DAY), true),
                                                                                        (10, '종료된 이벤트', '이 이벤트는 보이면 안 됩니다.', DATE_SUB(CURRENT_DATE, INTERVAL 20 DAY), DATE_SUB(CURRENT_DATE, INTERVAL 10 DAY), true);
+
+-- 4. 운영 시간 (스마트 포맷팅 테스트용: 평일/주말 다르게 설정)
+DELETE FROM shop_business_hours WHERE shop_id = 10;
+INSERT INTO shop_business_hours (shop_id, schedule_type, day_of_week, open_time, close_time, is_closed) VALUES
+-- 평일 (월~금): 10:00 ~ 20:00
+(10, 'WEEKLY', 1, '10:00:00', '20:00:00', false), -- 월
+(10, 'WEEKLY', 2, '10:00:00', '20:00:00', false), -- 화
+(10, 'WEEKLY', 3, '10:00:00', '20:00:00', false), -- 수
+(10, 'WEEKLY', 4, '10:00:00', '20:00:00', false), -- 목
+(10, 'WEEKLY', 5, '10:00:00', '20:00:00', false), -- 금
+
+-- 주말 (토~일): 12:00 ~ 22:00
+(10, 'WEEKLY', 6, '12:00:00', '22:00:00', false), -- 토
+(10, 'WEEKLY', 7, '12:00:00', '22:00:00', false); -- 일
