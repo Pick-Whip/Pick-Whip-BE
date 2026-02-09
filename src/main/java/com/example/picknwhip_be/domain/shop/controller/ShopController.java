@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +39,11 @@ public class ShopController {
       summary = "내 주변 가게 조회",
       description = "현재 위치(lat, lon)를 기준으로 특정 반경(radius) 내의 가게 목록을 조회합니다.")
   @GetMapping("/nearby")
-  public ResponseEntity<List<ShopPreviewResDTO>> getNearbyShops(
+  public ApiResponse<List<ShopPreviewResDTO>> getNearbyShops(
       @RequestParam double lat,
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {
-    return ResponseEntity.ok(shopService.getNearbyShops(lat, lon, radius));
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getNearbyShops(lat, lon, radius));
   }
 
   @Operation(
@@ -67,11 +66,11 @@ public class ShopController {
       summary = "가게 상세 조회",
       description = "가게 ID와 현재 위치(lat, lon)를 받아 가게 상세 정보(거리 포함)를 조회합니다.")
   @GetMapping("/{shopId}")
-  public ResponseEntity<ShopDetailResDTO> getShopDetail(
+  public ApiResponse<ShopDetailResDTO> getShopDetail(
       @PathVariable Long shopId,
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
       @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
-    return ResponseEntity.ok(shopService.getShopDetail(shopId, lat, lon));
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon));
   }
 
   @Operation(
