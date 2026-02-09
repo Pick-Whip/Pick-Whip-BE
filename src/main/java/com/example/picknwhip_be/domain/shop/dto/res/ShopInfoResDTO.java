@@ -11,7 +11,6 @@ import lombok.Getter;
 public class ShopInfoResDTO {
 
   private List<PriceGuideDTO> priceGuides;
-  private String priceNote;
 
   private List<SizeGuideDTO> sizeGuides;
 

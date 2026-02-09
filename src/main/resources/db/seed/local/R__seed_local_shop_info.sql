@@ -39,17 +39,6 @@ INSERT INTO shop_cake_sizes (shop_id, size_name, diameter, price) VALUES
                                                                       (10, '1호', '15cm', 30000),
                                                                       (10, '2호', '18cm', 40000);
 
--- 4. 운영 시간 (매일 10:00 - 20:00)
-DELETE FROM shop_business_hours WHERE shop_id = 10;
-INSERT INTO shop_business_hours (shop_id, schedule_type, day_of_week, open_time, close_time, is_closed) VALUES
-                                                                                                            (10, 'WEEKLY', 1, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 2, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 3, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 4, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 5, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 6, '10:00:00', '20:00:00', false),
-                                                                                                            (10, 'WEEKLY', 7, '10:00:00', '20:00:00', false);
-
 -- 5. 계좌 정보 (계좌이체 아이콘 뜨는지 확인용)
 DELETE FROM bank_accounts WHERE shop_id = 10;
 INSERT INTO bank_accounts (shop_id, bank_name, account_number, account_holder, is_primary) VALUES
@@ -65,7 +54,7 @@ INSERT INTO shop_events (shop_id, title, content, start_date, end_date, is_activ
 DELETE FROM shop_business_hours WHERE shop_id = 10;
 INSERT INTO shop_business_hours (shop_id, schedule_type, day_of_week, open_time, close_time, is_closed) VALUES
 -- 평일 (월~금): 10:00 ~ 20:00
-(10, 'WEEKLY', 1, '10:00:00', '20:00:00', false), -- 월
+(10, 'WEEKLY', 1, '00:00:00', '00:00:00', true), -- 월
 (10, 'WEEKLY', 2, '10:00:00', '20:00:00', false), -- 화
 (10, 'WEEKLY', 3, '10:00:00', '20:00:00', false), -- 수
 (10, 'WEEKLY', 4, '10:00:00', '20:00:00', false), -- 목

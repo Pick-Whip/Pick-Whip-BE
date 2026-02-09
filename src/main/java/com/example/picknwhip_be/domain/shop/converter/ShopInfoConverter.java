@@ -1,5 +1,7 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
+import com.example.picknwhip_be.domain.payment.entity.enums.PaymentMethod;
+import com.example.picknwhip_be.domain.shop.constant.ShopInfoConstants;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopInfoResDTO;
 import com.example.picknwhip_be.domain.shop.entity.*;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +23,6 @@ public class ShopInfoConverter {
       ShopEvent activeEvent) {
     return ShopInfoResDTO.builder()
         .priceGuides(toPriceGuides(sizes))
-        .priceNote("디자인 및 토핑에 따라 가격이 변동될 수 있습니다.")
         .sizeGuides(toSizeGuides(sizes))
         .pickupInfo(toPickupInfo(shop, hours))
         .paymentInfo(toPaymentInfo(shop, hasBankAccount))
@@ -78,15 +79,18 @@ public class ShopInfoConverter {
   }
 
   private String formatOperationHours(List<ShopBusinessHour> hours) {
-    if (hours == null || hours.isEmpty()) return "운영 시간 정보 없음";
+    if (hours == null || hours.isEmpty()) return ShopInfoConstants.NO_OPERATION_HOURS;
 
     Map<String, List<Integer>> timeGroup = new LinkedHashMap<>();
 
     hours.stream()
+        .filter(h -> h.getDayOfWeek() != null)
         .sorted(Comparator.comparingInt(ShopBusinessHour::getDayOfWeek))
         .forEach(
             h -> {
               if (h.isClosed()) return;
+
+              if (h.getOpenTime() == null || h.getCloseTime() == null) return;
 
               String timeStr =
                   String.format(
@@ -96,7 +100,7 @@ public class ShopInfoConverter {
               timeGroup.computeIfAbsent(timeStr, k -> new ArrayList<>()).add(h.getDayOfWeek());
             });
 
-    if (timeGroup.isEmpty()) return "휴무";
+    if (timeGroup.isEmpty()) return ShopInfoConstants.CLOSED_DAY;
 
     List<String> resultLines = new ArrayList<>();
 
@@ -144,9 +148,9 @@ public class ShopInfoConverter {
 
   private ShopInfoResDTO.PaymentInfoDTO toPaymentInfo(Shop shop, boolean hasBankAccount) {
     List<String> methods = new ArrayList<>();
-    methods.add("CARD");
+    methods.add(PaymentMethod.CARD.name());
     if (hasBankAccount) {
-      methods.add("TRANSFER");
+      methods.add(PaymentMethod.TRANSFER.name());
     }
 
     String prepaymentStr = null;
