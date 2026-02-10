@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.shop.entity;
 
+import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.favorite.entity.FavoriteShop;
 import com.example.picknwhip_be.domain.shop.entity.enums.ShopStatus;
 import com.example.picknwhip_be.domain.shop.entity.enums.VerificationStatus;
@@ -110,6 +111,10 @@ public class Shop {
   @OneToMany(mappedBy = "shop", cascade = CascadeType.REMOVE, orphanRemoval = true)
   @Builder.Default
   private List<FavoriteShop> favoriteShops = new ArrayList<>();
+
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<DesignGallery> designGalleries = new ArrayList<>();
 
   public Shop(User owner, String shopName, String phone, String address, Point location) {
     this.owner = owner;
