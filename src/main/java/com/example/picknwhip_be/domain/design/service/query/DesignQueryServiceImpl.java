@@ -85,9 +85,11 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     public DesignResDTO.GalleryListDTO searchGallery(
             String categoryStr, String sortType, Double lat, Double lon, Long userId, int page) {
 
+        validateCoordinate(lat, lon);
+
         List<Style> categories = parseCategory(categoryStr);
 
-        validateCoordinate(lat, lon);
+        validateSortType(sortType);
 
         // TODO: 외부 지도 API 연동 시, API 호출 실패 등에 대한 예외처리도 이곳에서 try-catch로 감싸야 함
         String currentDistrict = reverseGeocode(lat, lon);
@@ -108,22 +110,34 @@ public class DesignQueryServiceImpl implements DesignQueryService {
                 .build();
     }
 
+    private void validateCoordinate(Double lat, Double lon) {
+        if (lat == null || lon == null) {
+            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+        }
+        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+        }
+    }
+
     private List<Style> parseCategory(String categoryStr) {
         if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
             return null;
         }
+
         for (Style style : Style.values()) {
             if (style.getLabel().equals(categoryStr)) {
                 return List.of(style);
             }
         }
-        return null;
+
+        throw new DesignException(DesignErrorCode.INVALID_CATEGORY);
     }
 
-    private void validateCoordinate(Double lat, Double lon) {
-        if (lat == null || lon == null) return;
-        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
-            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+    private void validateSortType(String sortType) {
+        if (sortType == null || sortType.isBlank()) return;
+
+        if (!List.of("NAME", "NEARBY", "RATING").contains(sortType)) {
+            throw new DesignException(DesignErrorCode.INVALID_SORT_TYPE);
         }
     }
 

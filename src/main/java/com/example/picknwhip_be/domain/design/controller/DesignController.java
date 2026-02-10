@@ -53,22 +53,20 @@ public class DesignController {
             description = "카테고리, 정렬 조건과 함께 현재 위치(위도/경도)를 필수로 받아 디자인 목록을 조회합니다.")
     @GetMapping("/gallery")
     public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
-            @Parameter(description = "카테고리 (전체, 생일, 기념일, 크리스마스, 졸업, 개업)")
+
+            @Parameter(description = "카테고리")
             @RequestParam(required = false, defaultValue = "전체") String category,
 
-            @Parameter(description = "정렬 기준 (NAME: 가나다, NEARBY: 거리순, RATING: 평점순)")
+            @Parameter(description = "정렬 기준 (NAME, NEARBY, RATING)")
             @RequestParam(required = false, defaultValue = "NAME") String sort,
 
-            @Parameter(description = "현재 위치 위도", required = true, example = "37.5565")
-            @RequestParam Double lat,
+            @Parameter(description = "현재 위치 위도", required = true)
+            @RequestParam(required = false) Double lat,
 
-            @Parameter(description = "현재 위치 경도", required = true, example = "126.9241")
-            @RequestParam Double lon,
+            @Parameter(description = "현재 위치 경도", required = true)
+            @RequestParam(required = false) Double lon,
 
-            @Parameter(description = "페이지 번호 (0부터 시작)")
             @RequestParam(defaultValue = "0") int page,
-
-            @Parameter(hidden = true)
             @ExtractPayload Long userId
     ) {
         DesignResDTO.GalleryListDTO result = designQueryService.searchGallery(
