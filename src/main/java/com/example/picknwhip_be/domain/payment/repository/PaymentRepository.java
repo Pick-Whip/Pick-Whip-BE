@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.payment.repository;
 
+import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.payment.entity.Payment;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,11 +54,13 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
           + "       COUNT(o) as orderCount "
           + "FROM Order o "
           + "WHERE o.pickupDatetime BETWEEN :startDate AND :endDate "
-          + "  AND o.paymentStatus = 'PAID' "
+          + "  AND o.paymentStatus = :paymentStatus "
           + "  AND o.designGallery IS NOT NULL "
           + "GROUP BY o.designGallery.id, o.shop.id "
           + "ORDER BY orderCount DESC "
           + "LIMIT 4")
   List<PopularDesignAgg> findTop4DesignByOrders(
-      @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+      @Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate,
+      @Param("paymentStatus") PaymentStatus paymentStatus);
 }

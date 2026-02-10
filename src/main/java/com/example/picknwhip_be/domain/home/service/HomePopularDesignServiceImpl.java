@@ -90,7 +90,7 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
     }
 
     return PopularDesignResDTO.builder()
-        .rank(ranking.getRanking())
+        .ranking(ranking.getRanking())
         .designId(d.getId())
         .shopName(ranking.getShop().getShopName())
         .cakeName(d.getDesignName())

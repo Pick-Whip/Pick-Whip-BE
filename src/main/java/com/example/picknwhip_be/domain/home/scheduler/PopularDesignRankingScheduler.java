@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.home.scheduler;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.home.entity.PopularDesignRanking;
 import com.example.picknwhip_be.domain.home.repository.PopularDesignRankingRepository;
+import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.payment.repository.PaymentRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import jakarta.persistence.EntityManager;
@@ -32,7 +33,7 @@ public class PopularDesignRankingScheduler {
     LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
 
     List<PaymentRepository.PopularDesignAgg> top4 =
-        paymentRepository.findTop4DesignByOrders(startAt, endAt);
+        paymentRepository.findTop4DesignByOrders(startAt, endAt, PaymentStatus.PAID);
 
     rankingRepository.deleteAllInBatch();
 

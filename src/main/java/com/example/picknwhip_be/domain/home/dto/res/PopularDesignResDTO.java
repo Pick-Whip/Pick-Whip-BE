@@ -1,12 +1,13 @@
 package com.example.picknwhip_be.domain.home.dto.res;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class PopularDesignResDTO {
-  private Integer rank;
+  private Integer ranking;
   private Long designId;
 
   private String imageUrl;
@@ -18,5 +19,6 @@ public class PopularDesignResDTO {
   private String letteringPhrase;
   private String letteringOption;
 
+  @JsonProperty("isMyPick")
   private boolean isMyPick;
 }

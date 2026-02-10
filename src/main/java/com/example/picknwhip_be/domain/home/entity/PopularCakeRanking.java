@@ -16,7 +16,7 @@ public class PopularCakeRanking {
 
   @Id
   @Column(name = "ranking", nullable = false)
-  private Integer ranking; // 1~5
+  private Integer ranking;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "design_id", nullable = false)

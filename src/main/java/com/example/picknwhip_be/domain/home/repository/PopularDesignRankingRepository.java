@@ -13,6 +13,7 @@ public interface PopularDesignRankingRepository extends JpaRepository<PopularDes
           + "JOIN FETCH d.shop s "
           + "JOIN FETCH d.shopCakeSize "
           + "LEFT JOIN FETCH d.options "
+          + "LEFT JOIN FETCH d.keywords "
           + "ORDER BY r.ranking ASC")
   List<PopularDesignRanking> findTop4WithDetails();
 }
