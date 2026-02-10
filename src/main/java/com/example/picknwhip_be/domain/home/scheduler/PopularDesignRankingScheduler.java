@@ -34,7 +34,8 @@ public class PopularDesignRankingScheduler {
     LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
 
     List<PaymentRepository.PopularDesignAgg> top4 =
-        paymentRepository.findTop4DesignByOrders(startAt, endAt, PaymentStatus.PAID, PageRequest.of(0, 4));
+        paymentRepository.findTop4DesignByOrders(
+            startAt, endAt, PaymentStatus.PAID, PageRequest.of(0, 4));
 
     rankingRepository.deleteAllInBatch();
 

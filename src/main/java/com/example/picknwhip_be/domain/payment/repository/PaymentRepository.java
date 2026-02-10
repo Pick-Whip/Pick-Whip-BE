@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.order.entity.enums.PaymentStatus;
 import com.example.picknwhip_be.domain.payment.entity.Payment;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -50,19 +49,19 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Long getOrderCount();
   }
 
-    @Query(
-            "SELECT o.designGallery.id as designId, "
-                    + "       o.shop.id as shopId, "
-                    + "       COUNT(o) as orderCount "
-                    + "FROM Order o "
-                    + "WHERE o.pickupDatetime BETWEEN :startDate AND :endDate "
-                    + "  AND o.paymentStatus = :paymentStatus "
-                    + "  AND o.designGallery IS NOT NULL "
-                    + "GROUP BY o.designGallery.id, o.shop.id "
-                    + "ORDER BY orderCount DESC")
-    List<PopularDesignAgg> findTop4DesignByOrders(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("paymentStatus") PaymentStatus paymentStatus,
-            Pageable pageable);
+  @Query(
+      "SELECT o.designGallery.id as designId, "
+          + "       o.shop.id as shopId, "
+          + "       COUNT(o) as orderCount "
+          + "FROM Order o "
+          + "WHERE o.pickupDatetime BETWEEN :startDate AND :endDate "
+          + "  AND o.paymentStatus = :paymentStatus "
+          + "  AND o.designGallery IS NOT NULL "
+          + "GROUP BY o.designGallery.id, o.shop.id "
+          + "ORDER BY orderCount DESC")
+  List<PopularDesignAgg> findTop4DesignByOrders(
+      @Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate,
+      @Param("paymentStatus") PaymentStatus paymentStatus,
+      Pageable pageable);
 }
