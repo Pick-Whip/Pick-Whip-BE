@@ -56,9 +56,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
     Double getLon();
   }
 
-    @Query(
-            value =
-                    """
+  @Query(
+      value =
+          """
                     SELECT s.shop_id as shopId,
                            s.shop_name as shopName,
                            s.shop_image_url as shopImageUrl,
@@ -84,12 +84,12 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                         s.location,
                         ST_GeomFromText(
                           CONCAT('POLYGON((',
-                            :minLat, ' ', :minLon, ',', 
-                            :maxLat, ' ', :minLon, ',', 
-                            :maxLat, ' ', :maxLon, ',', 
-                            :minLat, ' ', :maxLon, ',', 
+                            :minLat, ' ', :minLon, ',',
+                            :maxLat, ' ', :minLon, ',',
+                            :maxLat, ' ', :maxLon, ',',
+                            :minLat, ' ', :maxLon, ',',
                             :minLat, ' ', :minLon,
-                          '))'), 
+                          '))'),
                           4326
                         )
                       )
@@ -101,16 +101,16 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                     ORDER BY distance ASC
                     LIMIT :limit
                     """,
-            nativeQuery = true)
-    List<ShopPreviewInfo> findNearbyShops(
-            @Param("lat") double lat,
-            @Param("lon") double lon,
-            @Param("minLat") double minLat,
-            @Param("maxLat") double maxLat,
-            @Param("minLon") double minLon,
-            @Param("maxLon") double maxLon,
-            @Param("radius") double radius,
-            @Param("limit") int limit);
+      nativeQuery = true)
+  List<ShopPreviewInfo> findNearbyShops(
+      @Param("lat") double lat,
+      @Param("lon") double lon,
+      @Param("minLat") double minLat,
+      @Param("maxLat") double maxLat,
+      @Param("minLon") double minLon,
+      @Param("maxLon") double maxLon,
+      @Param("radius") double radius,
+      @Param("limit") int limit);
 
   @Query(
       value =
@@ -127,15 +127,15 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
 
   // 가게 상세 조회
   @Query(
-          value =
-                  """
+      value =
+          """
                   SELECT s.shop_id as shopId,
                          s.shop_name as shopName,
                          s.shop_image_url as shopImageUrl,
                          IFNULL(s.average_rating, 0.0) as averageRating,
                          (SELECT COUNT(*) FROM review r WHERE r.shop_id = s.shop_id AND r.deleted_at IS NULL) as reviewCount,
                          ST_Distance_Sphere(
-                            s.location, 
+                            s.location,
                             ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lon, ')'), 4326)
                          ) as distance,
                          s.address as address,
@@ -152,7 +152,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                   WHERE s.shop_id = :shopId AND s.status = 'ACTIVE'
                   GROUP BY s.shop_id
                   """,
-          nativeQuery = true)
+      nativeQuery = true)
   Optional<ShopDetailInfo> findShopDetailById(
-          @Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
+      @Param("shopId") Long shopId, @Param("lat") double lat, @Param("lon") double lon);
 }
