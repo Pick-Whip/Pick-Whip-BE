@@ -15,6 +15,7 @@ public interface DesignGalleryRepositoryCustom {
       String district, // 행정구역(구) 필터
       Double lat,
       Double lon,
+      Long seed,
       Long userId,
       Pageable pageable);
 }

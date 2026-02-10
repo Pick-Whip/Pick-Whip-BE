@@ -48,25 +48,33 @@ public class DesignController {
     return null;
   }
 
-  @Operation(
-      summary = "디자인 갤러리 목록 조회 (메인)",
-      description = "카테고리, 정렬 조건과 함께 현재 위치(위도/경도)를 필수로 받아 디자인 목록을 조회합니다.")
-  @GetMapping("/gallery")
-  public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
-      @Parameter(description = "카테고리") @RequestParam(required = false, defaultValue = "전체")
-          String category,
-      @Parameter(description = "정렬 기준 (NAME, NEARBY, RATING)")
-          @RequestParam(required = false, defaultValue = "NAME")
-          String sort,
-      @Parameter(description = "현재 위치 위도", required = true) @RequestParam(required = false)
-          Double lat,
-      @Parameter(description = "현재 위치 경도", required = true) @RequestParam(required = false)
-          Double lon,
-      @RequestParam(defaultValue = "0") int page,
-      @ExtractPayload Long userId) {
-    DesignResDTO.GalleryListDTO result =
-        designQueryService.searchGallery(category, sort, lat, lon, userId, page);
+    @Operation(
+            summary = "디자인 갤러리 목록 조회 (홈)",
+            description = "카테고리, 정렬, 현재 위치를 기반으로 디자인 목록을 조회합니다. <br/>" +
+                    "<b>랜덤 정렬 시 seed 값을 보내주세요. (같은 seed = 같은 랜덤 순서)</b>")
+    @GetMapping("/gallery")
+    public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
+            @Parameter(description = "카테고리")
+            @RequestParam(required = false, defaultValue = "전체") String category,
 
-    return ApiResponse.of(GeneralSuccessCode.OK, result);
-  }
+            @Parameter(description = "정렬 기준 (NAME, NEARBY, RATING)")
+            @RequestParam(required = false, defaultValue = "NAME") String sort,
+
+            @Parameter(description = "현재 위치 위도 (필수)")
+            @RequestParam(required = false) Double lat,
+
+            @Parameter(description = "현재 위치 경도 (필수)")
+            @RequestParam(required = false) Double lon,
+
+            @Parameter(description = "랜덤 정렬 시드값 (중복 방지용)")
+            @RequestParam(required = false) Long seed,
+
+            @RequestParam(defaultValue = "0") int page,
+            @ExtractPayload Long userId
+    ) {
+        DesignResDTO.GalleryListDTO result = designQueryService.searchGallery(
+                category, sort, lat, lon, seed, userId, page);
+
+        return ApiResponse.of(GeneralSuccessCode.OK, result);
+    }
 }
