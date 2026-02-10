@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.design.service.query;
 import com.example.picknwhip_be.domain.design.converter.DesignConverter;
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.design.enums.Style;
 import com.example.picknwhip_be.domain.design.exception.DesignException;
 import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
 import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
@@ -13,6 +14,9 @@ import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,4 +79,53 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     List<DesignResDTO.DesignNameDTO> items = designRepository.fetchDesignNamesByShopId(shopId);
     return DesignConverter.toShopDesignNameListDTO(items);
   }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DesignResDTO.GalleryListDTO searchGallery(
+            String categoryStr, String sortType, Double lat, Double lon, Long userId, int page) {
+
+        List<Style> categories = parseCategory(categoryStr);
+
+        String currentDistrict = reverseGeocode(lat, lon);
+
+        Pageable pageable = PageRequest.of(page, 4);
+
+        Page<DesignResDTO.GalleryItemDTO> resultPage = designRepository.searchGallery(
+                categories, sortType, currentDistrict, lat, lon, userId, pageable
+        );
+
+        return DesignResDTO.GalleryListDTO.builder()
+                .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
+                .designs(resultPage.getContent())
+                .totalPage(resultPage.getTotalPages())
+                .totalElements(resultPage.getTotalElements())
+                .isFirst(resultPage.isFirst())
+                .isLast(resultPage.isLast())
+                .build();
+    }
+
+    // [추가] 카테고리 파싱 헬퍼 메서드
+    private List<Style> parseCategory(String categoryStr) {
+        if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
+            return null; // 필터링 안 함
+        }
+        for (Style style : Style.values()) {
+            if (style.getLabel().equals(categoryStr)) {
+                return List.of(style);
+            }
+        }
+        return null;
+    }
+
+    // 역지오코딩 (좌표 -> 주소) 시뮬레이션
+    private String reverseGeocode(Double lat, Double lon) {
+        if (lat == null || lon == null) return null;
+        // TODO: 실제 Naver Map API 연동 필요
+        // 현재는 테스트를 위해 요청이 들어오면 무조건 특정 값을 반환하거나,
+        // 클라이언트가 lat/lon과 함께 region 이름을 보내주는 것이 성능상 유리함.
+        // 여기서는 로직 동작 확인을 위해 임시로 null 반환 (전체 구 조회)
+        // "마포구" 등으로 하드코딩하면 테스트 가능.
+        return null;
+    }
 }

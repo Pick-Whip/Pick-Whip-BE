@@ -11,4 +11,13 @@ public interface DesignQueryService {
   DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId);
 
   DesignResDTO.DesignListDTO findShopDesignNameList(Long shopId);
+
+  DesignResDTO.GalleryListDTO searchGallery(
+            String categoryStr,
+            String sortType,
+            Double lat,
+            Double lon,
+            Long userId,
+            int page
+    );
 }

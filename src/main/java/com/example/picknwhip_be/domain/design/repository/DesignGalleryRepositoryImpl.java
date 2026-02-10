@@ -1,11 +1,24 @@
 package com.example.picknwhip_be.domain.design.repository;
 
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
+import com.example.picknwhip_be.domain.design.dto.res.QDesignResDTO_GalleryItemDTO; // QClass 확인 필요
 import com.example.picknwhip_be.domain.design.entity.QDesignGallery;
+import com.example.picknwhip_be.domain.design.enums.Style;
+import com.example.picknwhip_be.domain.favorite.entity.QFavoriteDesign; // 찜 엔티티 QClass
+import com.example.picknwhip_be.domain.shop.entity.QShop;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,4 +37,89 @@ public class DesignGalleryRepositoryImpl implements DesignGalleryRepositoryCusto
         .where(designGallery.shop.id.eq(shopId))
         .fetch();
   }
+
+    @Override
+    public Page<DesignResDTO.GalleryItemDTO> searchGallery(
+            List<Style> categories,
+            String sortType,
+            String district,
+            Double lat,
+            Double lon,
+            Long userId,
+            Pageable pageable) {
+
+        QDesignGallery design = QDesignGallery.designGallery;
+        QShop shop = QShop.shop;
+        QFavoriteDesign favorite = QFavoriteDesign.favoriteDesign;
+
+        List<DesignResDTO.GalleryItemDTO> content = queryFactory
+                .select(new QDesignResDTO_GalleryItemDTO(
+                        design.id,
+                        design.imageUrl,
+                        shop.shopName,
+                        shop.address,
+                        shop.minPrice,
+                        shop.averageRating,
+                        favorite.id // 찜 ID (조인 안되면 null)
+                ))
+                .from(design)
+                .join(design.shop, shop)
+                .leftJoin(favorite).on(
+                        favorite.designGallery.eq(design)
+                                .and(userId != null ? favorite.user.userId.eq(userId) : favorite.user.userId.isNull())
+                )
+                .where(
+                        inCategories(categories),
+                        sameDistrict(shop, district)
+                )
+                .orderBy(getOrderSpecifiers(sortType, shop, lat, lon))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(design.count())
+                .from(design)
+                .join(design.shop, shop)
+                .where(
+                        inCategories(categories),
+                        sameDistrict(shop, district)
+                );
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression inCategories(List<Style> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return null;
+        }
+        return QDesignGallery.designGallery.keywords.any().in(categories);
+    }
+
+    private BooleanExpression sameDistrict(QShop shop, String district) {
+        if (district == null || district.isBlank()) {
+            return null;
+        }
+        return shop.address.contains(district);
+    }
+    private OrderSpecifier[] getOrderSpecifiers(String sortType, QShop shop, Double userLat, Double userLon) {
+        List<OrderSpecifier> orders = new ArrayList<>();
+
+        if ("NEARBY".equals(sortType) && userLat != null && userLon != null) {
+            NumberTemplate<Double> distance = Expressions.numberTemplate(Double.class,
+                    "ST_Distance_Sphere({0}, ST_SRID(POINT({1}, {2}), 4326))",
+                    shop.location, userLon, userLat);
+            orders.add(distance.asc());
+
+        } else if ("RATING".equals(sortType)) {
+            orders.add(shop.averageRating.coalesce(0.0).desc());
+
+        } else {
+            orders.add(shop.shopName.asc());
+        }
+
+        orders.add(Expressions.numberTemplate(Double.class, "function('rand')").asc());
+
+        return orders.toArray(new OrderSpecifier[0]);
+    }
 }

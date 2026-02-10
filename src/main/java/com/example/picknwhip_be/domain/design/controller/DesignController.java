@@ -3,13 +3,16 @@ package com.example.picknwhip_be.domain.design.controller;
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.service.query.DesignQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
+import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Design API", description = "디자인 갤러리 관련 API")
@@ -44,4 +47,34 @@ public class DesignController {
 
     return null;
   }
+
+    @Operation(
+            summary = "디자인 갤러리 목록 조회 (메인)",
+            description = "카테고리(전체, 생일 등), 정렬(가나다, 거리순, 평점순), 현재 위치를 기반으로 디자인 목록을 조회합니다.")
+    @GetMapping("/gallery")
+    public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
+            @Parameter(description = "카테고리 (전체, 생일, 기념일, 크리스마스, 졸업, 개업)")
+            @RequestParam(required = false, defaultValue = "전체") String category,
+
+            @Parameter(description = "정렬 기준 (NAME: 가나다, NEARBY: 거리순, RATING: 평점순)")
+            @RequestParam(required = false, defaultValue = "NAME") String sort,
+
+            @Parameter(description = "현재 위치 위도")
+            @RequestParam(required = false) Double lat,
+
+            @Parameter(description = "현재 위치 경도")
+            @RequestParam(required = false) Double lon,
+
+            @Parameter(description = "페이지 번호 (0부터 시작)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(hidden = true)
+            @ExtractPayload Long userId
+    ) {
+        DesignResDTO.GalleryListDTO result = designQueryService.searchGallery(
+                category, sort, lat, lon, userId, page);
+
+        return ApiResponse.of(GeneralSuccessCode.OK, result);
+    }
+
 }
