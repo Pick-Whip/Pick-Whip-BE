@@ -25,130 +25,130 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DesignQueryServiceImpl implements DesignQueryService {
 
-    private final DesignGalleryRepository designRepository;
-    private final FavoriteDesignRepository favoriteDesignRepository;
-    private final ShopRepository shopRepository;
+  private final DesignGalleryRepository designRepository;
+  private final FavoriteDesignRepository favoriteDesignRepository;
+  private final ShopRepository shopRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public DesignResDTO.GetDesignListDTO findDesignListByUserId(Long userId) {
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GetDesignListDTO findDesignListByUserId(Long userId) {
 
-        List<FavoriteDesign> favoriteDesigns = favoriteDesignRepository.findAllByUserId(userId);
+    List<FavoriteDesign> favoriteDesigns = favoriteDesignRepository.findAllByUserId(userId);
 
-        List<DesignGallery> designs =
-                favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
+    List<DesignGallery> designs =
+        favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
 
-        return DesignConverter.toDesignListDTO(designs);
+    return DesignConverter.toDesignListDTO(designs);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long shopId) {
+
+    shopRepository
+        .findById(shopId)
+        .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
+
+    List<DesignGallery> designs = designRepository.findByShopId(shopId);
+
+    if (designs.isEmpty()) {
+      throw new DesignException(DesignErrorCode.DESIGN_NOT_REGISTER);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public DesignResDTO.GetDesignListDTO findDesignListByShopId(Long shopId) {
+    return DesignConverter.toDesignListDTO(designs);
+  }
 
-        shopRepository
-                .findById(shopId)
-                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId) {
 
-        List<DesignGallery> designs = designRepository.findByShopId(shopId);
+    DesignGallery design =
+        designRepository
+            .findDesignGalleryById(designId)
+            .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
-        if (designs.isEmpty()) {
-            throw new DesignException(DesignErrorCode.DESIGN_NOT_REGISTER);
-        }
+    return DesignConverter.toDesignDetailDTO(design);
+  }
 
-        return DesignConverter.toDesignListDTO(designs);
+  @Override
+  @Transactional
+  public DesignResDTO.DesignListDTO findShopDesignNameList(Long shopId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
+    List<DesignResDTO.DesignNameDTO> items = designRepository.fetchDesignNamesByShopId(shopId);
+    return DesignConverter.toShopDesignNameListDTO(items);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public DesignResDTO.GalleryListDTO searchGallery(
+      String categoryStr, String sortType, Double lat, Double lon, Long userId, int page) {
+
+    validateCoordinate(lat, lon);
+
+    List<Style> categories = parseCategory(categoryStr);
+
+    validateSortType(sortType);
+
+    // TODO: 외부 지도 API 연동 시, API 호출 실패 등에 대한 예외처리도 이곳에서 try-catch로 감싸야 함
+    String currentDistrict = reverseGeocode(lat, lon);
+
+    Pageable pageable = PageRequest.of(page, 4);
+
+    Page<DesignResDTO.GalleryItemDTO> resultPage =
+        designRepository.searchGallery(
+            categories, sortType, currentDistrict, lat, lon, userId, pageable);
+
+    return DesignResDTO.GalleryListDTO.builder()
+        .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
+        .designs(resultPage.getContent())
+        .totalPage(resultPage.getTotalPages())
+        .totalElements(resultPage.getTotalElements())
+        .isFirst(resultPage.isFirst())
+        .isLast(resultPage.isLast())
+        .build();
+  }
+
+  private void validateCoordinate(Double lat, Double lon) {
+    if (lat == null || lon == null) {
+      throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+    }
+    if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+      throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+    }
+  }
+
+  private List<Style> parseCategory(String categoryStr) {
+    if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
+      return null;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public DesignResDTO.GetDesignDetailDTO findDesignDetail(Long designId) {
-
-        DesignGallery design =
-                designRepository
-                        .findDesignGalleryById(designId)
-                        .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
-
-        return DesignConverter.toDesignDetailDTO(design);
+    for (Style style : Style.values()) {
+      if (style.getLabel().equals(categoryStr)) {
+        return List.of(style);
+      }
     }
 
-    @Override
-    @Transactional
-    public DesignResDTO.DesignListDTO findShopDesignNameList(Long shopId) {
-        if (!shopRepository.existsById(shopId)) {
-            throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
-        }
-        List<DesignResDTO.DesignNameDTO> items = designRepository.fetchDesignNamesByShopId(shopId);
-        return DesignConverter.toShopDesignNameListDTO(items);
+    throw new DesignException(DesignErrorCode.INVALID_CATEGORY);
+  }
+
+  private void validateSortType(String sortType) {
+    if (sortType == null || sortType.isBlank()) return;
+
+    if (!List.of("NAME", "NEARBY", "RATING").contains(sortType)) {
+      throw new DesignException(DesignErrorCode.INVALID_SORT_TYPE);
     }
+  }
 
-    @Override
-    @Transactional(readOnly = true)
-    public DesignResDTO.GalleryListDTO searchGallery(
-            String categoryStr, String sortType, Double lat, Double lon, Long userId, int page) {
-
-        validateCoordinate(lat, lon);
-
-        List<Style> categories = parseCategory(categoryStr);
-
-        validateSortType(sortType);
-
-        // TODO: 외부 지도 API 연동 시, API 호출 실패 등에 대한 예외처리도 이곳에서 try-catch로 감싸야 함
-        String currentDistrict = reverseGeocode(lat, lon);
-
-        Pageable pageable = PageRequest.of(page, 4);
-
-        Page<DesignResDTO.GalleryItemDTO> resultPage = designRepository.searchGallery(
-                categories, sortType, currentDistrict, lat, lon, userId, pageable
-        );
-
-        return DesignResDTO.GalleryListDTO.builder()
-                .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
-                .designs(resultPage.getContent())
-                .totalPage(resultPage.getTotalPages())
-                .totalElements(resultPage.getTotalElements())
-                .isFirst(resultPage.isFirst())
-                .isLast(resultPage.isLast())
-                .build();
+  // 역지오코딩 (좌표 -> 주소) 시뮬레이션
+  private String reverseGeocode(Double lat, Double lon) {
+    if (lat >= 37.54 && lat <= 37.57 && lon >= 126.90 && lon <= 126.95) {
+      return "마포구";
     }
-
-    private void validateCoordinate(Double lat, Double lon) {
-        if (lat == null || lon == null) {
-            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
-        }
-        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
-            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
-        }
+    if (lat >= 37.48 && lat <= 37.52 && lon >= 127.01 && lon <= 127.05) {
+      return "강남구";
     }
-
-    private List<Style> parseCategory(String categoryStr) {
-        if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
-            return null;
-        }
-
-        for (Style style : Style.values()) {
-            if (style.getLabel().equals(categoryStr)) {
-                return List.of(style);
-            }
-        }
-
-        throw new DesignException(DesignErrorCode.INVALID_CATEGORY);
-    }
-
-    private void validateSortType(String sortType) {
-        if (sortType == null || sortType.isBlank()) return;
-
-        if (!List.of("NAME", "NEARBY", "RATING").contains(sortType)) {
-            throw new DesignException(DesignErrorCode.INVALID_SORT_TYPE);
-        }
-    }
-
-    // 역지오코딩 (좌표 -> 주소) 시뮬레이션
-    private String reverseGeocode(Double lat, Double lon) {
-        if (lat >= 37.54 && lat <= 37.57 && lon >= 126.90 && lon <= 126.95) {
-            return "마포구";
-        }
-        if (lat >= 37.48 && lat <= 37.52 && lon >= 127.01 && lon <= 127.05) {
-            return "강남구";
-        }
-        return "마포구";
-    }
+    return "마포구";
+  }
 }

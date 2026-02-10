@@ -60,50 +60,56 @@ public class DesignResDTO {
   @Builder
   public record DesignListDTO(@Schema(description = "디자인 목록") List<DesignNameDTO> items) {}
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class GalleryListDTO {
-        private String currentRegion; // 현재 위치 (예: 서울시 마포구)
-        private List<GalleryItemDTO> designs;
-        private Integer totalPage;
-        private Long totalElements;
-        private Boolean isFirst;
-        private Boolean isLast;
+  @Getter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class GalleryListDTO {
+    private String currentRegion; // 현재 위치 (예: 서울시 마포구)
+    private List<GalleryItemDTO> designs;
+    private Integer totalPage;
+    private Long totalElements;
+    private Boolean isFirst;
+    private Boolean isLast;
+  }
+
+  @Getter
+  @NoArgsConstructor
+  public static class GalleryItemDTO {
+    private Long designId;
+    private String imageUrl;
+    private String shopName;
+    private String simpleAddress; // "서울 마포구" 까지만
+    private Integer minPrice;
+    private Double avgRating;
+    private boolean isMyPick;
+
+    @QueryProjection
+    public GalleryItemDTO(
+        Long designId,
+        String imageUrl,
+        String shopName,
+        String fullAddress,
+        Integer minPrice,
+        Double avgRating,
+        Long pickId) {
+      this.designId = designId;
+      this.imageUrl = imageUrl;
+      this.shopName = shopName;
+      this.simpleAddress = parseSimpleAddress(fullAddress); // 주소 가공 로직
+      this.minPrice = minPrice;
+      this.avgRating = avgRating != null ? avgRating : 0.0;
+      this.isMyPick = (pickId != null); // pickId가 있으면 true
     }
 
-    @Getter
-    @NoArgsConstructor
-    public static class GalleryItemDTO {
-        private Long designId;
-        private String imageUrl;
-        private String shopName;
-        private String simpleAddress; // "서울 마포구" 까지만
-        private Integer minPrice;
-        private Double avgRating;
-        private boolean isMyPick;
-
-        @QueryProjection
-        public GalleryItemDTO(Long designId, String imageUrl, String shopName,
-                              String fullAddress, Integer minPrice, Double avgRating, Long pickId) {
-            this.designId = designId;
-            this.imageUrl = imageUrl;
-            this.shopName = shopName;
-            this.simpleAddress = parseSimpleAddress(fullAddress); // 주소 가공 로직
-            this.minPrice = minPrice;
-            this.avgRating = avgRating != null ? avgRating : 0.0;
-            this.isMyPick = (pickId != null); // pickId가 있으면 true
-        }
-
-        // 주소 파싱 유틸리티 메서드
-        private String parseSimpleAddress(String fullAddress) {
-            if (fullAddress == null) return "";
-            String[] parts = fullAddress.split(" ");
-            if (parts.length >= 2) {
-                return parts[0] + " " + parts[1];
-            }
-            return fullAddress;
-        }
+    // 주소 파싱 유틸리티 메서드
+    private String parseSimpleAddress(String fullAddress) {
+      if (fullAddress == null) return "";
+      String[] parts = fullAddress.split(" ");
+      if (parts.length >= 2) {
+        return parts[0] + " " + parts[1];
+      }
+      return fullAddress;
     }
+  }
 }

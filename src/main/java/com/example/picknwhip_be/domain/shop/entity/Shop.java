@@ -39,8 +39,8 @@ public class Shop {
   @Column(name = "address", nullable = false)
   private String address;
 
-    @Column(name = "district", length = 20)
-    private String district; // 주소에서 구만 뽑아서 저장
+  @Column(name = "district", length = 20)
+  private String district; // 주소에서 구만 뽑아서 저장
 
   @Column(columnDefinition = "POINT SRID 4326", nullable = false)
   private Point location;
@@ -119,12 +119,13 @@ public class Shop {
   @Builder.Default
   private List<DesignGallery> designGalleries = new ArrayList<>();
 
-  public Shop(User owner, String shopName, String phone, String address, Point location, String district) {
+  public Shop(
+      User owner, String shopName, String phone, String address, Point location, String district) {
     this.owner = owner;
     this.shopName = shopName;
     this.phone = phone;
     this.address = address;
-      this.district = district;
+    this.district = district;
     this.location = location;
   }
 }

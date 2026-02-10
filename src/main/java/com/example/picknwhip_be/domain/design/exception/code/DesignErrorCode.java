@@ -10,8 +10,9 @@ import org.springframework.http.HttpStatus;
 public enum DesignErrorCode implements BaseErrorCode {
   DESIGN_NOT_FOUND(HttpStatus.NOT_FOUND, "DESIGN404_1", "해당 디자인을 찾을 수 없습니다."),
   DESIGN_NOT_REGISTER(HttpStatus.NOT_FOUND, "DESIGN404_2", "해당 디자인이 등록되지 않았습니다."),
-    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "DESIGN400_1", "유효하지 않은 카테고리입니다."),
-    INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "DESIGN400_2", "유효하지 않은 정렬 방식(NAME, NEARBY, RATING)입니다.");
+  INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "DESIGN400_1", "유효하지 않은 카테고리입니다."),
+  INVALID_SORT_TYPE(
+      HttpStatus.BAD_REQUEST, "DESIGN400_2", "유효하지 않은 정렬 방식(NAME, NEARBY, RATING)입니다.");
 
   private final HttpStatus status;
   private final String code;

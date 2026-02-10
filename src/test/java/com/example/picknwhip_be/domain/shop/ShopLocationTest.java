@@ -40,7 +40,7 @@ class ShopLocationTest {
 
     assertThat(foundShop.getLocation().getX()).isEqualTo(127.027610);
     assertThat(foundShop.getLocation().getY()).isEqualTo(37.498095);
-      assertThat(foundShop.getDistrict()).isEqualTo("강남구");
+    assertThat(foundShop.getDistrict()).isEqualTo("강남구");
   }
 
   private static Point point4326(double lng, double lat) {

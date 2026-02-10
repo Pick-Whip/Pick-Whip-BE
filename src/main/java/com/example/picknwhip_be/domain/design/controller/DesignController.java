@@ -21,57 +21,52 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/design")
 public class DesignController {
 
-    private final DesignQueryService designQueryService;
+  private final DesignQueryService designQueryService;
 
-    @Operation(summary = "가게 디자인갤러리 조회 API", description = "특정 가게의 디자인갤러리 목록을 조회합니다.")
-    @GetMapping("/shop/{shopId}")
-    public ApiResponse<DesignResDTO.GetDesignListDTO> getDesignListByShopId(
-            @PathVariable Long shopId) {
+  @Operation(summary = "가게 디자인갤러리 조회 API", description = "특정 가게의 디자인갤러리 목록을 조회합니다.")
+  @GetMapping("/shop/{shopId}")
+  public ApiResponse<DesignResDTO.GetDesignListDTO> getDesignListByShopId(
+      @PathVariable Long shopId) {
 
-        DesignResDTO.GetDesignListDTO result = designQueryService.findDesignListByShopId(shopId);
+    DesignResDTO.GetDesignListDTO result = designQueryService.findDesignListByShopId(shopId);
 
-        return ApiResponse.of(GeneralSuccessCode.OK, result);
-    }
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 
-    @Operation(summary = "디자인갤러리 상세조회 API", description = "design_id로 디자인 상세정보를 조회합니다.")
-    @GetMapping("/{designId}")
-    public ApiResponse<DesignResDTO.GetDesignDetailDTO> getDesignDetail(@PathVariable Long designId) {
+  @Operation(summary = "디자인갤러리 상세조회 API", description = "design_id로 디자인 상세정보를 조회합니다.")
+  @GetMapping("/{designId}")
+  public ApiResponse<DesignResDTO.GetDesignDetailDTO> getDesignDetail(@PathVariable Long designId) {
 
-        DesignResDTO.GetDesignDetailDTO result = designQueryService.findDesignDetail(designId);
+    DesignResDTO.GetDesignDetailDTO result = designQueryService.findDesignDetail(designId);
 
-        return ApiResponse.of(GeneralSuccessCode.OK, result);
-    }
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 
-    @GetMapping("/{userId}")
-    public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
+  @GetMapping("/{userId}")
+  public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
 
-        return null;
-    }
+    return null;
+  }
 
-    @Operation(
-            summary = "디자인 갤러리 목록 조회 (메인)",
-            description = "카테고리, 정렬 조건과 함께 현재 위치(위도/경도)를 필수로 받아 디자인 목록을 조회합니다.")
-    @GetMapping("/gallery")
-    public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
+  @Operation(
+      summary = "디자인 갤러리 목록 조회 (메인)",
+      description = "카테고리, 정렬 조건과 함께 현재 위치(위도/경도)를 필수로 받아 디자인 목록을 조회합니다.")
+  @GetMapping("/gallery")
+  public ApiResponse<DesignResDTO.GalleryListDTO> getDesignGallery(
+      @Parameter(description = "카테고리") @RequestParam(required = false, defaultValue = "전체")
+          String category,
+      @Parameter(description = "정렬 기준 (NAME, NEARBY, RATING)")
+          @RequestParam(required = false, defaultValue = "NAME")
+          String sort,
+      @Parameter(description = "현재 위치 위도", required = true) @RequestParam(required = false)
+          Double lat,
+      @Parameter(description = "현재 위치 경도", required = true) @RequestParam(required = false)
+          Double lon,
+      @RequestParam(defaultValue = "0") int page,
+      @ExtractPayload Long userId) {
+    DesignResDTO.GalleryListDTO result =
+        designQueryService.searchGallery(category, sort, lat, lon, userId, page);
 
-            @Parameter(description = "카테고리")
-            @RequestParam(required = false, defaultValue = "전체") String category,
-
-            @Parameter(description = "정렬 기준 (NAME, NEARBY, RATING)")
-            @RequestParam(required = false, defaultValue = "NAME") String sort,
-
-            @Parameter(description = "현재 위치 위도", required = true)
-            @RequestParam(required = false) Double lat,
-
-            @Parameter(description = "현재 위치 경도", required = true)
-            @RequestParam(required = false) Double lon,
-
-            @RequestParam(defaultValue = "0") int page,
-            @ExtractPayload Long userId
-    ) {
-        DesignResDTO.GalleryListDTO result = designQueryService.searchGallery(
-                category, sort, lat, lon, userId, page);
-
-        return ApiResponse.of(GeneralSuccessCode.OK, result);
-    }
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
+  }
 }

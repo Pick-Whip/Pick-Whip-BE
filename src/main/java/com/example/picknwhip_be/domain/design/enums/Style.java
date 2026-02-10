@@ -52,10 +52,10 @@ public enum Style {
 
   // 용도
   BIRTHDAY("생일"),
-    ANNIVERSARY("기념일"),
-    CHRISTMAS("크리스마스"),
-    GRADUATION("졸업"),
-    OPENING("개업");
+  ANNIVERSARY("기념일"),
+  CHRISTMAS("크리스마스"),
+  GRADUATION("졸업"),
+  OPENING("개업");
 
   private final String label;
 }
