@@ -5,6 +5,8 @@ import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.req.ShopReqDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
+import com.example.picknwhip_be.domain.shop.exception.ShopException;
+import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.util.List;
 import java.util.Set;
@@ -41,5 +43,11 @@ public class ShopQueryService {
     Page<Shop> shopPage = shopRepository.searchShops(condition, pageable);
 
     return shopPage.map(ShopResDTO.ShopSearchResDTO::from);
+  }
+
+  public void validateShopExists(Long shopId) {
+    if (!shopRepository.existsById(shopId)) {
+      throw new ShopException(ShopErrorCode.SHOP_NOT_FOUND);
+    }
   }
 }
