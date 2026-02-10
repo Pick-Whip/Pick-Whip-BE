@@ -48,7 +48,14 @@ public enum Style {
   LETTERING("레터링"),
   IDOL("아이돌"),
   GLUTEN_FREE("글루텐프리"),
-  VEGAN("비건");
+  VEGAN("비건"),
+
+  // 용도
+  BIRTHDAY("생일"),
+    ANNIVERSARY("기념일"),
+    CHRISTMAS("크리스마스"),
+    GRADUATION("졸업"),
+    OPENING("개업");
 
   private final String label;
 }
