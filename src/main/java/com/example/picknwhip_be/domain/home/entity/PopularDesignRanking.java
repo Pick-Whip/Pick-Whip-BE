@@ -14,12 +14,11 @@ import lombok.*;
 @Builder
 public class PopularDesignRanking {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Integer ranking; // 1 ~ 4위
+    private Integer ranking;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "design_id", nullable = false)
@@ -33,5 +32,5 @@ public class PopularDesignRanking {
     private Long orderCount;
 
     @Column(name = "calculated_at", nullable = false)
-    private LocalDateTime calculatedAt; // 집계 일시
+    private LocalDateTime calculatedAt;
 }

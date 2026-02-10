@@ -24,15 +24,12 @@ public class PopularDesignRankingScheduler {
     private final PopularDesignRankingRepository rankingRepository;
     private final EntityManager em;
 
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-
-    // 매일 00:00:00 실행
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정 실행
     @Transactional
     public void refreshDesignRanking() {
-        ZonedDateTime nowKst = ZonedDateTime.now(KST);
+        ZonedDateTime nowKst = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime endAt = nowKst.toLocalDateTime();
-        LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime(); //최근 14일
+        LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
 
         List<PaymentRepository.PopularDesignAgg> top4 =
                 paymentRepository.findTop4DesignByOrders(startAt, endAt);
@@ -43,18 +40,14 @@ public class PopularDesignRankingScheduler {
         int rankNum = 1;
 
         for (PaymentRepository.PopularDesignAgg agg : top4) {
-            DesignGallery designRef = em.getReference(DesignGallery.class, agg.getDesignId());
-            Shop shopRef = em.getReference(Shop.class, agg.getShopId());
-
             toSave.add(PopularDesignRanking.builder()
                     .ranking(rankNum++)
-                    .design(designRef)
-                    .shop(shopRef)
+                    .design(em.getReference(DesignGallery.class, agg.getDesignId()))
+                    .shop(em.getReference(Shop.class, agg.getShopId()))
                     .orderCount(agg.getOrderCount())
                     .calculatedAt(endAt)
                     .build());
         }
-
         rankingRepository.saveAll(toSave);
     }
 }
