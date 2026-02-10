@@ -34,6 +34,7 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
     List<Shop> content =
         queryFactory
             .selectFrom(shop)
+            .distinct()
             .leftJoin(shop.designGalleries, designGallery)
             .where(
                 containsKeyword(condition.getKeyword()), // 검색어
@@ -41,7 +42,6 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
                 inPurposes(condition.getPurposes()), // 용도 필터
                 betweenPrice(condition.getMinPrice(), condition.getMaxPrice()) // 가격대
                 )
-            .groupBy(shop.id) // 중복제거
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .orderBy(getOrderSpecifiers(pageable)) // 최신순 정렬 (변경가능)
