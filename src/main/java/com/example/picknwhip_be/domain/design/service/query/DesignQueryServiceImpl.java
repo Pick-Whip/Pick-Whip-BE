@@ -87,6 +87,15 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
         List<Style> categories = parseCategory(categoryStr);
 
+        if (lat != null || lon != null) {
+            validateCoordinate(lat, lon);
+        }
+
+        if ("NEARBY".equals(sortType) && (lat == null || lon == null)) {
+            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+        }
+
+        // TODO: 외부 지도 API 연동 시, API 호출 실패 등에 대한 예외처리도 이곳에서 try-catch로 감싸야 함
         String currentDistrict = reverseGeocode(lat, lon);
 
         Pageable pageable = PageRequest.of(page, 4);
@@ -105,7 +114,6 @@ public class DesignQueryServiceImpl implements DesignQueryService {
                 .build();
     }
 
-    // [추가] 카테고리 파싱 헬퍼 메서드
     private List<Style> parseCategory(String categoryStr) {
         if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
             return null; // 필터링 안 함
@@ -117,7 +125,12 @@ public class DesignQueryServiceImpl implements DesignQueryService {
         }
         return null;
     }
-
+    private void validateCoordinate(Double lat, Double lon) {
+        if (lat == null || lon == null) return;
+        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
+        }
+    }
     // 역지오코딩 (좌표 -> 주소) 시뮬레이션
     private String reverseGeocode(Double lat, Double lon) {
         if (lat == null || lon == null) return null;
