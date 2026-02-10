@@ -6,6 +6,8 @@ import com.example.picknwhip_be.domain.design.enums.Style;
 import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
 import com.example.picknwhip_be.domain.home.dto.res.PopularDesignResDTO;
 import com.example.picknwhip_be.domain.home.entity.PopularDesignRanking;
+import com.example.picknwhip_be.domain.home.exception.HomeException;
+import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
 import com.example.picknwhip_be.domain.home.repository.PopularDesignRankingRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import java.util.Collections;
@@ -28,7 +30,7 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         List<PopularDesignRanking> rankings = rankingRepository.findTop4WithDetails();
 
         if (rankings.isEmpty()) {
-            return Collections.emptyList();
+            throw new HomeException(HomeErrorCode.POPULAR_DESIGN_RANKING_NOT_READY);
         }
         Set<Long> pickedDesignIds = Collections.emptySet();
         if (userId != null) {

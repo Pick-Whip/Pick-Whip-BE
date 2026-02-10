@@ -45,7 +45,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
       Long getOrderCount();
   }
 
-    // ★ 수정됨: paymentStatus = 'DONE' -> 'PAID'
     @Query("SELECT o.designGallery.id as designId, " +
             "       o.shop.id as shopId, " +
             "       COUNT(o) as orderCount " +
