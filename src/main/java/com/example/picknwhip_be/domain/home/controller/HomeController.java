@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
   private final HomePopularCakeService homePopularCakeService;
-    private final HomePopularDesignService homePopularDesignService;
+  private final HomePopularDesignService homePopularDesignService;
 
   @Operation(
       summary = "인기 케이크 Top5 조회",
@@ -34,13 +34,14 @@ public class HomeController {
     List<PopularCakeResDTO> result = homePopularCakeService.getPopularCakesTop5(userId);
     return ApiResponse.of(HomeSuccessCode.POPULAR_CAKES_TOP5_OK, result);
   }
-    @Operation(
-            summary = "인기 케이크 도안 Top4 조회",
-            description = "최근 14일간 결제 완료된 주문량이 가장 많은 디자인 4개를 조회합니다. 클릭 시 상세 정보를 위한 스펙 데이터가 포함됩니다.")
-    @GetMapping("/popular-designs/top4")
-    public ApiResponse<List<PopularDesignResDTO>> getPopularDesigns(@ExtractPayload Long userId) {
 
-        List<PopularDesignResDTO> result = homePopularDesignService.getPopularDesignsTop4(userId);
-        return ApiResponse.of(HomeSuccessCode.POPULAR_DESIGNS_TOP4_OK, result);
-    }
+  @Operation(
+      summary = "인기 케이크 도안 Top4 조회",
+      description = "최근 14일간 결제 완료된 주문량이 가장 많은 디자인 4개를 조회합니다. 클릭 시 상세 정보를 위한 스펙 데이터가 포함됩니다.")
+  @GetMapping("/popular-designs/top4")
+  public ApiResponse<List<PopularDesignResDTO>> getPopularDesigns(@ExtractPayload Long userId) {
+
+    List<PopularDesignResDTO> result = homePopularDesignService.getPopularDesignsTop4(userId);
+    return ApiResponse.of(HomeSuccessCode.POPULAR_DESIGNS_TOP4_OK, result);
+  }
 }

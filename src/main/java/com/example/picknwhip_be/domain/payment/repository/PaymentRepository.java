@@ -38,25 +38,26 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   List<PopularCakeAgg> findPopularCakesTop5(
       @Param("startAt") LocalDateTime startAt, @Param("endAt") LocalDateTime endAt);
 
-  //인기 디자인
+  // 인기 디자인
   interface PopularDesignAgg {
-      Long getDesignId();
-      Long getShopId();
-      Long getOrderCount();
+    Long getDesignId();
+
+    Long getShopId();
+
+    Long getOrderCount();
   }
 
-    @Query("SELECT o.designGallery.id as designId, " +
-            "       o.shop.id as shopId, " +
-            "       COUNT(o) as orderCount " +
-            "FROM Order o " +
-            "WHERE o.pickupDatetime BETWEEN :startDate AND :endDate " +
-            "  AND o.paymentStatus = 'PAID' " +
-            "  AND o.designGallery IS NOT NULL " +
-            "GROUP BY o.designGallery.id, o.shop.id " +
-            "ORDER BY orderCount DESC " +
-            "LIMIT 4")
-    List<PopularDesignAgg> findTop4DesignByOrders(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
-    );
+  @Query(
+      "SELECT o.designGallery.id as designId, "
+          + "       o.shop.id as shopId, "
+          + "       COUNT(o) as orderCount "
+          + "FROM Order o "
+          + "WHERE o.pickupDatetime BETWEEN :startDate AND :endDate "
+          + "  AND o.paymentStatus = 'PAID' "
+          + "  AND o.designGallery IS NOT NULL "
+          + "GROUP BY o.designGallery.id, o.shop.id "
+          + "ORDER BY orderCount DESC "
+          + "LIMIT 4")
+  List<PopularDesignAgg> findTop4DesignByOrders(
+      @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

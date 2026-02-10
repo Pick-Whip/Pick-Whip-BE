@@ -6,17 +6,17 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PopularDesignResDTO {
-    private Integer rank;
-    private Long designId;
+  private Integer rank;
+  private Long designId;
 
-    private String imageUrl;
-    private String shopName;
-    private String cakeName;
+  private String imageUrl;
+  private String shopName;
+  private String cakeName;
 
-    private String designSpec;
-    private String flavorSpec;
-    private String letteringPhrase;
-    private String letteringOption;
+  private String designSpec;
+  private String flavorSpec;
+  private String letteringPhrase;
+  private String letteringOption;
 
-    private boolean isMyPick;
+  private boolean isMyPick;
 }

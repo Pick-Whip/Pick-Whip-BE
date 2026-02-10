@@ -14,23 +14,24 @@ import lombok.*;
 @Builder
 public class PopularDesignRanking {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private Integer ranking;
+  @Column(nullable = false)
+  private Integer ranking;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "design_id", nullable = false)
-    private DesignGallery design;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "design_id", nullable = false)
+  private DesignGallery design;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id", nullable = false)
-    private Shop shop;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shop_id", nullable = false)
+  private Shop shop;
 
-    @Column(name = "order_count", nullable = false)
-    private Long orderCount;
+  @Column(name = "order_count", nullable = false)
+  private Long orderCount;
 
-    @Column(name = "calculated_at", nullable = false)
-    private LocalDateTime calculatedAt;
+  @Column(name = "calculated_at", nullable = false)
+  private LocalDateTime calculatedAt;
 }

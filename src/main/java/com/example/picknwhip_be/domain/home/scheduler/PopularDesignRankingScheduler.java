@@ -20,34 +20,35 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PopularDesignRankingScheduler {
 
-    private final PaymentRepository paymentRepository;
-    private final PopularDesignRankingRepository rankingRepository;
-    private final EntityManager em;
+  private final PaymentRepository paymentRepository;
+  private final PopularDesignRankingRepository rankingRepository;
+  private final EntityManager em;
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정 실행
-    @Transactional
-    public void refreshDesignRanking() {
-        ZonedDateTime nowKst = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        LocalDateTime endAt = nowKst.toLocalDateTime();
-        LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
+  @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정 실행
+  @Transactional
+  public void refreshDesignRanking() {
+    ZonedDateTime nowKst = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+    LocalDateTime endAt = nowKst.toLocalDateTime();
+    LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
 
-        List<PaymentRepository.PopularDesignAgg> top4 =
-                paymentRepository.findTop4DesignByOrders(startAt, endAt);
+    List<PaymentRepository.PopularDesignAgg> top4 =
+        paymentRepository.findTop4DesignByOrders(startAt, endAt);
 
-        rankingRepository.deleteAllInBatch();
+    rankingRepository.deleteAllInBatch();
 
-        List<PopularDesignRanking> toSave = new ArrayList<>();
-        int rankNum = 1;
+    List<PopularDesignRanking> toSave = new ArrayList<>();
+    int rankNum = 1;
 
-        for (PaymentRepository.PopularDesignAgg agg : top4) {
-            toSave.add(PopularDesignRanking.builder()
-                    .ranking(rankNum++)
-                    .design(em.getReference(DesignGallery.class, agg.getDesignId()))
-                    .shop(em.getReference(Shop.class, agg.getShopId()))
-                    .orderCount(agg.getOrderCount())
-                    .calculatedAt(endAt)
-                    .build());
-        }
-        rankingRepository.saveAll(toSave);
+    for (PaymentRepository.PopularDesignAgg agg : top4) {
+      toSave.add(
+          PopularDesignRanking.builder()
+              .ranking(rankNum++)
+              .design(em.getReference(DesignGallery.class, agg.getDesignId()))
+              .shop(em.getReference(Shop.class, agg.getShopId()))
+              .orderCount(agg.getOrderCount())
+              .calculatedAt(endAt)
+              .build());
     }
+    rankingRepository.saveAll(toSave);
+  }
 }
