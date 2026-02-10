@@ -29,14 +29,13 @@ class PopularCakeRankingSchedulerTest {
   @InjectMocks private PopularCakeRankingScheduler scheduler;
 
   @Mock private PaymentRepository paymentRepository;
-
   @Mock private PopularCakeRankingRepository rankingRepository;
-
   @Mock private EntityManager em;
 
   @Test
   @DisplayName("Top5 갱신 스케줄러 실행 시 기존 데이터 삭제 후 새 데이터 저장")
   void refreshTop5_Success() {
+    // given
     PaymentRepository.PopularCakeAgg agg1 = mock(PaymentRepository.PopularCakeAgg.class);
     given(agg1.getDesignId()).willReturn(10L);
     given(agg1.getShopId()).willReturn(20L);
@@ -57,18 +56,23 @@ class PopularCakeRankingSchedulerTest {
     given(em.getReference(eq(DesignGallery.class), any())).willReturn(mockDesign);
     given(em.getReference(eq(Shop.class), any())).willReturn(mockShop);
 
+    // when
     scheduler.refreshTop5();
-    verify(rankingRepository).deleteAllInBatch();
+
+    // then
+    verify(rankingRepository).deleteAllInBatch(); // 기존 데이터 삭제 확인
 
     ArgumentCaptor<List<PopularCakeRanking>> captor = ArgumentCaptor.forClass(List.class);
-    verify(rankingRepository).saveAll(captor.capture());
+    verify(rankingRepository).saveAll(captor.capture()); // 저장 메서드 호출 확인
 
     List<PopularCakeRanking> savedList = captor.getValue();
     assertThat(savedList).hasSize(2);
 
+    // 랭킹 1위 검증
     assertThat(savedList.get(0).getRanking()).isEqualTo(1);
     assertThat(savedList.get(0).getOrderCount()).isEqualTo(100L);
 
+    // 랭킹 2위 검증
     assertThat(savedList.get(1).getRanking()).isEqualTo(2);
     assertThat(savedList.get(1).getOrderCount()).isEqualTo(80L);
   }

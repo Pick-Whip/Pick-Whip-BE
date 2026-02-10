@@ -2,17 +2,18 @@ package com.example.picknwhip_be.domain.home.service;
 
 import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
 import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResDTO;
-import com.example.picknwhip_be.domain.home.entity.PopularCakeRanking;
-import com.example.picknwhip_be.domain.home.exception.HomeException;
-import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
 import com.example.picknwhip_be.domain.home.repository.PopularCakeRankingRepository;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HomePopularCakeServiceImpl implements HomePopularCakeService {
@@ -24,34 +25,38 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
   @Transactional(readOnly = true)
   public List<PopularCakeResDTO> getPopularCakesTop5(Long userId) {
 
-    List<PopularCakeRanking> rankings = rankingRepository.findTop5WithDesignAndShop();
-
-    if (rankings.isEmpty()) {
-      throw new HomeException(HomeErrorCode.POPULAR_CAKE_RANKING_NOT_READY);
+    List<PopularCakeResDTO> cachedRankings = rankingRepository.findTop5Rankings();
+    if (cachedRankings == null || cachedRankings.isEmpty()) {
+      log.warn("인기 케이크 랭킹 데이터가 비어있습니다. 스케줄러가 아직 실행되지 않았을 수 있습니다.");
+      return Collections.emptyList();
     }
 
-    List<Long> designIds = rankings.stream().map(r -> r.getDesign().getId()).toList();
+    List<Long> designIds = cachedRankings.stream().map(PopularCakeResDTO::getDesignId).toList();
 
     Set<Long> pickedDesignIds = new HashSet<>();
     if (userId != null && !designIds.isEmpty()) {
       pickedDesignIds.addAll(designMyPickChecker.findPickedDesignIds(userId, designIds));
     }
 
-    return rankings.stream()
+    if (pickedDesignIds.isEmpty()) {
+      return cachedRankings;
+    }
+
+    return cachedRankings.stream()
         .map(
-            r ->
+            dto ->
                 PopularCakeResDTO.builder()
-                    .rank(r.getRanking())
-                    .designId(r.getDesign().getId())
-                    .cakeName(r.getDesign().getDesignName())
-                    .cakeImageUrl(r.getDesign().getImageUrl())
-                    .shopId(r.getShop().getId())
-                    .shopName(r.getShop().getShopName())
-                    .averageRating(r.getShop().getAverageRating())
-                    .minPrice(r.getShop().getMinPrice())
-                    .isMyPick(pickedDesignIds.contains(r.getDesign().getId()))
-                    .orderCount(r.getOrderCount())
+                    .rank(dto.getRank())
+                    .designId(dto.getDesignId())
+                    .cakeName(dto.getCakeName())
+                    .cakeImageUrl(dto.getCakeImageUrl())
+                    .shopId(dto.getShopId())
+                    .shopName(dto.getShopName())
+                    .averageRating(dto.getAverageRating())
+                    .minPrice(dto.getMinPrice())
+                    .orderCount(dto.getOrderCount())
+                    .isMyPick(pickedDesignIds.contains(dto.getDesignId()))
                     .build())
-        .toList();
+        .collect(Collectors.toList());
   }
 }

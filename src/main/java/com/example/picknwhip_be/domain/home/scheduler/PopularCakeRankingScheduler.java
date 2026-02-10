@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class PopularCakeRankingScheduler {
   // 매일 00:00:00 (자정) KST 실행
   @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
   @Transactional
+  @CacheEvict(value = "popularCakes", allEntries = true)
   public void refreshTop5() {
     ZonedDateTime nowKst = ZonedDateTime.now(KST);
 
@@ -41,6 +43,10 @@ public class PopularCakeRankingScheduler {
 
     // 최신 Top5로 완전 교체
     rankingRepository.deleteAllInBatch();
+
+    if (top5.isEmpty()) {
+      return;
+    }
 
     List<PopularCakeRanking> toSave = new ArrayList<>();
     int rankNum = 1;
