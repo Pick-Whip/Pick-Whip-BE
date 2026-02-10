@@ -26,37 +26,25 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
   public List<PopularCakeResDTO> getPopularCakesTop5(Long userId) {
 
     List<PopularCakeResDTO> cachedRankings = rankingRepository.findTop5Rankings();
+
     if (cachedRankings == null || cachedRankings.isEmpty()) {
       log.warn("인기 케이크 랭킹 데이터가 비어있습니다. 스케줄러가 아직 실행되지 않았을 수 있습니다.");
       return Collections.emptyList();
     }
 
     List<Long> designIds = cachedRankings.stream().map(PopularCakeResDTO::getDesignId).toList();
-
     Set<Long> pickedDesignIds = new HashSet<>();
+
     if (userId != null && !designIds.isEmpty()) {
       pickedDesignIds.addAll(designMyPickChecker.findPickedDesignIds(userId, designIds));
     }
 
     if (pickedDesignIds.isEmpty()) {
-      return cachedRankings;
+      return List.copyOf(cachedRankings);
     }
 
     return cachedRankings.stream()
-        .map(
-            dto ->
-                PopularCakeResDTO.builder()
-                    .rank(dto.getRank())
-                    .designId(dto.getDesignId())
-                    .cakeName(dto.getCakeName())
-                    .cakeImageUrl(dto.getCakeImageUrl())
-                    .shopId(dto.getShopId())
-                    .shopName(dto.getShopName())
-                    .averageRating(dto.getAverageRating())
-                    .minPrice(dto.getMinPrice())
-                    .orderCount(dto.getOrderCount())
-                    .isMyPick(pickedDesignIds.contains(dto.getDesignId()))
-                    .build())
+        .map(dto -> dto.toBuilder().isMyPick(pickedDesignIds.contains(dto.getDesignId())).build())
         .collect(Collectors.toList());
   }
 }

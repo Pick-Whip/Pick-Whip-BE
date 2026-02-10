@@ -30,7 +30,7 @@ public class PopularCakeRankingScheduler {
   // 매일 00:00:00 (자정) KST 실행
   @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
   @Transactional
-  @CacheEvict(value = "popularCakes", allEntries = true)
+  @CacheEvict(value = "popularCakes", key = "'top5'")
   public void refreshTop5() {
     ZonedDateTime nowKst = ZonedDateTime.now(KST);
 
