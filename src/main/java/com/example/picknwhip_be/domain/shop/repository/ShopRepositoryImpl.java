@@ -69,7 +69,9 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
       for (Sort.Order order : pageable.getSort()) {
         Order direction = order.isAscending() ? Order.ASC : Order.DESC;
         String prop = order.getProperty();
-
+        if (!isValidProperty(prop)) {
+          continue; // 유효하지 않은 필드는 무시하거나, 기본 정렬로 대체 가능
+        }
         // PathBuilder를 사용하여 동적으로 필드 매핑
         PathBuilder<Shop> orderByExpression = new PathBuilder<>(Shop.class, "shop");
         orders.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
@@ -80,6 +82,11 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
     }
 
     return orders.toArray(new OrderSpecifier[0]);
+  }
+
+  private boolean isValidProperty(String prop) {
+    // 정렬을 허용할 필드 목록 정의 (필요에 따라 추가)
+    return List.of("createdAt", "shopName", "minPrice", "maxPrice", "averageRating").contains(prop);
   }
 
   // 1. 통합 검색어 (가게이름, 주소, 디자인이름)
