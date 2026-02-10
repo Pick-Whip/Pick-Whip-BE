@@ -7,6 +7,7 @@ import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.service.query.ReviewQueryService;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopInfoResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import com.example.picknwhip_be.domain.shop.service.command.ShopService;
 import com.example.picknwhip_be.domain.shop.service.query.ShopQueryService;
@@ -17,10 +18,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +41,11 @@ public class ShopController {
       summary = "내 주변 가게 조회",
       description = "현재 위치(lat, lon)를 기준으로 특정 반경(radius) 내의 가게 목록을 조회합니다.")
   @GetMapping("/nearby")
-  public ResponseEntity<List<ShopPreviewResDTO>> getNearbyShops(
+  public ApiResponse<List<ShopPreviewResDTO>> getNearbyShops(
       @RequestParam double lat,
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {
-    return ResponseEntity.ok(shopService.getNearbyShops(lat, lon, radius));
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getNearbyShops(lat, lon, radius));
   }
 
   @Operation(
@@ -67,11 +68,11 @@ public class ShopController {
       summary = "가게 상세 조회",
       description = "가게 ID와 현재 위치(lat, lon)를 받아 가게 상세 정보(거리 포함)를 조회합니다.")
   @GetMapping("/{shopId}")
-  public ResponseEntity<ShopDetailResDTO> getShopDetail(
+  public ApiResponse<ShopDetailResDTO> getShopDetail(
       @PathVariable Long shopId,
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
       @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
-    return ResponseEntity.ok(shopService.getShopDetail(shopId, lat, lon));
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon));
   }
 
   @Operation(
@@ -102,5 +103,17 @@ public class ShopController {
   @GetMapping("/{shopId}/designs")
   public ApiResponse<DesignResDTO.DesignListDTO> getShopDesignNameList(@PathVariable Long shopId) {
     return ApiResponse.of(GeneralSuccessCode.OK, designQueryService.findShopDesignNameList(shopId));
+  }
+
+  @Operation(
+      summary = "가게 매장 정보 탭 조회",
+      description = "가게 상세 페이지의 '매장 정보' 탭 데이터(가격/사이즈/픽업/결제/이벤트)를 조회합니다.")
+  @GetMapping("/{shopId}/info")
+  public ApiResponse<ShopInfoResDTO> getShopInfoTab(
+      @Parameter(description = "가게 ID", required = true, example = "1")
+          @PathVariable
+          @Positive(message = "가게 ID는 양수여야 합니다.")
+          Long shopId) {
+    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopInfoTab(shopId));
   }
 }

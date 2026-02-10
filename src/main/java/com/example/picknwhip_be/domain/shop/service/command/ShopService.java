@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.shop.service.command;
 
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
+import com.example.picknwhip_be.domain.shop.dto.res.ShopInfoResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
 import java.util.List;
 
@@ -10,4 +11,6 @@ public interface ShopService {
 
   // 가게 상세 조회
   ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon);
+
+  ShopInfoResDTO getShopInfoTab(Long shopId);
 }
