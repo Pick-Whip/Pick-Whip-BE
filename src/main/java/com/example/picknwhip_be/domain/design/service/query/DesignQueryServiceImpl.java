@@ -81,6 +81,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public DesignResDTO.GalleryListDTO searchGallery(
       String categoryStr,
       String sortType,
