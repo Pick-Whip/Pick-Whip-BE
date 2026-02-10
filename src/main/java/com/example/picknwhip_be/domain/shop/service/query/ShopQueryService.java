@@ -3,11 +3,14 @@ package com.example.picknwhip_be.domain.shop.service.query;
 import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
+import com.example.picknwhip_be.domain.shop.dto.req.ShopReqDTO;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +34,12 @@ public class ShopQueryService {
             : java.util.Collections.emptySet();
 
     return shopConverter.toShopInMapListDTO(shops, pickedShopIds);
+  }
+
+  public Page<ShopResDTO.ShopSearchResDTO> searchShops(
+      ShopReqDTO.ShopSearchCondition condition, Pageable pageable) {
+    Page<Shop> shopPage = shopRepository.searchShops(condition, pageable);
+
+    return shopPage.map(ShopResDTO.ShopSearchResDTO::from);
   }
 }
