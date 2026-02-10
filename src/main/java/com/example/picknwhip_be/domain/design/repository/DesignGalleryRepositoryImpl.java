@@ -60,7 +60,7 @@ public class DesignGalleryRepositoryImpl implements DesignGalleryRepositoryCusto
                         shop.address,
                         shop.minPrice,
                         shop.averageRating,
-                        favorite.id // 찜 ID (조인 안되면 null)
+                        favorite.id
                 ))
                 .from(design)
                 .join(design.shop, shop)
@@ -100,7 +100,7 @@ public class DesignGalleryRepositoryImpl implements DesignGalleryRepositoryCusto
         if (district == null || district.isBlank()) {
             return null;
         }
-        return shop.address.contains(district);
+        return shop.district.eq(district);
     }
     private OrderSpecifier[] getOrderSpecifiers(String sortType, QShop shop, Double userLat, Double userLon) {
         List<OrderSpecifier> orders = new ArrayList<>();
@@ -113,7 +113,6 @@ public class DesignGalleryRepositoryImpl implements DesignGalleryRepositoryCusto
 
         } else if ("RATING".equals(sortType)) {
             orders.add(shop.averageRating.coalesce(0.0).desc());
-
         } else {
             orders.add(shop.shopName.asc());
         }
