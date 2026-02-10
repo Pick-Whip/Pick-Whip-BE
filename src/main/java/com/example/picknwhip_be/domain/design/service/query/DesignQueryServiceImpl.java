@@ -80,62 +80,68 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     return DesignConverter.toShopDesignNameListDTO(items);
   }
 
-    @Override
-    public DesignResDTO.GalleryListDTO searchGallery(
-            String categoryStr, String sortType, Double lat, Double lon, Long seed, Long userId, int page) {
+  @Override
+  public DesignResDTO.GalleryListDTO searchGallery(
+      String categoryStr,
+      String sortType,
+      Double lat,
+      Double lon,
+      Long seed,
+      Long userId,
+      int page) {
 
-        validateCoordinate(lat, lon);
+    validateCoordinate(lat, lon);
 
-        List<Style> categories = parseCategory(categoryStr);
-        validateSortType(sortType);
-        String currentDistrict = reverseGeocode(lat, lon);
+    List<Style> categories = parseCategory(categoryStr);
+    validateSortType(sortType);
+    String currentDistrict = reverseGeocode(lat, lon);
 
-        Pageable pageable = PageRequest.of(page, 4);
-        Page<DesignResDTO.GalleryItemDTO> resultPage = designRepository.searchGallery(
-                categories, sortType, currentDistrict, lat, lon, seed, userId, pageable
-        );
+    Pageable pageable = PageRequest.of(page, 4);
+    Page<DesignResDTO.GalleryItemDTO> resultPage =
+        designRepository.searchGallery(
+            categories, sortType, currentDistrict, lat, lon, seed, userId, pageable);
 
-        return DesignResDTO.GalleryListDTO.builder()
-                .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
-                .designs(resultPage.getContent())
-                .totalPage(resultPage.getTotalPages())
-                .totalElements(resultPage.getTotalElements())
-                .isFirst(resultPage.isFirst())
-                .isLast(resultPage.isLast())
-                .build();
+    return DesignResDTO.GalleryListDTO.builder()
+        .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
+        .designs(resultPage.getContent())
+        .totalPage(resultPage.getTotalPages())
+        .totalElements(resultPage.getTotalElements())
+        .isFirst(resultPage.isFirst())
+        .isLast(resultPage.isLast())
+        .build();
+  }
+
+  private void validateCoordinate(Double lat, Double lon) {
+    if (lat == null || lon == null) {
+      throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
     }
-
-    private void validateCoordinate(Double lat, Double lon) {
-        if (lat == null || lon == null) {
-            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
-        }
-        if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
-            throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
-        }
+    if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+      throw new ShopException(ShopErrorCode.INVALID_COORDINATE);
     }
+  }
 
-    private List<Style> parseCategory(String categoryStr) {
-        if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
-            return null;
-        }
-        for (Style style : Style.values()) {
-            if (style.getLabel().equals(categoryStr)) {
-                return List.of(style);
-            }
-        }
-        throw new DesignException(DesignErrorCode.INVALID_CATEGORY);
+  private List<Style> parseCategory(String categoryStr) {
+    if ("전체".equals(categoryStr) || categoryStr == null || categoryStr.isBlank()) {
+      return null;
     }
+    for (Style style : Style.values()) {
+      if (style.getLabel().equals(categoryStr)) {
+        return List.of(style);
+      }
+    }
+    throw new DesignException(DesignErrorCode.INVALID_CATEGORY);
+  }
 
-    private void validateSortType(String sortType) {
-        if (sortType == null || sortType.isBlank()) return;
-        if (!List.of("NAME", "NEARBY", "RATING").contains(sortType)) {
-            throw new DesignException(DesignErrorCode.INVALID_SORT_TYPE);
-        }
+  private void validateSortType(String sortType) {
+    if (sortType == null || sortType.isBlank()) return;
+    if (!List.of("NAME", "NEARBY", "RATING").contains(sortType)) {
+      throw new DesignException(DesignErrorCode.INVALID_SORT_TYPE);
     }
+  }
 
-    private String reverseGeocode(Double lat, Double lon) {
-        if (lat >= 37.54 && lat <= 37.57 && lon >= 126.90 && lon <= 126.95) return "마포구";
-        if (lat >= 37.48 && lat <= 37.52 && lon >= 127.01 && lon <= 127.05) return "강남구";
-        return null;
-    }
+  private String reverseGeocode(Double lat, Double lon) {
+    if (lat >= 37.54 && lat <= 37.57 && lon >= 126.90 && lon <= 126.95) return "마포구";
+    if (lat >= 37.48 && lat <= 37.52 && lon >= 127.01 && lon <= 127.05) return "강남구";
+    return null;
+  }
 }
