@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class PopularDesignRankingScheduler {
     LocalDateTime startAt = nowKst.minusDays(14).toLocalDateTime();
 
     List<PaymentRepository.PopularDesignAgg> top4 =
-        paymentRepository.findTop4DesignByOrders(startAt, endAt, PaymentStatus.PAID);
+        paymentRepository.findTop4DesignByOrders(startAt, endAt, PaymentStatus.PAID, PageRequest.of(0, 4));
 
     rankingRepository.deleteAllInBatch();
 
