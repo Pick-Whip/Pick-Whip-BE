@@ -6,6 +6,7 @@ import com.example.picknwhip_be.domain.review.dto.req.ReviewReqDTO;
 import com.example.picknwhip_be.domain.review.dto.res.ReviewResDTO;
 import com.example.picknwhip_be.domain.review.service.query.ReviewQueryService;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
+import com.example.picknwhip_be.domain.shop.dto.req.ShopReqDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopInfoResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
@@ -22,6 +23,10 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,5 +120,15 @@ public class ShopController {
           @Positive(message = "가게 ID는 양수여야 합니다.")
           Long shopId) {
     return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopInfoTab(shopId));
+  }
+
+  @Operation(summary = "가게 검색 및 필터링", description = "키워드, 스타일, 가격대 등으로 가게를 검색합니다.")
+  @GetMapping("/search")
+  public ApiResponse<Page<ShopResDTO.ShopSearchResDTO>> searchShops(
+      @ParameterObject @ModelAttribute ShopReqDTO.ShopSearchCondition condition,
+      @ParameterObject
+          @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ApiResponse.of(GeneralSuccessCode.OK, shopQueryService.searchShops(condition, pageable));
   }
 }
