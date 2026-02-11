@@ -7,15 +7,18 @@ import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
-@Table(name = "popular_cake_rankings")
+@Table(name = "popular_design_rankings")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class PopularCakeRanking {
+public class PopularDesignRanking {
 
   @Id
-  @Column(name = "ranking", nullable = false)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false)
   private Integer ranking;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -28,12 +31,6 @@ public class PopularCakeRanking {
 
   @Column(name = "order_count", nullable = false)
   private Long orderCount;
-
-  @Column(name = "window_start")
-  private LocalDateTime windowStart;
-
-  @Column(name = "window_end")
-  private LocalDateTime windowEnd;
 
   @Column(name = "calculated_at", nullable = false)
   private LocalDateTime calculatedAt;
