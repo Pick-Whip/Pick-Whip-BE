@@ -33,13 +33,14 @@ class ShopLocationTest {
   void saveAndFindPointTest() {
     Point location = point4326(127.027610, 37.498095); // lng, lat
 
-    Shop shop = new Shop(null, "테스트 케이크샵", "010-1234-5678", "서울시 테헤란로", location);
+    Shop shop = new Shop(null, "테스트 케이크샵", "010-1234-5678", "서울시 테헤란로", location, "강남구");
     Shop savedShop = shopRepository.save(shop);
 
     Shop foundShop = shopRepository.findById(savedShop.getId()).orElseThrow();
 
     assertThat(foundShop.getLocation().getX()).isEqualTo(127.027610);
     assertThat(foundShop.getLocation().getY()).isEqualTo(37.498095);
+    assertThat(foundShop.getDistrict()).isEqualTo("강남구");
   }
 
   private static Point point4326(double lng, double lat) {

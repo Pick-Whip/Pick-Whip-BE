@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO: 배포 시 이 파일 지우기!!!
 @Tag(name = "Test Auth", description = "테스트용 인증 API")
 @RestController
 @RequestMapping("/api/test")

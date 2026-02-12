@@ -14,6 +14,7 @@ public class DesignConverter {
 
   public static DesignResDTO.DesignPreviewDTO toDesignPreviewDTO(DesignGallery designGallery) {
     return DesignResDTO.DesignPreviewDTO.builder()
+        .designId(designGallery.getId())
         .cakeName(designGallery.getDesignName())
         .price(designGallery.getBasePrice())
         .imageUrl(designGallery.getImageUrl())
