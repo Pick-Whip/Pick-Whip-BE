@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.shop.service.query;
 
+import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.shop.converter.PickupConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.PickupResDTO;
@@ -65,10 +66,10 @@ public class PickupQueryServiceImpl implements PickupQueryService {
     if (hour == null || hour.isClosed()) {
       return pickupConverter.toDailySlots(date, true, Collections.emptyList());
     }
-
+    List<Status> excluded = List.of(Status.CANCELED_BY_SHOP, Status.PAYMENT_FAILED);
     List<Object[]> counts =
         orderRepository.countOrdersByShopAndDateRange(
-            shopId, date.atStartOfDay(), date.atTime(LocalTime.MAX));
+            shopId, date.atStartOfDay(), date.atTime(LocalTime.MAX), excluded);
 
     Map<LocalTime, Long> reservedMap =
         counts.stream()
