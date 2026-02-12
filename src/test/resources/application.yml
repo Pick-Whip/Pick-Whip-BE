@@ -40,7 +40,7 @@ spring:
             user-name-attribute: id
 
 jwt:
-  secret: testsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkey
+  secret: ${JWT_SECRET_KEY:testsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkey}
   access-token-validity: 3600000
 
 cloud:

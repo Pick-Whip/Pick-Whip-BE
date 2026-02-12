@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -196,8 +197,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     Map<Long, Long> likeCounts =
         likeCountData.stream()
-            .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
-
+            .collect(
+                Collectors.toMap(
+                    row -> ((Number) row[0]).longValue(), row -> ((Number) row[1]).longValue()));
     // 아이템 DTO 리스트 생성
     List<ReviewResDTO.BestReviewItemDTO> items =
         reviews.stream()
@@ -258,7 +260,10 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     String finalDesignName = shapeName.isEmpty() ? sizeName : sizeName + " " + shapeName;
 
-    String taste = sheetName + (creamName.isEmpty() ? "" : " + " + creamName);
+    String taste =
+        Stream.of(sheetName, creamName)
+            .filter(s -> s != null && !s.isEmpty())
+            .collect(Collectors.joining(" + "));
 
     String deco = String.join(", ", decos);
 
