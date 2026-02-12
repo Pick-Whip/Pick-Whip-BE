@@ -19,7 +19,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
   List<Object[]> countOrdersByShopAndDateRange(
       @Param("shopId") Long shopId,
       @Param("startOfDay") LocalDateTime startOfDay,
-      @Param("endOfDay") LocalDateTime endOfDay);
+      @Param("endOfDay") LocalDateTime endOfDay,
+      @Param("excludedStatuses") List<Status> excludedStatuses);
 
   @Query(
       "SELECT COUNT(o) FROM Order o "

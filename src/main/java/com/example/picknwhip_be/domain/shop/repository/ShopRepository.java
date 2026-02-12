@@ -67,11 +67,11 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                            IFNULL(s.max_price, 0) as maxPrice,
                            ST_Distance_Sphere(
                                s.location,
-                               ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lon, ')'), 4326)
+                               ST_GeomFromText(CONCAT('POINT(', :lon, ' ', :lat, ')'), 4326)
                              ) as distance,
                            COALESCE(JSON_ARRAYAGG(kt.keyword_text), JSON_ARRAY()) as tags,
-                           ST_Latitude(s.location) as lat,
-                           ST_Longitude(s.location) as lon
+                           ST_Longitude(s.location) as lon,
+                           ST_Latitude(s.location) as lat
                     FROM shops s
                     LEFT JOIN (
                         SELECT DISTINCT m.shop_id, k.keyword_text
@@ -141,8 +141,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                          s.address as address,
                          s.phone as phone,
                          COALESCE(JSON_ARRAYAGG(kt.keyword_text), JSON_ARRAY()) as keywords,
-                         ST_Latitude(s.location) as lat,
-                         ST_Longitude(s.location) as lon
+                         ST_Longitude(s.location) as lon,
+                         ST_Latitude(s.location) as lat
                   FROM shops s
                   LEFT JOIN (
                       SELECT DISTINCT m.shop_id, k.keyword_text

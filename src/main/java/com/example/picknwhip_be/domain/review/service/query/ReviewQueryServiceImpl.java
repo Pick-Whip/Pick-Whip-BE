@@ -18,7 +18,6 @@ import com.example.picknwhip_be.domain.review.repository.ReviewRepository;
 import com.example.picknwhip_be.domain.review.repository.ReviewSelectedKeywordRepository;
 import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursor;
 import com.example.picknwhip_be.domain.review.service.query.cursor.ReviewCursorCodec;
-import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
@@ -26,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -169,6 +169,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
   @Override
   public ReviewResDTO.BestReviewListDTO getBestCustomReviews() {
+    // Repository에서 Fetch Join된 데이터 가져오기 (최대 5개)
     List<Review> reviews = reviewRepository.findBestHelpfulReviews(5);
 
     if (reviews.isEmpty()) {
@@ -181,16 +182,9 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
     List<ReviewSelectedKeyword> allKeywords =
         reviewSelectedKeywordRepository.findAllByReviewIdIn(reviewIds);
-
     List<Object[]> likeCountData = reviewLikeRepository.countByReviewIdIn(reviewIds);
-    Map<Long, Long> likeCounts =
-        likeCountData.stream()
-            .collect(
-                Collectors.toMap(
-                    row -> (Long) row[0], // reviewId
-                    row -> (Long) row[1] // count
-                    ));
 
+    // 데이터 메모리 매핑
     Map<Long, List<OrderItem>> optionsByOrderId =
         allOrderItems.stream().collect(Collectors.groupingBy(item -> item.getOrder().getId()));
 
@@ -201,6 +195,12 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                     k -> k.getReview().getId(),
                     Collectors.mapping(k -> k.getKeyword().getLabel(), Collectors.toList())));
 
+    Map<Long, Long> likeCounts =
+        likeCountData.stream()
+            .collect(
+                Collectors.toMap(
+                    row -> ((Number) row[0]).longValue(), row -> ((Number) row[1]).longValue()));
+    // 아이템 DTO 리스트 생성
     List<ReviewResDTO.BestReviewItemDTO> items =
         reviews.stream()
             .map(
@@ -210,7 +210,6 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
                           review.getOrder().getId(), Collections.emptyList());
                   List<String> myKeywords =
                       keywordsByReviewId.getOrDefault(review.getId(), Collections.emptyList());
-
                   Long helpfulCount = likeCounts.getOrDefault(review.getId(), 0L);
 
                   return convertToBestReviewItemDTO(review, myOptions, myKeywords, helpfulCount);
@@ -226,6 +225,11 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     Order order = review.getOrder();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+    String designImageUrl = order.getReferenceImageUrl();
+
+    String sizeName = order.getShopCakeSize().getSizeName();
+    String shapeName = "";
+
     String sheetName = "";
     String creamName = "";
     List<String> decos = new ArrayList<>();
@@ -237,9 +241,8 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
     for (OrderItem item : options) {
       if (item.getOptionCategory() == null) continue;
 
-      OptionCategory category = item.getOptionCategory();
-
-      switch (category) {
+      switch (item.getOptionCategory()) {
+        case SHAPE -> shapeName = item.getOptionName();
         case SHEET -> {
           sheetName = item.getOptionName();
           if (item.getColorRgbCode() != null) sheetColor = item.getColorRgbCode();
@@ -255,8 +258,16 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
       }
     }
 
-    String taste = sheetName + (creamName.isEmpty() ? "" : " + " + creamName);
+    String finalDesignName = shapeName.isEmpty() ? sizeName : sizeName + " " + shapeName;
+
+    String taste =
+        Stream.of(sheetName, creamName)
+            .filter(s -> s != null && !s.isEmpty())
+            .collect(Collectors.joining(" + "));
+
     String deco = String.join(", ", decos);
+
+    String additionalRequest = order.getAdditionalRequest();
 
     ReviewResDTO.CakeColorsDTO colorsDTO =
         ReviewResDTO.CakeColorsDTO.builder()
@@ -267,17 +278,12 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
 
     ReviewResDTO.CakeOptionDTO optionDTO =
         ReviewResDTO.CakeOptionDTO.builder()
-            .designName(
-                order.getDesignGallery() != null
-                    ? order.getDesignGallery().getDesignName()
-                    : "Unknown Design")
+            .designName(finalDesignName)
             .taste(taste)
             .deco(deco)
-            .additionalRequest(order.getOrderAdditionalRequest())
+            .additionalRequest(additionalRequest)
             .colors(colorsDTO)
             .build();
-
-    String resultImageUrl = order.getReferenceImageUrl();
 
     return ReviewResDTO.BestReviewItemDTO.builder()
         .writerName(review.getUser().getNickname())
@@ -286,7 +292,7 @@ public class ReviewQueryServiceImpl implements ReviewQueryService {
         .helpfulCount(helpfulCount)
         .content(review.getContent())
         .keywords(keywords)
-        .cakeImageUrl(resultImageUrl)
+        .cakeImageUrl(designImageUrl)
         .options(optionDTO)
         .build();
   }
