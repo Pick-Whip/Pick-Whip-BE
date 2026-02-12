@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.design.entity;
 
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
+import com.example.picknwhip_be.domain.design.enums.Purpose;
 import com.example.picknwhip_be.domain.design.enums.Style;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
@@ -67,6 +68,14 @@ public class DesignGallery {
   @Column(name = "keyword")
   @Builder.Default
   private Set<Style> keywords = new HashSet<>();
+
+  @ElementCollection
+  @CollectionTable(
+      name = "design_gallery_purposes",
+      joinColumns = @JoinColumn(name = "design_gallery_id"))
+  @Column(name = "purpose")
+  @Enumerated(EnumType.STRING)
+  private Set<Purpose> purposes = new HashSet<>();
 
   @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
