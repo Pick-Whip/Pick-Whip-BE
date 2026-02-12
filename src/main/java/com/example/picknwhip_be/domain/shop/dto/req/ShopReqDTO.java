@@ -2,6 +2,7 @@ package com.example.picknwhip_be.domain.shop.dto.req;
 
 import com.example.picknwhip_be.domain.design.enums.Purpose;
 import com.example.picknwhip_be.domain.design.enums.Style;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +21,7 @@ public class ShopReqDTO {
     private List<Purpose> purposes;
     private Integer minPrice;
     private Integer maxPrice;
+    private LocalDate pickupDate;
+    private Boolean isDayOrder;
   }
 }

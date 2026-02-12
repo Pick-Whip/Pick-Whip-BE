@@ -74,7 +74,7 @@ public class ShopInfoConverter {
     return ShopInfoResDTO.PickupInfoDTO.builder()
         .operationHours(formatOperationHours(hours))
         .pickupNotice(shop.getPickupTimeGuide())
-        .sameDayOrder(shop.getDayOrderGuide())
+        .sameDayOrder(shop.isDayOrderGuide())
         .parkingInfo(shop.getParkingGuide())
         .build();
   }

@@ -14,6 +14,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +45,8 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
                 inStyles(condition.getStyles()), // 스타일/맛/토핑 필터
                 inPurposes(condition.getPurposes()), // 용도 필터
                 betweenPrice(condition.getMinPrice(), condition.getMaxPrice()), // 가격대
-                filterLocation(condition.getCity(), condition.getSubAreas()) // 지역
-                )
+                filterLocation(condition.getCity(), condition.getSubAreas()), // 지역
+                filterDate(condition.getPickupDate(), condition.getIsDayOrder()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .orderBy(getOrderSpecifiers(pageable))
@@ -61,7 +63,8 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
                 inStyles(condition.getStyles()),
                 inPurposes(condition.getPurposes()),
                 betweenPrice(condition.getMinPrice(), condition.getMaxPrice()),
-                filterLocation(condition.getCity(), condition.getSubAreas()));
+                filterLocation(condition.getCity(), condition.getSubAreas()),
+                filterDate(condition.getPickupDate(), condition.getIsDayOrder()));
 
     return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
   }
@@ -164,6 +167,32 @@ public class ShopRepositoryImpl implements ShopRepositoryCustom {
     }
 
     return (subAreaCondition != null) ? cityCondition.and(subAreaCondition) : cityCondition;
+  }
+
+  private BooleanExpression filterDate(LocalDate pickupDate, Boolean isDayOrder) {
+    BooleanExpression condition = null;
+
+    if (Boolean.TRUE.equals(isDayOrder)) {
+      condition = shop.dayOrderGuide.isTrue();
+    }
+
+    if (pickupDate != null) {
+      LocalDate today = LocalDate.now();
+
+      if (pickupDate.isEqual(today)) {
+        BooleanExpression todayCondition = shop.dayOrderGuide.isTrue();
+        condition = (condition == null) ? todayCondition : condition.and(todayCondition);
+      } else if (pickupDate.isAfter(today)) {
+
+        long daysUntilPickup = ChronoUnit.DAYS.between(today, pickupDate);
+
+        BooleanExpression timeCondition = shop.pickupTimeGuide.loe((int) daysUntilPickup);
+
+        condition = (condition == null) ? timeCondition : condition.and(timeCondition);
+      }
+    }
+
+    return condition;
   }
 
   // BooleanExpression 조합용 헬퍼

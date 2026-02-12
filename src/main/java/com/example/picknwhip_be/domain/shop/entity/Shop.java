@@ -73,11 +73,11 @@ public class Shop {
   @Builder.Default
   private int maxOrdersPerSlot = 2; // 슬롯당 최대 가능 주문 수
 
-  @Column(name = "pickup_time_guide", columnDefinition = "TEXT")
-  private String pickupTimeGuide;
+  @Column(name = "pickup_time_guide")
+  private int pickupTimeGuide;
 
-  @Column(name = "day_order_guide", columnDefinition = "TEXT")
-  private String dayOrderGuide;
+  @Column(name = "day_order_guide")
+  private boolean dayOrderGuide;
 
   @Column(name = "parking_guide", columnDefinition = "TEXT")
   private String parkingGuide;

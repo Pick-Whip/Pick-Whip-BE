@@ -20,8 +20,8 @@ INSERT INTO shops (
 ) VALUES (
              10, 999, '정보 탭 테스트 매장', '02-555-5555', '서울시 강남구 테헤란로', ST_GeomFromText('POINT(37.5 127.0)', 4326), 'ACTIVE', 'VERIFIED',
              '정보 탭 API 테스트를 위한 매장입니다.',
-             '주문 후 최소 3일 소요',           -- pickup_time_guide
-             '재고 케이크 한정 당일 예약 가능',  -- day_order_guide
+             3,           -- pickup_time_guide
+             0,  -- day_order_guide
              '매장 앞 공영주차장 이용 가능',     -- parking_guide
              '온라인 결제 시 주문 확정 후 3일 이내 취소 가능', -- payment_notice
              '주문 후 변경은 픽업 2일 전까지 가능합니다.\n생과일 케이크는 당일 소비를 권장합니다.\n알러지가 있으신 경우 주문 시 꼭 알려주세요.', -- precaution_notice
