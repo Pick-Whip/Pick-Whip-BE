@@ -135,6 +135,7 @@ VALUES
     AS new
 ON DUPLICATE KEY UPDATE
                      size_name = new.size_name,
+                     diameter = new.diameter,
                      price = new.price;
 
 

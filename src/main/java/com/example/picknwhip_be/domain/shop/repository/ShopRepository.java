@@ -95,7 +95,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                       )
                       AND ST_Distance_Sphere(
                             s.location,
-                            ST_GeomFromText(CONCAT('POINT(', :lon, ' ', :lat, ')'), 4326)
+                            ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lon, ')'), 4326)
                           ) <= :radius
                     GROUP BY s.shop_id
                     ORDER BY distance ASC
@@ -136,7 +136,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, ShopRepositor
                          (SELECT COUNT(*) FROM review r WHERE r.shop_id = s.shop_id AND r.deleted_at IS NULL) as reviewCount,
                          ST_Distance_Sphere(
                             s.location,
-                            ST_GeomFromText(CONCAT('POINT(', :lon, ' ', :lat, ')'), 4326)
+                            ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lon, ')'), 4326)
                          ) as distance,
                          s.address as address,
                          s.phone as phone,
