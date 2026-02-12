@@ -95,12 +95,21 @@ INSERT INTO shops (
     AS new
 ON DUPLICATE KEY UPDATE
                      shop_name = new.shop_name,
+                     phone = new.phone,
                      address = new.address,
                      district = new.district,
                      location = new.location,
+                     description = new.description,
                      average_rating = new.average_rating,
                      min_price = new.min_price,
                      max_price = new.max_price,
+                     pickup_time_guide = new.pickup_time_guide,
+                     day_order_guide = new.day_order_guide,
+                     parking_guide = new.parking_guide,
+                     payment_notice = new.payment_notice,
+                     precaution_notice = new.precaution_notice,
+                     prepayment = new.prepayment,
+                     chat_nickname = new.chat_nickname,
                      status = new.status,
                      verification_status = new.verification_status;
 

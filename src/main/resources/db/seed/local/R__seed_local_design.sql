@@ -70,10 +70,12 @@ INSERT INTO design_gallery (
       (18, 3, 7, '순위밖_오래된케이크', 40000, 'https://cdn.picknwhip.com/test/old.jpg',   NULL, '1달 전 주문이라 집계 제외', NULL, NULL, NULL)
     AS new
 ON DUPLICATE KEY UPDATE
-                     design_name  = new.design_name,
-                     base_price   = new.base_price,
-                     image_url    = new.image_url,
-                     lettering_text          = new.lettering_text,
+                     design_name         = new.design_name,
+                     base_price          = new.base_price,
+                     image_url           = new.image_url,
+                     allergy_info        = new.allergy_info,
+                     description         = new.description,
+                     lettering_text      = new.lettering_text,
                      lettering_line_count    = new.lettering_line_count,
                      lettering_alignment     = new.lettering_alignment;
 
