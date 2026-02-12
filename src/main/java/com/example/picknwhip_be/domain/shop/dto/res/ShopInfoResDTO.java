@@ -40,8 +40,8 @@ public class ShopInfoResDTO {
   @Builder
   public static class PickupInfoDTO {
     private String operationHours;
-    private String pickupNotice;
-    private String sameDayOrder;
+    private int pickupNotice;
+    private boolean sameDayOrder;
     private String parkingInfo;
   }
 
