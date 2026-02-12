@@ -144,6 +144,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
    */
   @Override
   public List<Review> findBestHelpfulReviews(int limit) {
+    // 1. 조건에 맞는 Review ID 조회 (커버링 인덱스)
     List<Long> ids =
         queryFactory
             .select(review.id)
@@ -154,7 +155,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
             .where(
                 review.deletedAt.isNull(),
                 review.agreement.isTrue(),
-                order.designGallery.isNotNull())
+                order.designGallery.isNotNull()) // 이대로 주문하기(도안 존재)
             .groupBy(review.id)
             .orderBy(reviewLike.count().desc(), review.id.desc())
             .limit(limit)
@@ -164,14 +165,18 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
       return List.of();
     }
 
+    // 2. Fetch Join (N+1 방지)
+    // ShopCakeSize를 join해야 getShopCakeSize().getSizeName()
     List<Review> reviews =
         queryFactory
             .selectFrom(review)
             .join(review.order, order)
             .fetchJoin()
-            .join(review.user, user)
+            .join(order.shopCakeSize)
             .fetchJoin()
             .join(order.designGallery, designGallery)
+            .fetchJoin()
+            .join(review.user, user)
             .fetchJoin()
             .where(review.id.in(ids))
             .fetch();

@@ -20,7 +20,39 @@ spring:
   flyway:
     enabled: false
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: test-client-id
+            client-secret: test-client-secret
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+            scope: account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+jwt:
+  secret: ${JWT_SECRET_KEY:testsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkeytestsecretkey}
+  access-token-validity: 3600000
+
 cloud:
   aws:
+    region: ap-northeast-2
     s3:
       bucket: test-bucket
+
+kakao:
+  admin-key: test-admin-key
+
+springdoc:
+  server-url: http://localhost:8080
+  swagger-ui:
+    enabled: false
