@@ -70,7 +70,7 @@ INSERT INTO shops (
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.5, 30000, 80000,
        'ACTIVE', 'VERIFIED', '홍대 근처 감성 케이크샵입니다.',
-       '주문 후 최소 3일 소요', '재고 케이크 한정 당일 예약 가능', '매장 앞 공영주차장 이용 가능',
+       3, 0, '매장 앞 공영주차장 이용 가능',
        '온라인 결제 시 주문 확정 후 3일 이내 취소 가능',
        '주문 후 변경은 픽업 2일 전까지 가능합니다.\n생과일 케이크는 당일 소비를 권장합니다.\n알러지가 있으신 경우 주문 시 꼭 알려주세요.',
        20000,
@@ -80,7 +80,7 @@ INSERT INTO shops (
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.8, 45000, 90000,
        'ACTIVE', 'VERIFIED', '강남역 최고의 케이크 맛집',
-       '주문 후 최소 2일 소요', NULL, '인근 유료 주차장 이용',
+       2, 1, '인근 유료 주차장 이용',
        '카드 결제만 가능합니다.',
        '픽업 당일 환불 불가',
        30000,
@@ -90,7 +90,7 @@ INSERT INTO shops (
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.8, 15000, 50000,
        'ACTIVE', 'VERIFIED', '인기 랭킹 테스트를 위한 매장입니다.',
-       NULL, NULL, NULL, NULL, NULL, NULL,
+       0, 0, NULL, NULL, NULL, NULL,
        '랭킹샵', NOW(6))
     AS new
 ON DUPLICATE KEY UPDATE
