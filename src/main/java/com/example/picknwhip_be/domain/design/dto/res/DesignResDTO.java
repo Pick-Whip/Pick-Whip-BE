@@ -18,6 +18,7 @@ public class DesignResDTO {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class DesignPreviewDTO {
+    private Long designId;
     private String cakeName;
     private int price;
     private List<String> keywords;
