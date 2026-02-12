@@ -42,12 +42,6 @@ public class DesignController {
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
-  @GetMapping("/{userId}")
-  public DesignResDTO.GetDesignListDTO getDesignListByUserId(@PathVariable Long userId) {
-
-    return null;
-  }
-
   @Operation(
       summary = "디자인 갤러리 목록 조회 (홈)",
       description =
