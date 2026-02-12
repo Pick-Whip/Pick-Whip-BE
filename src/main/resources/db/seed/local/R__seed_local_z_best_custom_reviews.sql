@@ -301,28 +301,45 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO order_items (
     id, order_id, custom_option_id, option_category, option_name, unit_price, color_rgb_code, position_x, position_y
 ) VALUES
-      -- 주문 37 (로맨틱 플라워): 바닐라 + 생크림 + 딸기 + 금박 + 핑크 아이싱
-      (37001, 37, 1, 'SHEET',   '바닐라 시트', 0,    NULL,       NULL, NULL),
+      -- 주문 37 (로맨틱 플라워): 1호 + 원형 + 바닐라 + 생크림 + 딸기 + 금박 + 핑크 아이싱 (#FFB6C1)
+      (37000, 37, 9, 'SHAPE',   '원형',         0,    NULL,       NULL, NULL),
+      (37001, 37, 1, 'SHEET',   '바닐라 시트',  0,    '#F5F5DC',  NULL, NULL),
       (37002, 37, 3, 'CREAM',   '생크림',       0,    '#FFFFFF',  NULL, NULL),
       (37003, 37, 5, 'TOPPING', '딸기',         3000, NULL,       NULL, NULL),
       (37004, 37, 7, 'TOPPING', '금박',         8000, NULL,       NULL, NULL),
       (37005, 37, 8, 'ICING',   '핑크 아이싱',  2000, '#FFB6C1',  NULL, NULL),
-      -- 주문 38 (초코 드림): 초코 시트 + 초코 크림 + 마카롱
-      (38001, 38, 2, 'SHEET',   '초코 시트',    1000, NULL,       NULL, NULL),
+
+      -- 주문 38 (초코 드림): 1호 + 원형 + 초코 시트 + 초코 크림 + 마카롱 + 초코 아이싱 (#8B4513)
+      (38000, 38, 9, 'SHAPE',   '원형',         0,    NULL,       NULL, NULL),
+      (38001, 38, 2, 'SHEET',   '초코 시트',    1000, '#8B4513',  NULL, NULL),
       (38002, 38, 4, 'CREAM',   '초코 크림',    1500, '#8B4513',  NULL, NULL),
       (38003, 38, 6, 'TOPPING', '마카롱',       5000, NULL,       NULL, NULL),
-      -- 주문 39 (아이돌 포토 하트): 바닐라 + 생크림 + 딸기
-      (39001, 39, 1, 'SHEET',   '바닐라 시트',  0,    NULL,       NULL, NULL),
+      (38004, 38, 8, 'ICING',   '초코 아이싱',  2000, '#5D4037',  NULL, NULL), -- [추가] 아이싱
+
+      -- 주문 39 (아이돌 포토 하트): 1호 + 하트 + 바닐라 + 생크림 + 딸기 + 화이트 아이싱 (#FFFFFF)
+      (39000, 39, 10,'SHAPE',   '하트',         2000, NULL,       NULL, NULL),
+      (39001, 39, 1, 'SHEET',   '바닐라 시트',  0,    '#F5F5DC',  NULL, NULL),
       (39002, 39, 3, 'CREAM',   '생크림',       0,    '#FFFFFF',  NULL, NULL),
       (39003, 39, 5, 'TOPPING', '딸기',         3000, NULL,       NULL, NULL),
-      -- 주문 40 (심플 플라워): 바닐라 + 생크림
-      (40001, 40, 1, 'SHEET',   '바닐라 시트',  0,    NULL,       NULL, NULL),
+      (39004, 39, 8, 'ICING',   '화이트 아이싱', 0,    '#FFFFFF',  NULL, NULL), -- [추가] 아이싱
+
+      -- 주문 40 (심플 플라워): 1호 + 원형 + 바닐라 + 생크림 + 진주 스프링클 + 연노랑 아이싱 (#FFFFE0)
+      (40000, 40, 9, 'SHAPE',   '원형',         0,    NULL,       NULL, NULL),
+      (40001, 40, 1, 'SHEET',   '바닐라 시트',  0,    '#F5F5DC',  NULL, NULL),
       (40002, 40, 3, 'CREAM',   '생크림',       0,    '#FFFFFF',  NULL, NULL),
-      -- 주문 41 (미니멀 레터링): 초코 시트 + 생크림
-      (41001, 41, 2, 'SHEET',   '초코 시트',    1000, NULL,       NULL, NULL),
-      (41002, 41, 3, 'CREAM',   '생크림',       0,    '#FFFFFF',  NULL, NULL)
+      (40003, 40, 7, 'TOPPING', '진주 스프링클', 1000, NULL,       NULL, NULL), -- [추가] 데코
+      (40004, 40, 8, 'ICING',   '연노랑 아이싱', 2000, '#FFFFE0',  NULL, NULL), -- [추가] 아이싱
+
+      -- 주문 41 (미니멀 레터링): 1호 + 원형 + 초코 시트 + 생크림 + 하트 스프링클 + 화이트 아이싱 (#FFFFFF)
+      (41000, 41, 9, 'SHAPE',   '원형',         0,    NULL,       NULL, NULL),
+      (41001, 41, 2, 'SHEET',   '초코 시트',    1000, '#8B4513',  NULL, NULL),
+      (41002, 41, 3, 'CREAM',   '생크림',       0,    '#FFFFFF',  NULL, NULL),
+      (41003, 41, 7, 'TOPPING', '하트 스프링클', 1000, NULL,       NULL, NULL), -- [추가] 데코
+      (41004, 41, 8, 'ICING',   '화이트 아이싱', 0,    '#FFFFFF',  NULL, NULL)  -- [추가] 아이싱
     AS new
-ON DUPLICATE KEY UPDATE unit_price = new.unit_price;
+ON DUPLICATE KEY UPDATE
+                     unit_price = new.unit_price,
+                     color_rgb_code = new.color_rgb_code;
 
 
 -- =====================================================
