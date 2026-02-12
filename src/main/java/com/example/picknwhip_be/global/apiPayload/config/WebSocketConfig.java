@@ -3,6 +3,7 @@ package com.example.picknwhip_be.global.apiPayload.config;
 import com.example.picknwhip_be.global.apiPayload.annotation.resolver.ExtractPayloadMessageArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -16,10 +17,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   private final ExtractPayloadMessageArgumentResolver extractPayloadMessageArgumentResolver;
   private final ChatPreHandler chatPreHandler;
 
+  @Value("${app.frontend-url}")
+  private String frontendUrl;
+
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    // TODO: 프론트엔드 애플리케이션 실제 도메인만 허용하도록 설정하기
-    registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+    registry
+        .addEndpoint("/ws")
+        .setAllowedOriginPatterns(frontendUrl, "http://localhost:3000", "http://localhost:5173")
+        .withSockJS();
   }
 
   @Override
