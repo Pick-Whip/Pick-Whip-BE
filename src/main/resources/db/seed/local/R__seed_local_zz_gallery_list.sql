@@ -11,7 +11,7 @@ UPDATE shops
 SET
     address        = '서울 마포구 양화로 160',
     district       = '마포구',
-    location       = ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
+    location       = ST_GeomFromText('POINT(126.9241 37.5565)', 4326),
     average_rating = 4.5,
     min_price      = 30000,
     max_price      = 80000,
@@ -23,13 +23,12 @@ UPDATE shops
 SET
     address        = '서울 강남구 강남대로 396',
     district       = '강남구',
-    location       = ST_GeomFromText('POINT(37.4979 127.0276)', 4326),
+    location       = ST_GeomFromText('POINT(127.0276 37.4979)', 4326),
     average_rating = 4.8,
     min_price      = 45000,
     max_price      = 90000,
     status         = 'ACTIVE'
 WHERE shop_id = 2;
-
 
 -- 2. [shop 2 케이크 사이즈 FK 보완]
 -- design_gallery id 9~12 는 shop_cake_size_id=5 를 참조하므로 size_id=5 가 존재해야 함

@@ -2,7 +2,7 @@
 -- Best Custom Reviews Seed Data (Repeatable)
 -- Goal   : Test 'Best Custom Reviews' API
 -- shop_id=1 (R__seed_local.sql 에서 이미 생성됨)
--- 리뷰어: user 7, 8 (R__seed_local.sql 에서 이미 생성됨)
+-- 리뷰어: user 4, 5, 6, 7, 8 (R__seed_local.sql 에서 이미 생성됨)
 -- 주문 ID: 37~41
 -- 리뷰 ID: 8~12
 -- ======================================================

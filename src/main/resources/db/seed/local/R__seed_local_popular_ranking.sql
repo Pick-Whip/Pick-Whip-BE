@@ -3,7 +3,7 @@
 -- Goal   : Test 'Get Popular Cakes Top 5' API
 -- Context: 최근 14일 내 주문량 순위 (판매량 집계 테스트)
 -- Shop: 3 (랭킹 테스트용), Design: 13~18
--- Orders: 15~29
+-- Orders: 15~31
 -- ======================================================
 
 -- 1. 랭킹 테스트용 주문 데이터 (Source Data for Scheduler)

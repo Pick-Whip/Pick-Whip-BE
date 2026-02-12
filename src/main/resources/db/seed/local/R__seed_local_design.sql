@@ -6,8 +6,8 @@
 
 /* ------------------------------------------------------
    1) 커스텀 옵션 (custom_options)
-   - id 1~6  : shop 1 옵션
-   - id 7~12 : shop 2 옵션
+   - id 1~11  : shop 1 옵션
+   - id 12~15 : shop 2 옵션
    ------------------------------------------------------ */
 INSERT INTO custom_options (id, shop_id, category, option_name, additional_price, color_rgb_code)
 VALUES
@@ -39,7 +39,7 @@ ON DUPLICATE KEY UPDATE
    2) 디자인 갤러리 (design_gallery)
    - id 1~8  : shop 1 디자인
    - id 9~12 : shop 2 디자인
-   - id 13~17: shop 3 디자인 (랭킹 테스트용, 1위~5위 + 순위밖)
+   - id 13~18: shop 3 디자인 (랭킹 테스트용, 1위~5위 + 순위밖)
    ------------------------------------------------------ */
 INSERT INTO design_gallery (
     id, shop_id, shop_cake_size_id,
@@ -108,7 +108,7 @@ INSERT INTO design_gallery_keywords (design_gallery_id, keyword) VALUES
 
 /* ------------------------------------------------------
    4) 디자인 옵션 매핑 (design_options)
-   - shop 1 디자인 1~4 옵션 연결
+   - shop 1 디자인 1~6 옵션 연결
    ------------------------------------------------------ */
 DELETE FROM design_options WHERE design_id BETWEEN 1 AND 12;
 

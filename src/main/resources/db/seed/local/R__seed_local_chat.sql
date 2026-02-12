@@ -175,33 +175,33 @@ UPDATE chat_rooms SET last_message_id = 25, updated_at = NOW(6) WHERE chat_room_
 /* ------------------------------------------------------
    테스트 시나리오 정리:
 
--- 채팅방 생성/조회 API (POST /api/chats)
+   -- 채팅방 생성/조회 API (POST /api/chats)
       - user 1이 shop 1, 2와 채팅방 생성/조회 가능
       - 이미 존재하는 채팅방 조회 가능
 
--- 채팅방 목록 조회 API (GET /api/chats)
+   -- 채팅방 목록 조회 API (GET /api/chats)
       - user 1: 채팅방 1, 2 조회됨 (총 2개)
       - user 2 (shop 1 사장): 채팅방 1, 3 조회됨 (총 2개)
       - user 3 (shop 2 사장): 채팅방 2 조회됨 (총 1개)
       - keyword 검색: "마포" -> 채팅방 1, "강남" -> 채팅방 2
 
--- 메시지 내역 조회 API (GET /api/chats/{roomId}/messages)
+   -- 메시지 내역 조회 API (GET /api/chats/{roomId}/messages)
       - 채팅방 1: 총 14개 메시지 (cursor 기반 페이징 테스트 가능)
       - 채팅방 2: 총 7개 메시지
       - 채팅방 3: 총 4개 메시지
       - 상대방 메시지 읽음 처리 테스트 가능
 
--- 메시지 전송 (WebSocket - MessageMapping)
+  -- 메시지 전송 (WebSocket - MessageMapping)
       - user 1 -> shop 1, 2에 메시지 전송 가능
       - 실시간 읽지않은 메시지 카운트 업데이트
 
--- 이미지 업로드 URL 발급 API (POST /api/chats/{roomId}/images)
+  -- 이미지 업로드 URL 발급 API (POST /api/chats/{roomId}/images)
       - 채팅방 참여자만 Presigned URL 발급 가능
       - 권한 체크 테스트 가능
 
--- 통계 데이터:
+   -- 통계 데이터:
       - user 1의 안읽은 메시지: 2개 (채팅방 1에서 메시지 13, 14)
-      - user 2의 안읽은 메시지: 1개 (채팅방 2에서 메시지 21) + 1개 (채팅방 3에서 메시지 25)
-      - user 3의 안읽은 메시지: 0개
-      - user 4의 안읽은 메시지: 0개
+      - user 2의 안읽은 메시지: 0개 (채팅방 1, 3의 미읽은 메시지는 모두 본인이 발송)
+      - user 3의 안읽은 메시지: 1개 (채팅방 2에서 메시지 21)
+      - user 4의 안읽은 메시지: 1개 (채팅방 3에서 메시지 25)
    ------------------------------------------------------ */
