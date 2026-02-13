@@ -9,8 +9,6 @@ import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.repository.UserWithdrawalRepository;
 import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepository;
-import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
-import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -202,7 +200,6 @@ public class UserCommandServiceImpl implements UserCommandService {
       log.info("카카오 서버 로그아웃 완료. userId: {}", userId);
     } catch (RestClientException e) {
       log.error("카카오 로그아웃 API 실패: {}", e.getMessage());
-      throw new GeneralException(GeneralErrorCode.INTERNAL_SERVER_ERROR);
     }
   }
 }

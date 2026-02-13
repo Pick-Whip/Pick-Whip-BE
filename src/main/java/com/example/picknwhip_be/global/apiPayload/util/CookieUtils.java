@@ -7,10 +7,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Optional;
+import org.springframework.security.jackson2.SecurityJackson2Modules;
+import org.springframework.security.oauth2.client.jackson2.OAuth2ClientJackson2Module;
 
 public class CookieUtils {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
+
+  static {
+    objectMapper.registerModules(
+        SecurityJackson2Modules.getModules(CookieUtils.class.getClassLoader()));
+    objectMapper.registerModule(new OAuth2ClientJackson2Module());
+  }
 
   public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
     Cookie[] cookies = request.getCookies();
