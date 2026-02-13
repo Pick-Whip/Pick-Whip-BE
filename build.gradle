@@ -63,6 +63,9 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
 
+	// .env 파일 로드
+	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
     // QueryDSL : OpenFeign
     implementation "io.github.openfeign.querydsl:querydsl-jpa:7.0"
     implementation "io.github.openfeign.querydsl:querydsl-core:7.0"
