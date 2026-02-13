@@ -1,13 +1,16 @@
 package com.example.picknwhip_be.global.apiPayload.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Optional;
-import org.springframework.util.SerializationUtils;
 
 public class CookieUtils {
+
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
     Cookie[] cookies = request.getCookies();
@@ -26,6 +29,7 @@ public class CookieUtils {
     Cookie cookie = new Cookie(name, value);
     cookie.setPath("/");
     cookie.setHttpOnly(true);
+    cookie.setSecure(true);
     cookie.setMaxAge(maxAge);
     response.addCookie(cookie);
   }
@@ -46,11 +50,20 @@ public class CookieUtils {
   }
 
   public static String serialize(Object object) {
-    return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(object));
+    try {
+      byte[] jsonBytes = objectMapper.writeValueAsBytes(object);
+      return Base64.getUrlEncoder().encodeToString(jsonBytes);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("쿠키 직렬화에 실패했습니다.", e);
+    }
   }
 
   public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-    return cls.cast(
-        SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+    try {
+      byte[] decoded = Base64.getUrlDecoder().decode(cookie.getValue());
+      return objectMapper.readValue(decoded, cls);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("쿠키 역직렬화에 실패했습니다.", e);
+    }
   }
 }
