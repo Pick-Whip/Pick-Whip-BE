@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -20,6 +21,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
   private final UserRepository userRepository;
   private final JwtTokenProvider jwtTokenProvider;
+
+  @Value("${app.frontend-url}")
+  private String frontendUrl;
 
   @Override
   public void onAuthenticationSuccess(
@@ -41,16 +45,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     // 리다이렉트 경로 설정 및 토큰 전달
     String targetUrl;
     if (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null) {
-      // 추가 정보 입력이 필요한 경우 TODO: 프론트엔드에서 리다이렉트 주소 받기
       targetUrl =
-          UriComponentsBuilder.fromUriString("http://localhost:3000/signup/extra")
+          UriComponentsBuilder.fromUriString(frontendUrl + "/signup/extra")
               .queryParam("accessToken", accessToken)
               .build()
               .toUriString();
     } else {
       // 이미 가입된 유저인 경우 홈으로 이동
       targetUrl =
-          UriComponentsBuilder.fromUriString("http://localhost:3000/")
+          UriComponentsBuilder.fromUriString(frontendUrl + "/")
               .queryParam("accessToken", accessToken)
               .build()
               .toUriString();
