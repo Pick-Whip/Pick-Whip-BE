@@ -54,7 +54,8 @@ public class ShopConverter {
   }
 
   public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
-    Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
+
+    Double distanceKm = (info.getDistanceKm() != null) ? info.getDistanceKm() : 0.0;
 
     return ShopDetailResDTO.builder()
         .shopId(info.getShopId())
@@ -62,7 +63,7 @@ public class ShopConverter {
         .shopImageUrl(info.getShopImageUrl())
         .averageRating(info.getAverageRating())
         .reviewCount(info.getReviewCount())
-        .distance(distanceInKm)
+        .distanceKm(distanceKm)
         .address(info.getAddress())
         .lat(info.getLat())
         .lon(info.getLon())
