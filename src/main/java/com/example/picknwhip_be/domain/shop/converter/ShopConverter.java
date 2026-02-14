@@ -53,26 +53,24 @@ public class ShopConverter {
         .build();
   }
 
-    public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
+  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
 
-        Double distanceKm =
-                (info.getDistanceKm() != null) ? info.getDistanceKm() : 0.0;
+    Double distanceKm = (info.getDistanceKm() != null) ? info.getDistanceKm() : 0.0;
 
-        return ShopDetailResDTO.builder()
-                .shopId(info.getShopId())
-                .shopName(info.getShopName())
-                .shopImageUrl(info.getShopImageUrl())
-                .averageRating(info.getAverageRating())
-                .reviewCount(info.getReviewCount())
-                .distanceKm(distanceKm)
-                .address(info.getAddress())
-                .lat(info.getLat())
-                .lon(info.getLon())
-                .phone(info.getPhone())
-                .keywords(parseTags(info.getKeywords()))
-                .build();
-    }
-
+    return ShopDetailResDTO.builder()
+        .shopId(info.getShopId())
+        .shopName(info.getShopName())
+        .shopImageUrl(info.getShopImageUrl())
+        .averageRating(info.getAverageRating())
+        .reviewCount(info.getReviewCount())
+        .distanceKm(distanceKm)
+        .address(info.getAddress())
+        .lat(info.getLat())
+        .lon(info.getLon())
+        .phone(info.getPhone())
+        .keywords(parseTags(info.getKeywords()))
+        .build();
+  }
 
   public ShopResDTO.ShopInMapListDTO toShopInMapListDTO(List<Shop> shop, Set<Long> pickedShopIds) {
     return ShopResDTO.ShopInMapListDTO.builder()
