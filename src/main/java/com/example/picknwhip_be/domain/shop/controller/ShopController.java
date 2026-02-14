@@ -50,7 +50,7 @@ public class ShopController {
       @RequestParam double lat,
       @RequestParam double lon,
       @RequestParam(defaultValue = "1000") double radius) {
-    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getNearbyShops(lat, lon, radius));
+      return ApiResponse.of(GeneralSuccessCode.OK, shopService.getNearbyShops(lat, lon, radius));
   }
 
   @Operation(

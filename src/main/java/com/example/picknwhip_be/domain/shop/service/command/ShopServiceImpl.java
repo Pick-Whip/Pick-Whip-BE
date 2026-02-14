@@ -44,24 +44,31 @@ public class ShopServiceImpl implements ShopService {
     }
 
     GeoUtils.BoundingBox box = GeoUtils.normalize(GeoUtils.boundingBox(lat, lon, radius));
+      System.out.println(
+              "BOX minLat=" + box.minLat()
+                      + ", maxLat=" + box.maxLat()
+                      + ", minLon=" + box.minLon()
+                      + ", maxLon=" + box.maxLon()
+      );
+      try {
+          return shopRepository
+                  .findNearbyShops(
+                          lon,
+                          lat,
+                          box.minLon(),
+                          box.minLat(),
+                          box.maxLat(),
+                          box.maxLon(),
+                          radius,
+                          DEFAULT_LIMIT
+                  )
+                  .stream()
+                  .map(shopConverter::toPreviewDto)
+                  .toList();
 
-    try {
-      return shopRepository
-          .findNearbyShops(
-              lat,
-              lon,
-              box.minLat(),
-              box.maxLat(),
-              box.minLon(),
-              box.maxLon(),
-              radius,
-              DEFAULT_LIMIT)
-          .stream()
-          .map(shopConverter::toPreviewDto)
-          .toList();
-    } catch (Exception e) {
-      throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
-    }
+      } catch (Exception e) {
+          throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
+      }
   }
 
   @Override
