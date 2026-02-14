@@ -16,9 +16,11 @@ import com.example.picknwhip_be.global.apiPayload.util.GeoUtils;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -44,21 +46,27 @@ public class ShopServiceImpl implements ShopService {
     }
 
     GeoUtils.BoundingBox box = GeoUtils.normalize(GeoUtils.boundingBox(lat, lon, radius));
-
+    log.debug(
+        "BOX minLat={}, maxLat={}, minLon={}, maxLon={}",
+        box.minLat(),
+        box.maxLat(),
+        box.minLon(),
+        box.maxLon());
     try {
       return shopRepository
           .findNearbyShops(
-              lat,
               lon,
+              lat,
+              box.minLon(),
               box.minLat(),
               box.maxLat(),
-              box.minLon(),
               box.maxLon(),
               radius,
               DEFAULT_LIMIT)
           .stream()
           .map(shopConverter::toPreviewDto)
           .toList();
+
     } catch (Exception e) {
       throw new ShopException(ShopErrorCode.SHOP_NEARBY_QUERY_FAILED);
     }

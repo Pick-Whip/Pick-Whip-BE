@@ -12,7 +12,7 @@ public class ShopDetailResDTO {
   private String shopImageUrl;
   private Double averageRating;
   private Integer reviewCount;
-  private Double distance;
+  private Double distanceKm;
   private String address;
   private String phone;
   private List<String> keywords;
