@@ -2,7 +2,8 @@ app:
   frontend-url: ${FRONTEND_URL:https://pick-whip.vercel.app}
 
 spring:
-  forward-headers-strategy: framework
+  server:
+    forward-headers-strategy: framework
   security:
     oauth2:
       client:
@@ -54,7 +55,6 @@ jwt:
   access-token-validity: 3600000 # 1시간 (단위: ms)
 
 springdoc:
-  server-url: ${BASE_URL:http://localhost:8080}
   api-docs:
     path: /v3/api-docs
   swagger-ui:
