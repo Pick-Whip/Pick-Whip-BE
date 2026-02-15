@@ -44,6 +44,8 @@ public class ShopResDTO {
     private String shopImageUrl;
     private Double averageRating;
     private String address;
+    private Double longitude;
+    private Double latitude;
 
     private Integer minPrice;
     private Integer maxPrice;
@@ -58,6 +60,8 @@ public class ShopResDTO {
           .shopImageUrl(shop.getShopImageUrl())
           .averageRating(shop.getAverageRating() != null ? shop.getAverageRating() : 0.0)
           .address(shop.getAddress())
+          .longitude(shop.getLocation().getX())
+          .latitude(shop.getLocation().getY())
           .minPrice(shop.getMinPrice())
           .maxPrice(shop.getMaxPrice())
           // ShopKeywordMapping 엔티티에서 태그 이름만 추출
