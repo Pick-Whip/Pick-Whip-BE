@@ -2,8 +2,6 @@ app:
   frontend-url: ${FRONTEND_URL:https://pick-whip.vercel.app}
 
 spring:
-  server:
-    forward-headers-strategy: framework
   security:
     oauth2:
       client:
