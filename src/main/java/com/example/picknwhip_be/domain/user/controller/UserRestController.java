@@ -8,9 +8,13 @@ import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
 import com.example.picknwhip_be.domain.user.service.query.UserQueryService;
 import com.example.picknwhip_be.global.apiPayload.ApiResponse;
 import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
+import com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
+import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+import com.example.picknwhip_be.global.apiPayload.util.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -25,6 +29,25 @@ public class UserRestController {
 
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
+
+  @Operation(
+      summary = "리프레시토큰 발급 API",
+      description = "액세스 토큰 만료 시 호출합니다. 쿠키 또는 body의 refreshToken을 사용합니다.")
+  @PostMapping("/refresh")
+  public ApiResponse<UserResDTO.TokenResponseDTO> refresh(
+      @RequestBody(required = false) UserReqDTO.RefreshTokenReqDTO dto,
+      HttpServletRequest request) {
+    String token =
+        CookieUtils.getCookie(request, "refreshToken")
+            .map(Cookie::getValue)
+            .orElseGet(
+                () ->
+                    (dto != null && dto.getRefreshToken() != null) ? dto.getRefreshToken() : null);
+    if (token == null || token.isBlank()) {
+      throw new GeneralException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+    }
+    return ApiResponse.of(GeneralSuccessCode.OK, userCommandService.refreshAccessToken(token));
+  }
 
   @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호, 생일을 입력받아 업데이트합니다.")
   @PostMapping("/extra/info")

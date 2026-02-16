@@ -24,6 +24,9 @@ public class JwtTokenProvider {
   @Value("${jwt.access-token-validity}")
   private long tokenValidityInMilliseconds;
 
+  @Value("${jwt.refresh-token-validity:1209600000}")
+  private long refreshTokenValidityInMilliseconds; // 14일 기본값
+
   private SecretKey key;
 
   @PostConstruct
@@ -70,6 +73,22 @@ public class JwtTokenProvider {
     } catch (IllegalArgumentException e) {
       throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
           com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
+    }
+  }
+
+  public String createRefreshToken(Long userId) {
+    Claims claims = Jwts.claims().subject(String.valueOf(userId)).build();
+    Date now = new Date();
+    Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+
+    return Jwts.builder().claims(claims).issuedAt(now).expiration(validity).signWith(key).compact();
+  }
+
+  public Claims getClaimsFromExpiredToken(String token) {
+    try {
+      return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
     }
   }
 }
