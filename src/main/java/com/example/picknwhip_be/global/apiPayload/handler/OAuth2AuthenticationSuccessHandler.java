@@ -4,7 +4,6 @@ import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
-import com.example.picknwhip_be.global.apiPayload.util.CookieUtils;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +50,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     userCommandService.saveOrUpdateRefreshToken(user.getUserId(), refreshTokenValue);
 
     int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
-    CookieUtils.addRefreshTokenCookie(response, "refreshToken", refreshTokenValue, cookieMaxAge);
+
+    org.springframework.http.ResponseCookie cookie =
+        org.springframework.http.ResponseCookie.from("refreshToken", refreshTokenValue)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(cookieMaxAge)
+            .sameSite("Lax")
+            .build();
+
+    response.addHeader("Set-Cookie", cookie.toString());
 
     String targetUrl;
     if (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null) {

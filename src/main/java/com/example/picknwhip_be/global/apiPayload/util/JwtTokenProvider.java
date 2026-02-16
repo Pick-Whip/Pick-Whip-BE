@@ -92,18 +92,4 @@ public class JwtTokenProvider {
 
     return Jwts.builder().claims(claims).issuedAt(now).expiration(validity).signWith(key).compact();
   }
-
-  public Claims getClaimsFromExpiredToken(String token) {
-    try {
-      return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-    } catch (ExpiredJwtException e) {
-      return e.getClaims();
-    } catch (io.jsonwebtoken.security.SecurityException
-        | MalformedJwtException
-        | UnsupportedJwtException
-        | IllegalArgumentException e) {
-      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
-          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
-    }
-  }
 }
