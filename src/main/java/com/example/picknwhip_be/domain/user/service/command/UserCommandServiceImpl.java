@@ -15,6 +15,7 @@ import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepos
 import com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,9 @@ public class UserCommandServiceImpl implements UserCommandService {
 
   @Value("${cloud.aws.region:ap-northeast-2}")
   private String region;
+
+  @Value("${jwt.refresh-token-validity:1209600000}")
+  private long refreshTokenValidityInMilliseconds; // 14일 기본값
 
   @Override
   public User joinOrCreateUser(
@@ -216,6 +220,28 @@ public class UserCommandServiceImpl implements UserCommandService {
   }
 
   @Override
+  public void saveOrUpdateRefreshToken(Long userId, String tokenValue) {
+    LocalDateTime expiryDate =
+        LocalDateTime.now().plus(Duration.ofMillis(refreshTokenValidityInMilliseconds));
+    RefreshToken refreshToken =
+        refreshTokenRepository
+            .findByUserId(userId)
+            .map(
+                entity -> {
+                  entity.updateToken(tokenValue, expiryDate);
+                  return entity;
+                })
+            .orElseGet(
+                () ->
+                    RefreshToken.builder()
+                        .token(tokenValue)
+                        .userId(userId)
+                        .expiryDate(expiryDate)
+                        .build());
+    refreshTokenRepository.save(refreshToken);
+  }
+
+  @Override
   @Transactional
   public UserResDTO.TokenResponseDTO refreshAccessToken(String refreshTokenRequest) {
     RefreshToken refreshToken =
@@ -232,7 +258,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     String newAccessToken = jwtTokenProvider.createToken(refreshToken.getUserId());
 
     String newRefreshTokenValue = jwtTokenProvider.createRefreshToken(refreshToken.getUserId());
-    refreshToken.updateToken(newRefreshTokenValue, LocalDateTime.now().plusDays(14));
+    LocalDateTime newExpiryDate =
+        LocalDateTime.now().plus(Duration.ofMillis(refreshTokenValidityInMilliseconds));
+    refreshToken.updateToken(newRefreshTokenValue, newExpiryDate);
 
     return UserResDTO.TokenResponseDTO.builder()
         .accessToken(newAccessToken)

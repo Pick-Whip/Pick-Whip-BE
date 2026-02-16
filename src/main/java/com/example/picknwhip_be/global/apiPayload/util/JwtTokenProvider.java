@@ -34,9 +34,12 @@ public class JwtTokenProvider {
     this.key = Keys.hmacShaKeyFor(secretKeyPlain.getBytes(StandardCharsets.UTF_8));
   }
 
-  // 토큰 생성
+  private static final String TOKEN_TYPE_ACCESS = "access";
+  private static final String TOKEN_TYPE_REFRESH = "refresh";
+
+  // 액세스 토큰 생성
   public String createToken(Long userId) {
-    Claims claims = Jwts.claims().subject(userId.toString()).build();
+    Claims claims = Jwts.claims().subject(userId.toString()).add("type", TOKEN_TYPE_ACCESS).build();
     Date now = new Date();
     Date validity = new Date(now.getTime() + tokenValidityInMilliseconds);
 
@@ -59,7 +62,11 @@ public class JwtTokenProvider {
   // 토큰 유효성 및 만료 기간 검증
   public boolean validateToken(String token) {
     try {
-      Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+      Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+      if (!TOKEN_TYPE_ACCESS.equals(claims.get("type", String.class))) {
+        throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+            com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
+      }
       return true;
     } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
       throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
@@ -76,8 +83,10 @@ public class JwtTokenProvider {
     }
   }
 
+  // 리프레시 토큰 생성
   public String createRefreshToken(Long userId) {
-    Claims claims = Jwts.claims().subject(String.valueOf(userId)).build();
+    Claims claims =
+        Jwts.claims().subject(String.valueOf(userId)).add("type", TOKEN_TYPE_REFRESH).build();
     Date now = new Date();
     Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
 
@@ -89,6 +98,12 @@ public class JwtTokenProvider {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     } catch (ExpiredJwtException e) {
       return e.getClaims();
+    } catch (io.jsonwebtoken.security.SecurityException
+        | MalformedJwtException
+        | UnsupportedJwtException
+        | IllegalArgumentException e) {
+      throw new com.example.picknwhip_be.global.apiPayload.exception.GeneralException(
+          com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode.INVALID_TOKEN);
     }
   }
 }

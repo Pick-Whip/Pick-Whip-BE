@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.client.jackson2.OAuth2ClientJackson2Module;
 
@@ -40,6 +42,20 @@ public class CookieUtils {
     cookie.setSecure(true);
     cookie.setMaxAge(maxAge);
     response.addCookie(cookie);
+  }
+
+  /** 리프레시 토큰용 쿠키 추가. SameSite=Lax 설정으로 CSRF 취약점 방지. */
+  public static void addRefreshTokenCookie(
+      HttpServletResponse response, String name, String value, int maxAge) {
+    ResponseCookie cookie =
+        ResponseCookie.from(name, value)
+            .path("/")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Lax")
+            .maxAge(Duration.ofSeconds(maxAge))
+            .build();
+    response.addHeader("Set-Cookie", cookie.toString());
   }
 
   public static void deleteCookie(

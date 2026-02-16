@@ -17,10 +17,10 @@ public class RefreshToken extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 512)
   private String token;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private Long userId;
 
   @Column(nullable = false)

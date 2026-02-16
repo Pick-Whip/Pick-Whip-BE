@@ -16,9 +16,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User", description = "사용자 관련 API")
@@ -30,13 +32,17 @@ public class UserRestController {
   private final UserQueryService userQueryService;
   private final UserCommandService userCommandService;
 
+  @Value("${jwt.refresh-token-validity:1209600000}")
+  private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
+
   @Operation(
       summary = "리프레시토큰 발급 API",
       description = "액세스 토큰 만료 시 호출합니다. 쿠키 또는 body의 refreshToken을 사용합니다.")
   @PostMapping("/refresh")
   public ApiResponse<UserResDTO.TokenResponseDTO> refresh(
       @RequestBody(required = false) UserReqDTO.RefreshTokenReqDTO dto,
-      HttpServletRequest request) {
+      HttpServletRequest request,
+      HttpServletResponse response) {
     String token =
         CookieUtils.getCookie(request, "refreshToken")
             .map(Cookie::getValue)
@@ -46,7 +52,13 @@ public class UserRestController {
     if (token == null || token.isBlank()) {
       throw new GeneralException(AuthErrorCode.INVALID_REFRESH_TOKEN);
     }
-    return ApiResponse.of(GeneralSuccessCode.OK, userCommandService.refreshAccessToken(token));
+    UserResDTO.TokenResponseDTO result = userCommandService.refreshAccessToken(token);
+    int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
+
+    CookieUtils.addRefreshTokenCookie(
+        response, "refreshToken", result.getRefreshToken(), cookieMaxAge);
+
+    return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
 
   @Operation(summary = "신규 가입 유저 추가 정보 저장 API", description = "이름과 휴대폰 번호, 생일을 입력받아 업데이트합니다.")
@@ -82,11 +94,14 @@ public class UserRestController {
 
   @Operation(summary = "로그아웃 API", description = "서버 세션을 만료시키고 카카오 로그아웃을 수행합니다.")
   @PostMapping("/logout")
-  public ApiResponse<String> createLogout(@ExtractPayload Long userId, HttpServletRequest request) {
+  public ApiResponse<String> createLogout(
+      @ExtractPayload Long userId, HttpServletRequest request, HttpServletResponse response) {
     try {
-      // 카카오 서버 로그아웃
+      // 카카오 서버 로그아웃 + DB 리프레시 토큰 삭제
       userCommandService.logout(userId);
     } finally {
+      // 리프레시 토큰 쿠키 삭제
+      CookieUtils.deleteCookie(request, response, "refreshToken");
       // 서버 세션 무효화
       HttpSession session = request.getSession(false);
       if (session != null) {

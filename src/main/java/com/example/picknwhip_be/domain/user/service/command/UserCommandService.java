@@ -21,5 +21,7 @@ public interface UserCommandService {
 
   void logout(Long userId);
 
+  void saveOrUpdateRefreshToken(Long userId, String tokenValue);
+
   UserResDTO.TokenResponseDTO refreshAccessToken(String refreshTokenRequest);
 }
