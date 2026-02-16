@@ -3,6 +3,7 @@ package com.example.picknwhip_be.global.apiPayload.handler;
 import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
+import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,10 +21,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
   private final UserRepository userRepository;
+  private final UserCommandService userCommandService;
   private final JwtTokenProvider jwtTokenProvider;
 
   @Value("${app.frontend-url}")
   private String frontendUrl;
+
+  @Value("${jwt.refresh-token-validity:1209600000}")
+  private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
 
   @Override
   public void onAuthenticationSuccess(
@@ -39,10 +44,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .findByKakaoId(kakaoId)
             .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다. kakaoId: " + kakaoId));
 
-    // JWT 토큰 생성
     String accessToken = jwtTokenProvider.createToken(user.getUserId());
 
-    // 리다이렉트 경로 설정 및 토큰 전달
+    String refreshTokenValue = jwtTokenProvider.createRefreshToken(user.getUserId());
+    userCommandService.saveOrUpdateRefreshToken(user.getUserId(), refreshTokenValue);
+
+    int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
+
+    org.springframework.http.ResponseCookie cookie =
+        org.springframework.http.ResponseCookie.from("refreshToken", refreshTokenValue)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(cookieMaxAge)
+            .sameSite("Lax")
+            .build();
+
+    response.addHeader("Set-Cookie", cookie.toString());
+
     String targetUrl;
     if (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null) {
       targetUrl =
@@ -51,7 +70,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
               .build()
               .toUriString();
     } else {
-      // 이미 가입된 유저인 경우 홈으로 이동
       targetUrl =
           UriComponentsBuilder.fromUriString(frontendUrl + "/")
               .queryParam("accessToken", accessToken)

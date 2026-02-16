@@ -58,8 +58,9 @@ public class SecurityConfig {
                     .requestMatchers("/api/users/extra/info")
                     .authenticated()
                     .requestMatchers("/api/test/**")
-                    .permitAll() // 테스트 API 허용 추가
-
+                    .permitAll()
+                    .requestMatchers("/api/users/refresh")
+                    .permitAll()
                     // 그 외 모든 API는 인증 필요
                     .anyRequest()
                     .authenticated())

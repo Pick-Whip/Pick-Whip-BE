@@ -1,14 +1,22 @@
 package com.example.picknwhip_be.domain.user.service.command;
 
 import com.example.picknwhip_be.domain.user.dto.req.UserReqDTO;
+import com.example.picknwhip_be.domain.user.dto.res.UserResDTO;
+import com.example.picknwhip_be.domain.user.entity.RefreshToken;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.entity.UserWithdrawal;
 import com.example.picknwhip_be.domain.user.entity.WithdrawalReasonItem;
 import com.example.picknwhip_be.domain.user.exception.UserException;
 import com.example.picknwhip_be.domain.user.exception.code.UserErrorCode;
+import com.example.picknwhip_be.domain.user.repository.RefreshTokenRepository;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.repository.UserWithdrawalRepository;
 import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepository;
+import com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode;
+import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +40,8 @@ public class UserCommandServiceImpl implements UserCommandService {
   private final UserRepository userRepository;
   private final UserWithdrawalRepository userWithdrawalRepository;
   private final WithdrawalReasonItemRepository reasonItemRepository;
+  private final RefreshTokenRepository refreshTokenRepository;
+  private final JwtTokenProvider jwtTokenProvider;
   private final OAuth2AuthorizedClientService authorizedClientService;
   private final RestTemplate restTemplate = new RestTemplate();
   private static final int MAX_NICKNAME_GENERATION_ATTEMPTS = 20;
@@ -41,6 +51,9 @@ public class UserCommandServiceImpl implements UserCommandService {
 
   @Value("${cloud.aws.region:ap-northeast-2}")
   private String region;
+
+  @Value("${jwt.refresh-token-validity:1209600000}")
+  private long refreshTokenValidityInMilliseconds; // 14일 기본값
 
   @Override
   public User joinOrCreateUser(
@@ -201,5 +214,57 @@ public class UserCommandServiceImpl implements UserCommandService {
     } catch (RestClientException e) {
       log.error("카카오 로그아웃 API 실패: {}", e.getMessage());
     }
+
+    // DB 리프레시 토큰 삭제 (로그아웃 시 재사용 방지)
+    refreshTokenRepository.deleteByUserId(userId);
+  }
+
+  @Override
+  public void saveOrUpdateRefreshToken(Long userId, String tokenValue) {
+    LocalDateTime expiryDate =
+        LocalDateTime.now().plus(Duration.ofMillis(refreshTokenValidityInMilliseconds));
+    RefreshToken refreshToken =
+        refreshTokenRepository
+            .findByUserId(userId)
+            .map(
+                entity -> {
+                  entity.updateToken(tokenValue, expiryDate);
+                  return entity;
+                })
+            .orElseGet(
+                () ->
+                    RefreshToken.builder()
+                        .token(tokenValue)
+                        .userId(userId)
+                        .expiryDate(expiryDate)
+                        .build());
+    refreshTokenRepository.save(refreshToken);
+  }
+
+  @Override
+  @Transactional
+  public UserResDTO.TokenResponseDTO refreshAccessToken(String refreshTokenRequest) {
+    RefreshToken refreshToken =
+        refreshTokenRepository
+            .findByToken(refreshTokenRequest)
+            .orElseThrow(() -> new GeneralException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+
+    if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+      refreshTokenRepository.delete(refreshToken);
+      throw new GeneralException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
+    }
+
+    // 새 액세스 토큰 생성
+    String newAccessToken = jwtTokenProvider.createToken(refreshToken.getUserId());
+
+    String newRefreshTokenValue = jwtTokenProvider.createRefreshToken(refreshToken.getUserId());
+    LocalDateTime newExpiryDate =
+        LocalDateTime.now().plus(Duration.ofMillis(refreshTokenValidityInMilliseconds));
+    refreshToken.updateToken(newRefreshTokenValue, newExpiryDate);
+
+    return UserResDTO.TokenResponseDTO.builder()
+        .accessToken(newAccessToken)
+        .refreshToken(newRefreshTokenValue)
+        .build();
   }
 }

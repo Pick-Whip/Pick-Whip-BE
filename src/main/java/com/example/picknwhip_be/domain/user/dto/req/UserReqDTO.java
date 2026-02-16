@@ -31,6 +31,13 @@ public class UserReqDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class RefreshTokenReqDTO {
+    private String refreshToken;
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class WithdrawalDTO {
     private List<WithdrawalReason> reasons;
     private String feedback;

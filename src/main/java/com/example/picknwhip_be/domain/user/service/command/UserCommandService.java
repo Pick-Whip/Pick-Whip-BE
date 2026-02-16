@@ -1,6 +1,7 @@
 package com.example.picknwhip_be.domain.user.service.command;
 
 import com.example.picknwhip_be.domain.user.dto.req.UserReqDTO;
+import com.example.picknwhip_be.domain.user.dto.res.UserResDTO;
 import com.example.picknwhip_be.domain.user.entity.User;
 
 public interface UserCommandService {
@@ -19,4 +20,8 @@ public interface UserCommandService {
   void withdrawMember(Long userId, UserReqDTO.WithdrawalDTO request);
 
   void logout(Long userId);
+
+  void saveOrUpdateRefreshToken(Long userId, String tokenValue);
+
+  UserResDTO.TokenResponseDTO refreshAccessToken(String refreshTokenRequest);
 }

@@ -28,4 +28,11 @@ public class UserResDTO {
     private Long userId;
     private LocalDateTime updatedAt;
   }
+
+  @Builder
+  @Getter
+  public static class TokenResponseDTO {
+    private String accessToken;
+    private String refreshToken;
+  }
 }
