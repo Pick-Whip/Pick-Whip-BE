@@ -30,6 +30,17 @@ public class GeneralExceptionAdvice {
         .body(ApiResponse.onFailure(code, "데이터 처리 중 오류가 발생했습니다. (참조 ID 등을 확인하세요)"));
   }
 
+  /** 인증 없이 접근 시 @ExtractPayload에서 발생 → 401 반환 (500 방지) */
+  @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+  public ResponseEntity<ApiResponse<Void>> handleAuthRelated(RuntimeException ex) {
+    if (ex.getMessage() != null
+        && (ex.getMessage().contains("인증 정보가 없습니다") || ex.getMessage().contains("유효하지 않은 유저 ID"))) {
+      return ResponseEntity.status(401)
+          .body(ApiResponse.onFailure(GeneralErrorCode.UNAUTHORIZED, null));
+    }
+    throw ex;
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<String>> handleException(Exception ex) {
 
