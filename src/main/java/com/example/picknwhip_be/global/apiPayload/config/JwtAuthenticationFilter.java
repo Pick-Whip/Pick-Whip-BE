@@ -1,7 +1,6 @@
 package com.example.picknwhip_be.global.apiPayload.config;
 
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
-import com.example.picknwhip_be.global.apiPayload.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -49,18 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private String resolveToken(HttpServletRequest request) {
-    // 1) Authorization 헤더 (Bearer)
     String bearerToken = request.getHeader("Authorization");
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
-    }
-    // 2) accessToken 쿠키 (OAuth 로그인 후 리다이렉트 시 설정된 쿠키)
-    if (request.getCookies() != null) {
-      for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
-        if (OAuth2AuthenticationSuccessHandler.ACCESS_TOKEN_COOKIE_NAME.equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
     }
     return null;
   }
