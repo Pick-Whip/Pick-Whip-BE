@@ -9,10 +9,7 @@ import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import lombok.*;
 
 @Entity
@@ -65,7 +62,7 @@ public class DesignGallery {
   private String letteringColor;
 
   @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<AvailOption> availOptions = new ArrayList<>();
+  private Set<AvailOption> availOptions = new LinkedHashSet<>();
 
   @ElementCollection
   @CollectionTable(
@@ -86,5 +83,5 @@ public class DesignGallery {
 
   @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  private List<DesignOption> options = new ArrayList<>();
+  private Set<DesignOption> options = new HashSet<>();
 }

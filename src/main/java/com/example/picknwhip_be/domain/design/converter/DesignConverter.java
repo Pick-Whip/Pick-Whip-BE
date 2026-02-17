@@ -6,6 +6,7 @@ import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import com.example.picknwhip_be.domain.design.enums.Style;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +34,8 @@ public class DesignConverter {
 
   public static DesignResDTO.GetDesignDetailDTO toDesignDetailDTO(DesignGallery design) {
 
-    List<DesignOption> rawOptions = design.getOptions() != null ? design.getOptions() : List.of();
+    Collection<DesignOption> rawOptions =
+        design.getOptions() != null ? design.getOptions() : List.of();
 
     Map<Boolean, List<DesignOption>> partitionedOptions =
         rawOptions.stream().collect(Collectors.partitioningBy(item -> item.getPositionX() != null));
