@@ -11,7 +11,6 @@ import com.example.picknwhip_be.global.apiPayload.annotation.ExtractPayload;
 import com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode;
 import com.example.picknwhip_be.global.apiPayload.code.GeneralSuccessCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
-import com.example.picknwhip_be.global.apiPayload.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.picknwhip_be.global.apiPayload.util.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,9 +35,6 @@ public class UserRestController {
   @Value("${jwt.refresh-token-validity:1209600000}")
   private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
 
-  @Value("${jwt.access-token-validity:3600000}")
-  private long accessTokenValidityInMilliseconds; // 1시간 기본값 (ms)
-
   @Operation(
       summary = "리프레시토큰 발급 API",
       description = "액세스 토큰 만료 시 호출합니다. 쿠키 또는 body의 refreshToken을 사용합니다.")
@@ -57,17 +53,10 @@ public class UserRestController {
       throw new GeneralException(AuthErrorCode.INVALID_REFRESH_TOKEN);
     }
     UserResDTO.TokenResponseDTO result = userCommandService.refreshAccessToken(token);
-    int refreshCookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
-    int accessCookieMaxAge = (int) (accessTokenValidityInMilliseconds / 1000);
+    int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
 
-    // 로테이션된 새 토큰을 쿠키로 내려줘야 클라이언트 쿠키가 갱신됨 (HttpOnly라 JS로 세팅 불가)
     CookieUtils.addRefreshTokenCookie(
-        response, "refreshToken", result.getRefreshToken(), refreshCookieMaxAge);
-    CookieUtils.addAccessTokenCookie(
-        response,
-        OAuth2AuthenticationSuccessHandler.ACCESS_TOKEN_COOKIE_NAME,
-        result.getAccessToken(),
-        accessCookieMaxAge);
+        response, "refreshToken", result.getRefreshToken(), cookieMaxAge);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
