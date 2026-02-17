@@ -10,6 +10,7 @@ import com.example.picknwhip_be.domain.home.exception.HomeException;
 import com.example.picknwhip_be.domain.home.exception.code.HomeErrorCode;
 import com.example.picknwhip_be.domain.home.repository.PopularDesignRankingRepository;
 import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -112,7 +113,7 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         .orElse(null);
   }
 
-  private String findOptionName(List<DesignOption> options, OptionCategory category) {
+  private String findOptionName(Collection<DesignOption> options, OptionCategory category) {
     if (options == null || options.isEmpty()) return "선택 안함";
 
     return options.stream()

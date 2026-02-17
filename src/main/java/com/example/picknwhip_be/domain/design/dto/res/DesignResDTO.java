@@ -3,6 +3,7 @@ package com.example.picknwhip_be.domain.design.dto.res;
 import com.example.picknwhip_be.domain.custom.dto.res.CustomResDTO;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringAlignment;
 import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
+import com.example.picknwhip_be.domain.shop.entity.enums.OptionCategory;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -47,10 +48,23 @@ public class DesignResDTO {
     private String letteringText;
     private LetteringLineCount letteringLineCount;
     private LetteringAlignment letteringAlignment;
+    private String letteringColor;
+
+    private List<AvailOptionDTO> availOptions;
     private List<String> keywords;
 
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
+  }
+
+  @Getter
+  @Builder
+  @AllArgsConstructor
+  public static class AvailOptionDTO {
+    private OptionCategory category;
+    private String name;
+    private String colorCode;
+    private int price;
   }
 
   @Builder

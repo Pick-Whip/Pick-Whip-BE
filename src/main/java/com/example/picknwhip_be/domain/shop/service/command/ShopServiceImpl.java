@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.shop.service.command;
 
+import com.example.picknwhip_be.domain.favorite.repository.FavoriteShopRepository;
 import com.example.picknwhip_be.domain.shop.converter.ShopConverter;
 import com.example.picknwhip_be.domain.shop.converter.ShopInfoConverter;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
@@ -36,6 +37,7 @@ public class ShopServiceImpl implements ShopService {
   private final ShopEventRepository shopEventRepository;
   private final BankAccountRepository bankAccountRepository;
   private final ShopInfoConverter shopInfoConverter;
+  private final FavoriteShopRepository favoriteShopRepository;
 
   @Override
   public List<ShopPreviewResDTO> getNearbyShops(double lat, double lon, double radius) {
@@ -73,11 +75,17 @@ public class ShopServiceImpl implements ShopService {
   }
 
   @Override
-  public ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon) {
+  public ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon, Long userId) {
     validateCoordinate(lat, lon);
     return shopRepository
         .findShopDetailById(shopId, lat, lon)
-        .map(shopConverter::toDetailDto)
+        .map(
+            info -> {
+              boolean isMyPick =
+                  (userId != null)
+                      && favoriteShopRepository.existsByUserIdAndShopId(userId, shopId);
+              return shopConverter.toDetailDto(info, isMyPick);
+            })
         .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
   }
 

@@ -53,7 +53,7 @@ public class ShopConverter {
         .build();
   }
 
-  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info) {
+  public ShopDetailResDTO toDetailDto(ShopRepository.ShopDetailInfo info, boolean isMyPick) {
 
     Double distanceKm = (info.getDistanceKm() != null) ? info.getDistanceKm() : 0.0;
 
@@ -69,6 +69,7 @@ public class ShopConverter {
         .lon(info.getLon())
         .phone(info.getPhone())
         .keywords(parseTags(info.getKeywords()))
+        .isMyPick(isMyPick)
         .build();
   }
 
