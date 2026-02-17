@@ -11,6 +11,6 @@ public class FavoriteShopDTO {
   private Long shopId; // 가게 ID
   private String shopName;
   private String shopImageUrl;
-    private Boolean isMyPick;
-    private List<String> keywords;
+  private Boolean isMyPick;
+  private List<String> keywords;
 }

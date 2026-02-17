@@ -15,20 +15,22 @@ public class FavoriteShopConverter {
   }
 
   public static FavoriteShopDTO toDto(FavoriteShop favoriteShop) {
-      List<String> keywords =
-              favoriteShop.getShop().getKeywordMappings().stream()
-                      .map(mapping -> mapping.getKeyword() != null ? mapping.getKeyword().getKeywordText() : null)
-                      .filter(k -> k != null && !k.isBlank())
-                      .distinct()
-                      .toList();
+    List<String> keywords =
+        favoriteShop.getShop().getKeywordMappings().stream()
+            .map(
+                mapping ->
+                    mapping.getKeyword() != null ? mapping.getKeyword().getKeywordText() : null)
+            .filter(k -> k != null && !k.isBlank())
+            .distinct()
+            .toList();
 
     return FavoriteShopDTO.builder()
         .favoriteId(favoriteShop.getId())
         .shopId(favoriteShop.getShop().getId())
         .shopName(favoriteShop.getShop().getShopName())
         .shopImageUrl(favoriteShop.getShop().getShopImageUrl())
-            .isMyPick(true)
-            .keywords(keywords)
+        .isMyPick(true)
+        .keywords(keywords)
         .build();
   }
 
