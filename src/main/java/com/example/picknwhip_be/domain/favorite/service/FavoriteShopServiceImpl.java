@@ -105,7 +105,7 @@ public class FavoriteShopServiceImpl implements FavoriteShopService {
         favoriteShops.stream().map(FavoriteShopConverter::toDto).collect(Collectors.toList());
 
     Long nextCursor = null;
-    if (!pageIds.isEmpty()) {
+    if (hasNext && !pageIds.isEmpty()) {
       nextCursor = pageIds.get(pageIds.size() - 1);
     }
 
