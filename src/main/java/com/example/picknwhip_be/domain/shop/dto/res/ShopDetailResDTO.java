@@ -18,4 +18,5 @@ public class ShopDetailResDTO {
   private List<String> keywords;
   private Double lat;
   private Double lon;
+  private Boolean isMyPick;
 }

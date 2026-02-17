@@ -10,7 +10,7 @@ public interface ShopService {
   List<ShopPreviewResDTO> getNearbyShops(double lat, double lon, double radius);
 
   // 가게 상세 조회
-  ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon);
+  ShopDetailResDTO getShopDetail(Long shopId, double lat, double lon, Long userId);
 
   ShopInfoResDTO getShopInfoTab(Long shopId);
 }

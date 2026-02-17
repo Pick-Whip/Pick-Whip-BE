@@ -39,4 +39,10 @@ public interface FavoriteShopRepository extends JpaRepository<FavoriteShop, Long
 
   @Query("SELECT distinct f.shop.id FROM FavoriteShop f WHERE f.user.userId = :userId")
   Set<Long> findShopIdsByUserId(@Param("userId") Long userId);
+
+  @Query(
+      "SELECT (COUNT(fs) > 0) FROM FavoriteShop fs "
+          + "WHERE fs.user.userId = :userId "
+          + "AND fs.shop.id = :shopId")
+  boolean existsByUserIdAndShopId(@Param("userId") Long userId, @Param("shopId") Long shopId);
 }
