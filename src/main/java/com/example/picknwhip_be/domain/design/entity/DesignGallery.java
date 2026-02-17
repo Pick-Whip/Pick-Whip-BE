@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.design.entity;
 
+import com.example.picknwhip_be.domain.design.entity.mapping.AvailOption;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import com.example.picknwhip_be.domain.design.enums.Purpose;
 import com.example.picknwhip_be.domain.design.enums.Style;
@@ -8,10 +9,7 @@ import com.example.picknwhip_be.domain.order.entity.enums.LetteringLineCount;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopCakeSize;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import lombok.*;
 
 @Entity
@@ -60,6 +58,12 @@ public class DesignGallery {
   @Column(name = "lettering_alignment")
   private LetteringAlignment letteringAlignment;
 
+  @Column(name = "lettering_color")
+  private String letteringColor;
+
+  @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<AvailOption> availOptions = new LinkedHashSet<>();
+
   @ElementCollection
   @CollectionTable(
       name = "design_gallery_keywords",
@@ -79,5 +83,5 @@ public class DesignGallery {
 
   @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  private List<DesignOption> options = new ArrayList<>();
+  private Set<DesignOption> options = new HashSet<>();
 }

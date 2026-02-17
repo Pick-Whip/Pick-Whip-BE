@@ -52,34 +52,3 @@ SELECT 2, @kw_xmas
     WHERE @kw_xmas IS NOT NULL
   AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=2 AND keyword_id=@kw_xmas);
 
--- shop 11: 레망도레 광화문점
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 11, @kw_xmas
-    WHERE @kw_xmas IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=11 AND keyword_id=@kw_xmas);
-
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 11, @kw_anniv
-    WHERE @kw_anniv IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=11 AND keyword_id=@kw_anniv);
-
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 11, @kw_party
-    WHERE @kw_party IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=11 AND keyword_id=@kw_party);
-
--- shop 14: 더플라자호텔 블랑제리
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 14, @kw_birthday
-    WHERE @kw_birthday IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=14 AND keyword_id=@kw_birthday);
-
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 14, @kw_anniv
-    WHERE @kw_anniv IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=14 AND keyword_id=@kw_anniv);
-
-INSERT INTO shop_keyword_mapping (shop_id, keyword_id)
-SELECT 14, @kw_party
-    WHERE @kw_party IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM shop_keyword_mapping WHERE shop_id=14 AND keyword_id=@kw_party);
