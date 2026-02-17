@@ -9,7 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DesignGalleryRepository
     extends JpaRepository<DesignGallery, Long>, DesignGalleryRepositoryCustom {
 
-  @EntityGraph(attributePaths = {"options", "options.customOption", "shopCakeSize", "keywords"})
+  @EntityGraph(
+      attributePaths = {
+        "options",
+        "options.customOption",
+        "shopCakeSize",
+        "keywords",
+        "availOptions",
+        "availOptions.customOption"
+      })
   Optional<DesignGallery> findDesignGalleryById(Long id);
 
   @EntityGraph(attributePaths = {"keywords"})

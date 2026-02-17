@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.design.entity;
 
+import com.example.picknwhip_be.domain.design.entity.mapping.AvailOption;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import com.example.picknwhip_be.domain.design.enums.Purpose;
 import com.example.picknwhip_be.domain.design.enums.Style;
@@ -59,6 +60,12 @@ public class DesignGallery {
   @Enumerated(EnumType.STRING)
   @Column(name = "lettering_alignment")
   private LetteringAlignment letteringAlignment;
+
+  @Column(name = "lettering_color")
+  private String letteringColor;
+
+  @OneToMany(mappedBy = "designGallery", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<AvailOption> availOptions = new ArrayList<>();
 
   @ElementCollection
   @CollectionTable(

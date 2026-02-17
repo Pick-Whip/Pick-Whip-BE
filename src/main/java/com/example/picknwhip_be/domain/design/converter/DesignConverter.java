@@ -61,6 +61,18 @@ public class DesignConverter {
         .letteringText(design.getLetteringText())
         .letteringAlignment(design.getLetteringAlignment())
         .letteringLineCount(design.getLetteringLineCount())
+        .letteringColor(design.getLetteringColor())
+        .availOptions(
+            design.getAvailOptions().stream()
+                .map(
+                    avail ->
+                        DesignResDTO.AvailOptionDTO.builder()
+                            .category(avail.getCustomOption().getCategory())
+                            .name(avail.getCustomOption().getOptionName())
+                            .price(avail.getCustomOption().getAdditionalPrice())
+                            .colorCode(avail.getCustomOption().getColorRgbCode())
+                            .build())
+                .toList())
         .keywords(design.getKeywords().stream().map(Style::getLabel).toList())
         .toppings(toppings)
         .options(options)
