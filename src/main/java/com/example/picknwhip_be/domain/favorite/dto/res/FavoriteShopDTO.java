@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.favorite.dto.res;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +11,6 @@ public class FavoriteShopDTO {
   private Long shopId; // 가게 ID
   private String shopName;
   private String shopImageUrl;
-  private Double averageRating;
-  private Integer minPrice;
+  private Boolean isMyPick;
+  private List<String> keywords;
 }
