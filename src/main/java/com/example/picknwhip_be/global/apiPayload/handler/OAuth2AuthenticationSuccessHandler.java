@@ -4,6 +4,7 @@ import com.example.picknwhip_be.domain.user.dto.auth.KakaoUserInfo;
 import com.example.picknwhip_be.domain.user.entity.User;
 import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.service.command.UserCommandService;
+import com.example.picknwhip_be.global.apiPayload.util.CookieUtils;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +29,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
   @Value("${jwt.refresh-token-validity:1209600000}")
   private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
+
+  @Value("${jwt.access-token-validity:3600000}")
+  private long accessTokenValidityInMilliseconds; // 1시간 기본값 (ms)
 
   @Override
   public void onAuthenticationSuccess(
@@ -51,7 +54,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
 
-    org.springframework.http.ResponseCookie cookie =
+    org.springframework.http.ResponseCookie refreshCookie =
         org.springframework.http.ResponseCookie.from("refreshToken", refreshTokenValue)
             .httpOnly(true)
             .secure(true)
@@ -60,21 +63,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .sameSite("Lax")
             .build();
 
-    response.addHeader("Set-Cookie", cookie.toString());
+    response.addHeader("Set-Cookie", refreshCookie.toString());
+
+    int accessTokenCookieMaxAge = (int) (accessTokenValidityInMilliseconds / 1000);
+    org.springframework.http.ResponseCookie accessCookie =
+        org.springframework.http.ResponseCookie.from(
+                CookieUtils.ACCESS_TOKEN_COOKIE_NAME, accessToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(accessTokenCookieMaxAge)
+            .sameSite("Lax")
+            .build();
+
+    response.addHeader("Set-Cookie", accessCookie.toString());
 
     String targetUrl;
     if (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null) {
-      targetUrl =
-          UriComponentsBuilder.fromUriString(frontendUrl + "/signup/extra")
-              .queryParam("accessToken", accessToken)
-              .build()
-              .toUriString();
+      targetUrl = frontendUrl + "/signup/extra";
     } else {
-      targetUrl =
-          UriComponentsBuilder.fromUriString(frontendUrl + "/")
-              .queryParam("accessToken", accessToken)
-              .build()
-              .toUriString();
+      targetUrl = frontendUrl + "/";
     }
 
     getRedirectStrategy().sendRedirect(request, response, targetUrl);

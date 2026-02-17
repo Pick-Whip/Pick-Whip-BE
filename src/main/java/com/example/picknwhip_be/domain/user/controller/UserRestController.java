@@ -35,9 +35,13 @@ public class UserRestController {
   @Value("${jwt.refresh-token-validity:1209600000}")
   private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
 
+  @Value("${jwt.access-token-validity:3600000}")
+  private long accessTokenValidityInMilliseconds; // 1시간 기본값 (ms)
+
   @Operation(
       summary = "리프레시토큰 발급 API",
-      description = "액세스 토큰 만료 시 호출합니다. 쿠키 또는 body의 refreshToken을 사용합니다.")
+      description =
+          "액세스 토큰 만료 시 호출합니다. 쿠키 또는 body의 refreshToken을 사용합니다. 새 액세스/리프레시 토큰은 응답 쿠키로도 설정됩니다.")
   @PostMapping("/refresh")
   public ApiResponse<UserResDTO.TokenResponseDTO> refresh(
       @RequestBody(required = false) UserReqDTO.RefreshTokenReqDTO dto,
@@ -53,10 +57,13 @@ public class UserRestController {
       throw new GeneralException(AuthErrorCode.INVALID_REFRESH_TOKEN);
     }
     UserResDTO.TokenResponseDTO result = userCommandService.refreshAccessToken(token);
-    int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
+
+    int refreshCookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
+    int accessCookieMaxAge = (int) (accessTokenValidityInMilliseconds / 1000);
 
     CookieUtils.addRefreshTokenCookie(
-        response, "refreshToken", result.getRefreshToken(), cookieMaxAge);
+        response, "refreshToken", result.getRefreshToken(), refreshCookieMaxAge);
+    CookieUtils.addAccessTokenCookie(response, result.getAccessToken(), accessCookieMaxAge);
 
     return ApiResponse.of(GeneralSuccessCode.OK, result);
   }
@@ -100,8 +107,8 @@ public class UserRestController {
       // 카카오 서버 로그아웃 + DB 리프레시 토큰 삭제
       userCommandService.logout(userId);
     } finally {
-      // 리프레시 토큰 쿠키 삭제
       CookieUtils.deleteCookie(request, response, "refreshToken");
+      CookieUtils.deleteCookie(request, response, CookieUtils.ACCESS_TOKEN_COOKIE_NAME);
       // 서버 세션 무효화
       HttpSession session = request.getSession(false);
       if (session != null) {

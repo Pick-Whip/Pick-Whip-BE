@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.client.jackson2.OAuth2ClientJackson2M
 
 public class CookieUtils {
 
+  public static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
+
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   static {
@@ -46,16 +48,26 @@ public class CookieUtils {
 
   /** 리프레시 토큰용 쿠키 추가. SameSite=Lax 설정으로 CSRF 취약점 방지. */
   public static void addRefreshTokenCookie(
-      HttpServletResponse response, String name, String value, int maxAge) {
-    ResponseCookie cookie =
-        ResponseCookie.from(name, value)
-            .path("/")
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("Lax")
-            .maxAge(Duration.ofSeconds(maxAge))
-            .build();
-    response.addHeader("Set-Cookie", cookie.toString());
+      HttpServletResponse response, String name, String value, int maxAgeSeconds) {
+    response.addHeader("Set-Cookie", buildHttpOnlySecureCookie(name, value, maxAgeSeconds));
+  }
+
+  /** 액세스 토큰용 쿠키 추가 (리프레시 응답 등에서 사용). */
+  public static void addAccessTokenCookie(
+      HttpServletResponse response, String value, int maxAgeSeconds) {
+    response.addHeader(
+        "Set-Cookie", buildHttpOnlySecureCookie(ACCESS_TOKEN_COOKIE_NAME, value, maxAgeSeconds));
+  }
+
+  private static String buildHttpOnlySecureCookie(String name, String value, int maxAgeSeconds) {
+    return ResponseCookie.from(name, value)
+        .path("/")
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("Lax")
+        .maxAge(Duration.ofSeconds(maxAgeSeconds))
+        .build()
+        .toString();
   }
 
   public static void deleteCookie(
