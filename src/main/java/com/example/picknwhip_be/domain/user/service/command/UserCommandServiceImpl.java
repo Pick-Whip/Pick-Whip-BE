@@ -13,6 +13,7 @@ import com.example.picknwhip_be.domain.user.repository.UserRepository;
 import com.example.picknwhip_be.domain.user.repository.UserWithdrawalRepository;
 import com.example.picknwhip_be.domain.user.repository.WithdrawalReasonItemRepository;
 import com.example.picknwhip_be.global.apiPayload.code.AuthErrorCode;
+import com.example.picknwhip_be.global.apiPayload.code.GeneralErrorCode;
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import java.time.Duration;
@@ -157,6 +158,10 @@ public class UserCommandServiceImpl implements UserCommandService {
   @Override
   @Transactional
   public void withdrawMember(Long userId, UserReqDTO.WithdrawalDTO request) {
+    if (request == null) {
+      throw new GeneralException(GeneralErrorCode.BAD_REQUEST);
+    }
+
     User user =
         userRepository
             .findById(userId)
@@ -164,11 +169,14 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     // 탈퇴 기록 생성
     UserWithdrawal withdrawal =
-        UserWithdrawal.builder().user(user).feedback(request.getFeedback()).build();
-    userWithdrawalRepository.save(withdrawal);
+        UserWithdrawal.builder()
+            .user(user)
+            .feedback(request.getFeedback() != null ? request.getFeedback() : "")
+            .build();
+    userWithdrawalRepository.saveAndFlush(withdrawal);
 
     // 선택한 사유 저장
-    if (request.getReasons() != null) {
+    if (request.getReasons() != null && !request.getReasons().isEmpty()) {
       List<WithdrawalReasonItem> items =
           request.getReasons().stream()
               .map(
@@ -181,7 +189,8 @@ public class UserCommandServiceImpl implements UserCommandService {
       reasonItemRepository.saveAll(items);
     }
 
-    // 직접 상태를 변경하는 대신 Repository의 delete를 호출
+    // 리프레시 토큰 삭제 후 회원 soft delete
+    refreshTokenRepository.deleteByUserId(userId);
     userRepository.delete(user);
   }
 
