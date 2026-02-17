@@ -61,6 +61,7 @@ public class DesignGalleryRepositoryImpl implements DesignGalleryRepositoryCusto
             .select(
                 new QDesignResDTO_GalleryItemDTO(
                     design.id,
+                    shop.id,
                     design.imageUrl,
                     shop.shopName,
                     shop.address,

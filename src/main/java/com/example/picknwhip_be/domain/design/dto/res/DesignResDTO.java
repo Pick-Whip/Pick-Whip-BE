@@ -78,6 +78,7 @@ public class DesignResDTO {
   @NoArgsConstructor
   public static class GalleryItemDTO {
     private Long designId;
+    private Long shopId;
     private String imageUrl;
     private String shopName;
     private String simpleAddress; // "서울 마포구" 까지만
@@ -88,6 +89,7 @@ public class DesignResDTO {
     @QueryProjection
     public GalleryItemDTO(
         Long designId,
+        Long shopId,
         String imageUrl,
         String shopName,
         String fullAddress,
@@ -95,6 +97,7 @@ public class DesignResDTO {
         Double avgRating,
         Long pickId) {
       this.designId = designId;
+      this.shopId = shopId;
       this.imageUrl = imageUrl;
       this.shopName = shopName;
       this.simpleAddress = parseSimpleAddress(fullAddress); // 주소 가공 로직
