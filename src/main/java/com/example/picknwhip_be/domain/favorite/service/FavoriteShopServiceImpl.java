@@ -84,24 +84,27 @@ public class FavoriteShopServiceImpl implements FavoriteShopService {
       throw new UserException(UserErrorCode.USER_NOT_FOUND);
     }
 
-    List<FavoriteShop> rawShops =
-        favoriteShopRepository.findAllByUserIdAndCursor(
-            userId, cursor, PageRequest.of(0, limit + 1));
-    List<FavoriteShop> favoriteShops = new ArrayList<>(rawShops);
+      List<Long> rawIds =
+              favoriteShopRepository.findIdsByUserIdAndCursor(userId, cursor, PageRequest.of(0, limit + 1));
 
-    boolean hasNext = false;
-    if (favoriteShops.size() > limit) {
-      hasNext = true;
-      favoriteShops.remove(limit);
-    }
+      boolean hasNext = false;
+      List<Long> pageIds = new ArrayList<>(rawIds);
 
-    List<FavoriteShopDTO> shopDtos =
-        favoriteShops.stream().map(FavoriteShopConverter::toDto).collect(Collectors.toList());
+      if (pageIds.size() > limit) {
+          hasNext = true;
+          pageIds = pageIds.subList(0, limit);
+      }
 
-    Long nextCursor = null;
-    if (!favoriteShops.isEmpty()) {
-      nextCursor = favoriteShops.get(favoriteShops.size() - 1).getId();
-    }
+      List<FavoriteShop> favoriteShops =
+              pageIds.isEmpty() ? List.of() : favoriteShopRepository.findAllByIdsWithShopAndKeywords(pageIds);
+
+      List<FavoriteShopDTO> shopDtos =
+              favoriteShops.stream().map(FavoriteShopConverter::toDto).collect(Collectors.toList());
+
+      Long nextCursor = null;
+      if (!pageIds.isEmpty()) {
+          nextCursor = pageIds.get(pageIds.size() - 1);
+      }
 
     return FavoriteShopConverter.toListResponse(shopDtos, nextCursor, hasNext);
   }
