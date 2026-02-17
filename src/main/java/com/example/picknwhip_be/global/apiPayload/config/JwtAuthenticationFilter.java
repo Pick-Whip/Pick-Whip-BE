@@ -1,9 +1,11 @@
 package com.example.picknwhip_be.global.apiPayload.config;
 
 import com.example.picknwhip_be.global.apiPayload.exception.GeneralException;
+import com.example.picknwhip_be.global.apiPayload.util.CookieUtils;
 import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,6 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
-    return null;
+    return CookieUtils.getCookie(request, CookieUtils.ACCESS_TOKEN_COOKIE_NAME)
+        .map(Cookie::getValue)
+        .filter(StringUtils::hasText)
+        .orElse(null);
   }
 }
