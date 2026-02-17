@@ -76,8 +76,10 @@ public class ShopController {
   public ApiResponse<ShopDetailResDTO> getShopDetail(
       @PathVariable Long shopId,
       @Parameter(description = "현재 위치 위도", required = true) @RequestParam double lat,
-      @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon) {
-    return ApiResponse.of(GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon));
+      @Parameter(description = "현재 위치 경도", required = true) @RequestParam double lon,
+      @Parameter(hidden = true) @ExtractPayload Long userId) {
+    return ApiResponse.of(
+        GeneralSuccessCode.OK, shopService.getShopDetail(shopId, lat, lon, userId));
   }
 
   @Operation(
