@@ -45,6 +45,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorize ->
                 authorize
+                    .requestMatchers(org.springframework.web.cors.CorsUtils::isPreFlightRequest)
+                    .permitAll()
                     .requestMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
@@ -95,13 +97,14 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     // Swagger UI와 로컬 프론트엔드 주소 허용
-    configuration.setAllowedOrigins(
+    configuration.setAllowedOriginPatterns(
         List.of(
             "http://localhost:8080",
             "http://localhost:3000",
             "http://localhost:5173",
             "https://pick-whip.vercel.app",
-            "https://*.vercel.app"));
+            "https://*.vercel.app",
+            "https://www.picknwhip.shop"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
