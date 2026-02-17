@@ -21,12 +21,21 @@ public interface FavoriteShopRepository extends JpaRepository<FavoriteShop, Long
 
   /** 마이픽 목록 조회 (커서 페이징 + Fetch Join) :cursor가 null이면 가장 최신꺼부터 조회, 있으면 그 ID보다 작은 것 조회 */
   @Query(
-      "SELECT fs FROM FavoriteShop fs JOIN FETCH fs.shop s "
-          + "WHERE fs.user.id = :userId "
+      "SELECT fs.id FROM FavoriteShop fs "
+          + "WHERE fs.user.userId = :userId "
           + "AND (:cursor IS NULL OR fs.id < :cursor) "
           + "ORDER BY fs.id DESC")
-  List<FavoriteShop> findAllByUserIdAndCursor(
+  List<Long> findIdsByUserIdAndCursor(
       @Param("userId") Long userId, @Param("cursor") Long cursor, Pageable pageable);
+
+  @Query(
+      "SELECT DISTINCT fs FROM FavoriteShop fs "
+          + "JOIN FETCH fs.shop s "
+          + "LEFT JOIN FETCH s.keywordMappings km "
+          + "LEFT JOIN FETCH km.keyword k "
+          + "WHERE fs.id IN :ids "
+          + "ORDER BY fs.id DESC")
+  List<FavoriteShop> findAllByIdsWithShopAndKeywords(@Param("ids") List<Long> ids);
 
   @Query("SELECT distinct f.shop.id FROM FavoriteShop f WHERE f.user.userId = :userId")
   Set<Long> findShopIdsByUserId(@Param("userId") Long userId);
