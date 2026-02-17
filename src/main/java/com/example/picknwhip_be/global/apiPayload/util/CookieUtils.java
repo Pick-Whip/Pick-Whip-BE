@@ -58,6 +58,20 @@ public class CookieUtils {
     response.addHeader("Set-Cookie", cookie.toString());
   }
 
+  /** 액세스 토큰용 쿠키 추가 (로테이션/리프레시 시 쿠키 갱신용). HttpOnly, Secure, SameSite=Lax. */
+  public static void addAccessTokenCookie(
+      HttpServletResponse response, String name, String value, int maxAgeSeconds) {
+    ResponseCookie cookie =
+        ResponseCookie.from(name, value)
+            .path("/")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Lax")
+            .maxAge(Duration.ofSeconds(maxAgeSeconds))
+            .build();
+    response.addHeader("Set-Cookie", cookie.toString());
+  }
+
   public static void deleteCookie(
       HttpServletRequest request, HttpServletResponse response, String name) {
     Cookie[] cookies = request.getCookies();
