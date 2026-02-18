@@ -44,6 +44,19 @@ public class CookieUtils {
     response.addCookie(cookie);
   }
 
+  public static void addOAuth2RequestCookie(
+      HttpServletResponse response, String name, String value, int maxAge) {
+    ResponseCookie cookie =
+        ResponseCookie.from(name, value)
+            .path("/")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .maxAge(Duration.ofSeconds(maxAge))
+            .build();
+    response.addHeader("Set-Cookie", cookie.toString());
+  }
+
   public static void addRefreshTokenCookie(
       HttpServletResponse response, String name, String value, int maxAge) {
     ResponseCookie cookie =
