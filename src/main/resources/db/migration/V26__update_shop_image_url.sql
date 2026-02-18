@@ -1,0 +1,1 @@
+ALTER TABLE shops MODIFY shop_image_url VARCHAR(1000) NULL;
