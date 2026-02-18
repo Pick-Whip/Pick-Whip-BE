@@ -1,3 +1,6 @@
+app:
+  cookie-domain: ""  # 로컬에서는 domain 미설정 (localhost 기준)
+
 spring:
   security:
     oauth2:
