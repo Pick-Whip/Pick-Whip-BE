@@ -34,14 +34,14 @@ VALUES (999, NOW(6), NOW(6), 'info.test@picknwhip.com', 9000000001, '정보탭�
 -- [수정] shops 테이블에 'updated_at' 컬럼 제거
 INSERT INTO shops (
     shop_id, owner_id, shop_name, phone, address, location, status, verification_status,
-    description,
+    description, shop_image_url,
     pickup_time_guide, day_order_guide, parking_guide,
     payment_notice, precaution_notice, prepayment,
     created_at
 ) VALUES (
              10, 999, '정보 탭 테스트 매장', '02-555-5555', '서울시 강남구 테헤란로', ST_GeomFromText('POINT(37.5 127.0)', 4326), 'ACTIVE', 'VERIFIED',
              '정보 탭 API 테스트를 위한 매장입니다.',
-             3,           -- pickup_time_guide
+             'https://picknwhip.s3.ap-northeast-2.amazonaws.com/profile/bd0373a2-9c9c-4776-85fc-dc1a344bde23/store4.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260218T164907Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIA4WJPWFJSK45ATAUL%2F20260218%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=240faf1aa94248fcfd75f8b385f7a1bd4342c1fab5c41a5fc7c43aff5dfeffc7',3,           -- pickup_time_guide
              0,  -- day_order_guide
              '매장 앞 공영주차장 이용 가능',     -- parking_guide
              '온라인 결제 시 주문 확정 후 3일 이내 취소 가능', -- payment_notice
