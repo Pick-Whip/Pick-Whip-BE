@@ -83,7 +83,16 @@ public class CustomResDTO {
   @AllArgsConstructor
   public static class GetDesignOptionDTO {
     private Long shopId;
-    private List<String> cakeSizes;
+    private List<CakeSizeDTO> cakeSizes;
     private List<Option> customOptions;
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  public static class CakeSizeDTO {
+    private Long id;
+    private String name;
   }
 }
