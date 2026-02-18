@@ -23,9 +23,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint; // 주입 확인!
-  private final CustomOAuth2UserService customOAuth2UserService; // 주입
-  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler; // 주입
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
   private final JwtTokenProvider jwtTokenProvider;
 
   @Value("${app.frontend-url}")
