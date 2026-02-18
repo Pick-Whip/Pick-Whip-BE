@@ -28,6 +28,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
   @Value("${app.frontend-url}")
   private String frontendUrl;
 
+  @Value("${app.cookie-domain:}")
+  private String cookieDomain;
+
   @Value("${jwt.refresh-token-validity:1209600000}")
   private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
 
@@ -57,27 +60,30 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     int cookieMaxAge = (int) (refreshTokenValidityInMilliseconds / 1000);
 
-    org.springframework.http.ResponseCookie cookie =
+    var refreshCookieBuilder =
         org.springframework.http.ResponseCookie.from("refreshToken", refreshTokenValue)
             .httpOnly(true)
             .secure(true)
             .path("/")
             .maxAge(cookieMaxAge)
-            .sameSite("None")
-            .build();
-
-    response.addHeader("Set-Cookie", cookie.toString());
+            .sameSite("None");
+    if (cookieDomain != null && !cookieDomain.isBlank()) {
+      refreshCookieBuilder.domain(cookieDomain);
+    }
+    response.addHeader("Set-Cookie", refreshCookieBuilder.build().toString());
 
     int accessTokenMaxAge = (int) (accessTokenValidityInMilliseconds / 1000);
-    org.springframework.http.ResponseCookie accessTokenCookie =
+    var accessTokenCookieBuilder =
         org.springframework.http.ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, accessToken)
             .httpOnly(true)
             .secure(true)
             .path("/")
             .maxAge(accessTokenMaxAge)
-            .sameSite("None")
-            .build();
-    response.addHeader("Set-Cookie", accessTokenCookie.toString());
+            .sameSite("None");
+    if (cookieDomain != null && !cookieDomain.isBlank()) {
+      accessTokenCookieBuilder.domain(cookieDomain);
+    }
+    response.addHeader("Set-Cookie", accessTokenCookieBuilder.build().toString());
 
     String encodedToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
     String basePath =

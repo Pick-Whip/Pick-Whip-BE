@@ -19,6 +19,7 @@ import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,9 +68,18 @@ public class UserCommandServiceImpl implements UserCommandService {
     // 이미 가입된 카카오 유저인지 확인
     return userRepository
         .findByKakaoId(kakaoId)
+        .or(
+            () -> {
+              // 탈퇴 후 재가입: withdrawn 유저 복구
+              int restored = userRepository.restoreWithdrawnByKakaoId(kakaoId);
+              if (restored > 0) {
+                return userRepository.findByKakaoId(kakaoId);
+              }
+              return Optional.empty();
+            })
         .orElseGet(
             () -> {
-              // 가입된 적이 없으면 랜덤 닉네임 생성 후 등록
+              // 신규 가입
               NicknameInfo info = generateRandomNicknameWithInfo();
               String resolvedImageUrl =
                   (profileImageUrl != null && !profileImageUrl.isBlank())
