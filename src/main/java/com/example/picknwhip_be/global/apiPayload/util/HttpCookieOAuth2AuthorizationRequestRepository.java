@@ -50,7 +50,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
       return;
     }
 
-    CookieUtils.addCookie(
+    CookieUtils.addOAuth2RequestCookie(
         response,
         OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME,
         CookieUtils.serialize(authorizationRequest),
@@ -59,7 +59,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
     String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
     if (StringUtils.isNotBlank(redirectUriAfterLogin)
         && isAuthorizedRedirectUri(redirectUriAfterLogin)) {
-      CookieUtils.addCookie(
+      CookieUtils.addOAuth2RequestCookie(
           response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
     }
   }
