@@ -8,6 +8,8 @@ import com.example.picknwhip_be.global.apiPayload.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -61,7 +63,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .secure(true)
             .path("/")
             .maxAge(cookieMaxAge)
-            .sameSite("Lax")
+            .sameSite("None")
             .build();
 
     response.addHeader("Set-Cookie", cookie.toString());
@@ -77,10 +79,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             .build();
     response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
-    String targetUrl =
+    String encodedToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
+    String basePath =
         (user.getName() == null || user.getPhone() == null || user.getBirthdate() == null)
-            ? frontendUrl + "/signup/extra"
-            : frontendUrl + "/";
+            ? "/signup/extra"
+            : "/";
+    String targetUrl = frontendUrl + basePath + "?accessToken=" + encodedToken;
 
     getRedirectStrategy().sendRedirect(request, response, targetUrl);
   }

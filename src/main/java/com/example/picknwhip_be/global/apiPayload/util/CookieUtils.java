@@ -44,7 +44,6 @@ public class CookieUtils {
     response.addCookie(cookie);
   }
 
-  /** 리프레시 토큰용 쿠키 추가. SameSite=Lax 설정으로 CSRF 취약점 방지. */
   public static void addRefreshTokenCookie(
       HttpServletResponse response, String name, String value, int maxAge) {
     ResponseCookie cookie =
@@ -52,7 +51,7 @@ public class CookieUtils {
             .path("/")
             .httpOnly(true)
             .secure(true)
-            .sameSite("Lax")
+            .sameSite("None")
             .maxAge(Duration.ofSeconds(maxAge))
             .build();
     response.addHeader("Set-Cookie", cookie.toString());
