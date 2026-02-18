@@ -30,7 +30,6 @@ public class GeneralExceptionAdvice {
         .body(ApiResponse.onFailure(code, "데이터 처리 중 오류가 발생했습니다. (참조 ID 등을 확인하세요)"));
   }
 
-  /** 인증 없이 접근 시 @ExtractPayload에서 발생 → 401 반환 (500 방지) */
   @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
   public ResponseEntity<ApiResponse<Void>> handleAuthRelated(RuntimeException ex) {
     if (ex.getMessage() != null
@@ -43,7 +42,6 @@ public class GeneralExceptionAdvice {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<String>> handleException(Exception ex) {
-
     log.error("Unexpected Error Occurred: ", ex);
     BaseErrorCode code = GeneralErrorCode.INTERNAL_SERVER_ERROR;
     return ResponseEntity.status(code.getStatus()).body(ApiResponse.onFailure(code, null));

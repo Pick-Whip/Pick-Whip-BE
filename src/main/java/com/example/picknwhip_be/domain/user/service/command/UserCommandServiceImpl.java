@@ -170,7 +170,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     // 탈퇴 기록 생성
     UserWithdrawal withdrawal =
         UserWithdrawal.builder()
-            .user(user)
+            .userId(user.getUserId())
             .feedback(request.getFeedback() != null ? request.getFeedback() : "")
             .build();
     userWithdrawalRepository.saveAndFlush(withdrawal);

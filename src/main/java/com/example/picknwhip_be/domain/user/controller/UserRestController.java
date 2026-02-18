@@ -33,7 +33,7 @@ public class UserRestController {
   private final UserCommandService userCommandService;
 
   @Value("${jwt.refresh-token-validity:1209600000}")
-  private long refreshTokenValidityInMilliseconds; // 14일 기본값 (ms)
+  private long refreshTokenValidityInMilliseconds;
 
   @Operation(
       summary = "리프레시토큰 발급 API",
@@ -97,12 +97,9 @@ public class UserRestController {
   public ApiResponse<String> createLogout(
       @ExtractPayload Long userId, HttpServletRequest request, HttpServletResponse response) {
     try {
-      // 카카오 서버 로그아웃 + DB 리프레시 토큰 삭제
       userCommandService.logout(userId);
     } finally {
-      // 리프레시 토큰 쿠키 삭제
       CookieUtils.deleteCookie(request, response, "refreshToken");
-      // 서버 세션 무효화
       HttpSession session = request.getSession(false);
       if (session != null) {
         session.invalidate();
