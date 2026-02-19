@@ -31,16 +31,21 @@ public class KakaoLocalClient {
             .build()
             .toUriString();
 
-    // 환경변수/프로퍼티에 공백/개행이 섞이는 경우가 진짜 흔함 → 무조건 trim
     String appKey = (kakaoRestApiKey == null) ? null : kakaoRestApiKey.trim();
 
-    // 키 원문 노출 금지: 길이만 비교(원본 vs trim)
+    // 키 누락/비어있으면 카카오 호출 전에 즉시 실패시키기
+    if (appKey == null || appKey.isBlank()) {
+      throw new IllegalStateException(
+          "Kakao REST API key is missing. Please set property 'kakao.rest-api-key' (e.g., env KAKAO_CLIENT_ID).");
+    }
+
+    // 키 원문 노출 금지: 길이만 로그
     int rawLen = (kakaoRestApiKey == null) ? -1 : kakaoRestApiKey.length();
-    int trimmedLen = (appKey == null) ? -1 : appKey.length();
+    int trimmedLen = appKey.length();
     log.info("[KakaoLocalClient] restApiKey rawLen={}, trimmedLen={}", rawLen, trimmedLen);
 
     HttpHeaders headers = new HttpHeaders();
-    headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + appKey); // 공백 포함 정확히
+    headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + appKey);
 
     HttpEntity<Void> entity = new HttpEntity<>(headers);
 
