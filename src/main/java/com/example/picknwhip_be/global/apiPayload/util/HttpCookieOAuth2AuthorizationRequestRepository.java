@@ -37,7 +37,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
             CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME).isPresent();
         log.warn(
             "[OAuth2] authorization_request_not_found. "
-                + "프론트엔드가 반드시 https://www.picknwhip.shop/oauth2/authorization/kakao 로 진입해야 함. "
+                + "프론트엔드가 반드시 https://www.api.picknwhip.shop/oauth2/authorization/kakao 로 진입해야 함. "
                 + "path={}, 쿠키존재={}",
             request.getRequestURI(),
             hasCookie);
