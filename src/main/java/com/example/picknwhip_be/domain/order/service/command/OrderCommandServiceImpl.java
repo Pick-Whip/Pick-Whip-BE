@@ -2,6 +2,8 @@ package com.example.picknwhip_be.domain.order.service.command;
 
 import com.example.picknwhip_be.domain.custom.entity.OrderDraft;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
+import com.example.picknwhip_be.domain.notification.enums.NotificationKind;
+import com.example.picknwhip_be.domain.notification.event.CreateNotificationEvent;
 import com.example.picknwhip_be.domain.order.dto.req.OrderReqDTO;
 import com.example.picknwhip_be.domain.order.dto.res.OrderResDTO;
 import com.example.picknwhip_be.domain.order.entity.DailyShopOrderCounter;
@@ -21,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final DailyShopOrderCounterRepository counterRepository;
   private final PickupTimeValidator pickupTimeValidator;
   private final OrderHistoryRepository orderHistoryRepository;
+  private final ApplicationEventPublisher publisher;
 
   @Override
   public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
@@ -97,6 +101,15 @@ public class OrderCommandServiceImpl implements OrderCommandService {
       orderItemRepository.saveAll(orderItems);
     }
     orderDraftRepository.delete(draft);
+
+    Long orderId = savedOrder.getId();
+    publisher.publishEvent(
+        new CreateNotificationEvent(
+            userId,
+            NotificationKind.ORDER_SHEET_CHECKING,
+            orderId,
+            savedOrder.getShop().getShopName()));
+
     return OrderResDTO.from(savedOrder);
   }
 
