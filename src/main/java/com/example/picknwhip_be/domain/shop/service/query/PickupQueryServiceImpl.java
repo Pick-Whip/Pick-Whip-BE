@@ -11,12 +11,15 @@ import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,9 @@ public class PickupQueryServiceImpl implements PickupQueryService {
   private final ShopBusinessHourRepository businessHourRepository;
   private final OrderRepository orderRepository;
   private final PickupConverter pickupConverter;
+    // kstClock만 주입받도록 명시 (기존 clock Bean 영향 없음)
+    @Qualifier("kstClock")
+    private final Clock clock;
 
   /** 월간 캘린더 조회 (날짜별 휴무 여부) */
   @Override
@@ -81,7 +87,7 @@ public class PickupQueryServiceImpl implements PickupQueryService {
 
     List<PickupResDTO.TimeSlotDTO> slotDTOs = new ArrayList<>();
     LocalTime current = hour.getOpenTime();
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now(clock);
 
     int interval = shop.getSlotIntervalMinutes() > 0 ? shop.getSlotIntervalMinutes() : 30;
     int maxCapacity = shop.getMaxOrdersPerSlot() > 0 ? shop.getMaxOrdersPerSlot() : 2;

@@ -7,7 +7,10 @@ import com.example.picknwhip_be.domain.order.repository.OrderRepository;
 import com.example.picknwhip_be.domain.shop.entity.Shop;
 import com.example.picknwhip_be.domain.shop.entity.ShopBusinessHour;
 import com.example.picknwhip_be.domain.shop.entity.enums.ScheduleType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
+
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,11 +27,14 @@ public class PickupTimeValidator {
 
   private final ShopBusinessHourRepository shopBusinessHourRepository;
   private final OrderRepository orderRepository;
+    // kstClock만 주입받도록 명시 (기존 clock Bean 영향 없음)
+    @Qualifier("kstClock")
+    private final Clock clock;
 
   public void validate(Shop shop, LocalDateTime pickupTime) {
-    if (pickupTime.isBefore(LocalDateTime.now())) {
-      throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
-    }
+      if (pickupTime.isBefore(LocalDateTime.now(clock))) {
+          throw new OrderException(OrderErrorCode.INVALID_PICKUP_TIME);
+      }
 
     int interval = shop.getSlotIntervalMinutes() > 0 ? shop.getSlotIntervalMinutes() : 30;
     if (pickupTime.getMinute() % interval != 0
