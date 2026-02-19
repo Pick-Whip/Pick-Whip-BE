@@ -92,12 +92,12 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         letteringOption = align + line;
       }
     }
-      // 디자인 이미지 (DB key) -> presigned GET URL 변환
-      String rawImage = d.getImageUrl();
-      String imageUrl =
-              (rawImage == null || rawImage.isBlank() || isHttpUrl(rawImage))
-                      ? rawImage
-                      : s3Service.createPresignedDownloadUrl(rawImage);
+    // 디자인 이미지 (DB key) -> presigned GET URL 변환
+    String rawImage = d.getImageUrl();
+    String imageUrl =
+        (rawImage == null || rawImage.isBlank() || isHttpUrl(rawImage))
+            ? rawImage
+            : s3Service.createPresignedDownloadUrl(rawImage);
 
     return PopularDesignResDTO.builder()
         .ranking(ranking.getRanking())
@@ -132,7 +132,8 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         .findFirst()
         .orElse("선택 안함");
   }
-    private boolean isHttpUrl(String value) {
-        return value.startsWith("http://") || value.startsWith("https://");
-    }
+
+  private boolean isHttpUrl(String value) {
+    return value.startsWith("http://") || value.startsWith("https://");
+  }
 }

@@ -35,17 +35,17 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
     }
 
     List<PopularCakeResDTO> presignedConverted =
-              cachedRankings.stream()
-                      .map(
-                              dto -> {
-                                  String raw = dto.getCakeImageUrl();
-                                  if (raw == null || raw.isBlank() || isHttpUrl(raw)) {
-                                      return dto;
-                                  }
-                                  String presigned = s3Service.createPresignedDownloadUrl(raw);
-                                  return dto.toBuilder().cakeImageUrl(presigned).build();
-                              })
-                      .toList();
+        cachedRankings.stream()
+            .map(
+                dto -> {
+                  String raw = dto.getCakeImageUrl();
+                  if (raw == null || raw.isBlank() || isHttpUrl(raw)) {
+                    return dto;
+                  }
+                  String presigned = s3Service.createPresignedDownloadUrl(raw);
+                  return dto.toBuilder().cakeImageUrl(presigned).build();
+                })
+            .toList();
 
     List<Long> designIds = cachedRankings.stream().map(PopularCakeResDTO::getDesignId).toList();
     Set<Long> pickedDesignIds = new HashSet<>();
@@ -62,7 +62,8 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
         .map(dto -> dto.toBuilder().isMyPick(pickedDesignIds.contains(dto.getDesignId())).build())
         .collect(Collectors.toList());
   }
-    private boolean isHttpUrl(String value) {
-        return value.startsWith("http://") || value.startsWith("https://");
-    }
+
+  private boolean isHttpUrl(String value) {
+    return value.startsWith("http://") || value.startsWith("https://");
+  }
 }
