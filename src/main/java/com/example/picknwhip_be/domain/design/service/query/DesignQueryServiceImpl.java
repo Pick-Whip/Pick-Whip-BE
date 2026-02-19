@@ -34,7 +34,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
   private final KakaoLocalClient kakaoLocalClient;
-    private final S3Service s3Service;
+  private final S3Service s3Service;
 
   @Override
   @Transactional(readOnly = true)
@@ -110,24 +110,26 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     Page<DesignResDTO.GalleryItemDTO> resultPage =
         designRepository.searchGallery(
             categories, sortType, currentDistrict, lat, lon, seed, userId, pageable);
-      List<DesignResDTO.GalleryItemDTO> converted =
-              resultPage.getContent().stream()
-                      .map(
-                              item -> {
-                                  String raw = item.getImageUrl();
+    List<DesignResDTO.GalleryItemDTO> converted =
+        resultPage.getContent().stream()
+            .map(
+                item -> {
+                  String raw = item.getImageUrl();
 
-                                  // 이미 완성 URL이면 그대로 (시드 데이터가 URL일 수도 있어서 안전장치)
-                                  if (isHttpUrl(raw)) {
-                                      return item;
-                                  }
+                  // 이미 완성 URL이면 그대로 (시드 데이터가 URL일 수도 있어서 안전장치)
+                  if (isHttpUrl(raw)) {
+                    return item;
+                  }
 
-                                  // keyName이면 presigned GET URL 생성
-                                  String presigned =
-                                          (raw == null || raw.isBlank()) ? raw : s3Service.createPresignedDownloadUrl(raw);
+                  // keyName이면 presigned GET URL 생성
+                  String presigned =
+                      (raw == null || raw.isBlank())
+                          ? raw
+                          : s3Service.createPresignedDownloadUrl(raw);
 
-                                  return DesignResDTO.GalleryItemDTO.withImageUrl(item, presigned);
-                              })
-                      .toList();
+                  return DesignResDTO.GalleryItemDTO.withImageUrl(item, presigned);
+                })
+            .toList();
     return DesignResDTO.GalleryListDTO.builder()
         .currentRegion(currentRegionText)
         .designs(converted)
@@ -138,10 +140,10 @@ public class DesignQueryServiceImpl implements DesignQueryService {
         .build();
   }
 
-    private boolean isHttpUrl(String value) {
-        if (value == null) return false;
-        return value.startsWith("http://") || value.startsWith("https://");
-    }
+  private boolean isHttpUrl(String value) {
+    if (value == null) return false;
+    return value.startsWith("http://") || value.startsWith("https://");
+  }
 
   // 좌표 -> "시/구" 텍스트 + district(구) 추출
   private RegionResult resolveRegion(Double lat, Double lon) {
