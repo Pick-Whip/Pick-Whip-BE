@@ -7,6 +7,10 @@ import com.example.picknwhip_be.domain.custom.entity.OrderDraftItem;
 import com.example.picknwhip_be.domain.custom.exception.CustomException;
 import com.example.picknwhip_be.domain.custom.exception.code.CustomErrorCode;
 import com.example.picknwhip_be.domain.custom.repository.OrderDraftRepository;
+import com.example.picknwhip_be.domain.design.entity.DesignGallery;
+import com.example.picknwhip_be.domain.design.exception.DesignException;
+import com.example.picknwhip_be.domain.design.exception.code.DesignErrorCode;
+import com.example.picknwhip_be.domain.design.repository.DesignGalleryRepository;
 import com.example.picknwhip_be.domain.order.entity.enums.Status;
 import com.example.picknwhip_be.domain.order.exception.OrderException;
 import com.example.picknwhip_be.domain.order.exception.code.OrderErrorCode;
@@ -50,6 +54,7 @@ public class CustomCommandServiceImpl implements CustomCommandService {
   private final UserRepository userRepository;
   private final ShopBusinessHourRepository shopBusinessHourRepository;
   private final OrderRepository orderRepository;
+  private final DesignGalleryRepository designGalleryRepository;
 
   @Override
   public CustomResDTO.CustomCreateDTO saveCustom(Long userId, CustomReqDTO.CustomCreateDTO dto) {
@@ -69,6 +74,14 @@ public class CustomCommandServiceImpl implements CustomCommandService {
             .findById(dto.shopCakeSizeId())
             .orElseThrow(() -> new ShopException(ShopErrorCode.CAKE_SIZE_NOT_FOUND));
 
+    DesignGallery designGallery = null;
+    if (dto.designId() != null) {
+      designGallery =
+          designGalleryRepository
+              .findById(dto.designId())
+              .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
+    }
+
     if (size.getShop() == null || !size.getShop().getId().equals(shop.getId())) {
       throw new ShopException(ShopErrorCode.CAKE_SIZE_NOT_FOUND);
     }
@@ -80,6 +93,7 @@ public class CustomCommandServiceImpl implements CustomCommandService {
             .shop(shop)
             .shopCakeSize(size)
             .pickupDatetime(dto.pickupDatetime())
+            .designGallery(designGallery)
             .letteringText(dto.letteringText())
             .letteringLineCount(dto.letteringLineCount())
             .letteringAlignment(dto.letteringAlignment())
