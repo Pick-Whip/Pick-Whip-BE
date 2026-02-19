@@ -16,50 +16,55 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class KakaoLocalClient {
 
-    private final RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-    @Value("${kakao.rest-api-key}")
-    private String kakaoRestApiKey;
+  @Value("${kakao.rest-api-key}")
+  private String kakaoRestApiKey;
 
-    public KakaoCoord2RegionResponse.Document coordToRegion(Double lat, Double lon) {
+  public KakaoCoord2RegionResponse.Document coordToRegion(Double lat, Double lon) {
 
-        String url = UriComponentsBuilder
-                .fromHttpUrl("https://dapi.kakao.com/v2/local/geo/coord2regioncode.json")
-                .queryParam("x", lon) // x=경도
-                .queryParam("y", lat) // y=위도
-                .build()
-                .toUriString();
+    String url =
+        UriComponentsBuilder.fromHttpUrl(
+                "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json")
+            .queryParam("x", lon) // x=경도
+            .queryParam("y", lat) // y=위도
+            .build()
+            .toUriString();
 
-        // 환경변수/프로퍼티에 공백/개행이 섞이는 경우가 진짜 흔함 → 무조건 trim
-        String appKey = (kakaoRestApiKey == null) ? null : kakaoRestApiKey.trim();
+    // 환경변수/프로퍼티에 공백/개행이 섞이는 경우가 진짜 흔함 → 무조건 trim
+    String appKey = (kakaoRestApiKey == null) ? null : kakaoRestApiKey.trim();
 
-        // 키 원문 노출 금지: 길이만 비교(원본 vs trim)
-        int rawLen = (kakaoRestApiKey == null) ? -1 : kakaoRestApiKey.length();
-        int trimmedLen = (appKey == null) ? -1 : appKey.length();
-        log.info("[KakaoLocalClient] restApiKey rawLen={}, trimmedLen={}", rawLen, trimmedLen);
+    // 키 원문 노출 금지: 길이만 비교(원본 vs trim)
+    int rawLen = (kakaoRestApiKey == null) ? -1 : kakaoRestApiKey.length();
+    int trimmedLen = (appKey == null) ? -1 : appKey.length();
+    log.info("[KakaoLocalClient] restApiKey rawLen={}, trimmedLen={}", rawLen, trimmedLen);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + appKey); // 공백 포함 정확히
+    HttpHeaders headers = new HttpHeaders();
+    headers.set(HttpHeaders.AUTHORIZATION, "KakaoAK " + appKey); // 공백 포함 정확히
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+    HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        try {
-            ResponseEntity<KakaoCoord2RegionResponse> response =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, KakaoCoord2RegionResponse.class);
+    try {
+      ResponseEntity<KakaoCoord2RegionResponse> response =
+          restTemplate.exchange(url, HttpMethod.GET, entity, KakaoCoord2RegionResponse.class);
 
-            KakaoCoord2RegionResponse body = response.getBody();
-            if (body == null || body.documents() == null || body.documents().isEmpty()) return null;
+      KakaoCoord2RegionResponse body = response.getBody();
+      if (body == null || body.documents() == null || body.documents().isEmpty()) return null;
 
-            // "H"(행정동) 우선 선택
-            return body.documents().stream()
-                    .sorted(Comparator.comparing(
-                            (KakaoCoord2RegionResponse.Document d) -> !"H".equals(d.region_type())))
-                    .findFirst()
-                    .orElse(null);
+      // "H"(행정동) 우선 선택
+      return body.documents().stream()
+          .sorted(
+              Comparator.comparing(
+                  (KakaoCoord2RegionResponse.Document d) -> !"H".equals(d.region_type())))
+          .findFirst()
+          .orElse(null);
 
-        } catch (HttpStatusCodeException e) {
-            log.warn("[KakaoLocalClient] FAILED status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw e;
-        }
+    } catch (HttpStatusCodeException e) {
+      log.warn(
+          "[KakaoLocalClient] FAILED status={}, body={}",
+          e.getStatusCode(),
+          e.getResponseBodyAsString());
+      throw e;
     }
+  }
 }
