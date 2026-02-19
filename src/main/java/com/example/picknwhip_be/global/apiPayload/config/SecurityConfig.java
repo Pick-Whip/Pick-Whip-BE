@@ -102,8 +102,7 @@ public class SecurityConfig {
             "http://localhost:8080",
             "http://localhost:3000",
             "http://localhost:5173",
-            "https://pick-whip.vercel.app",
-            "https://*.vercel.app",
+            "https://picknwhip.shop",
             "https://www.picknwhip.shop"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     configuration.setAllowedHeaders(List.of("*"));

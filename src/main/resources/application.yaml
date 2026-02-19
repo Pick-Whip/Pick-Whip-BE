@@ -1,5 +1,5 @@
 app:
-  frontend-url: ${FRONTEND_URL:https://pick-whip.vercel.app}
+  frontend-url: ${FRONTEND_URL:https://picknwhip.shop}
   cookie-domain: ${COOKIE_DOMAIN:.picknwhip.shop}
 
 spring:
@@ -12,7 +12,7 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "https://www.picknwhip.shop/login/oauth2/code/kakao"
+            redirect-uri: "https://www.api.picknwhip.shop/login/oauth2/code/kakao"
             scope: account_email
             client-name: Kakao
 
