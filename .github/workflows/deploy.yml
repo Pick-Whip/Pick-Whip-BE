@@ -78,8 +78,8 @@ jobs:
                                     --KAKAO_ADMIN_KEY="${{ secrets.KAKAO_ADMIN_KEY }}" \
                                     --KAKAO_CLIENT_ID="${{ secrets.KAKAO_CLIENT_ID }}" \
                                     --KAKAO_CLIENT_SECRET="${{ secrets.KAKAO_CLIENT_SECRET }}" \
-                                    --FRONTEND_URL="https://pick-whip.vercel.app" \
-                                    --BASE_URL="https://www.picknwhip.shop" \
+                                    --FRONTEND_URL="https://picknwhip.shop" \
+                                    --BASE_URL="https://www.api.picknwhip.shop" \
                                     --spring.flyway.ignore-missing-migrations=true \
                                     --aws.region=ap-northeast-2 \
                                     > nohup.out 2>&1 &
@@ -131,8 +131,8 @@ jobs:
                                       --KAKAO_ADMIN_KEY="${{ secrets.KAKAO_ADMIN_KEY }}" \
                                       --KAKAO_CLIENT_ID="${{ secrets.KAKAO_CLIENT_ID }}" \
                                       --KAKAO_CLIENT_SECRET="${{ secrets.KAKAO_CLIENT_SECRET }}" \
-                                      --FRONTEND_URL="https://pick-whip.vercel.app" \
-                                      --BASE_URL="https://www.picknwhip.shop" \
+                                      --FRONTEND_URL="https://picknwhip.shop" \
+                                      --BASE_URL="https://www.api.picknwhip.shop" \
                                       --spring.flyway.ignore-missing-migrations=true \
                                       --aws.region=ap-northeast-2 \
                                       > nohup.out 2>&1 &
