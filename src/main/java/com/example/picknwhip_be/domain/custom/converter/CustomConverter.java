@@ -33,6 +33,7 @@ public class CustomConverter {
 
     return CustomResDTO.GetDraftDetailDTO.builder()
         .draftId(draft.getId())
+        .designId(draft.getDesignGallery().getId())
         .shopCakeSizeId(draft.getShopCakeSize().getId())
         .pickupDatetime(draft.getPickupDatetime())
         .letteringText(draft.getLetteringText())
