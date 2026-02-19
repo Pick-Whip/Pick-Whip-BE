@@ -42,7 +42,6 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final ApplicationEventPublisher publisher;
 
   @Override
-  @Transactional
   public OrderResDTO.OrderCompleteDTO createOrder(Long userId, OrderReqDTO.CreateOrderDTO dto) {
     OrderDraft draft =
         orderDraftRepository
