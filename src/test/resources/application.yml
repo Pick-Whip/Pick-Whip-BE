@@ -51,6 +51,7 @@ cloud:
 
 kakao:
   admin-key: test-admin-key
+  rest-api-key: test-api-key
 
 springdoc:
   server-url: http://localhost:8080

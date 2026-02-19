@@ -68,6 +68,7 @@ cloud:
 
 kakao:
   admin-key: ${KAKAO_ADMIN_KEY}
+  rest-api-key: ${KAKAO_CLIENT_ID}
 
 logging:
   level:
