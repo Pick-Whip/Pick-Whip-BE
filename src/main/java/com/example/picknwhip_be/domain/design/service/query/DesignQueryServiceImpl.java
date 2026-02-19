@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.design.service.query;
 
+import com.example.picknwhip_be.domain.S3.service.S3Service;
 import com.example.picknwhip_be.domain.design.converter.DesignConverter;
 import com.example.picknwhip_be.domain.design.dto.res.DesignResDTO;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
@@ -28,6 +29,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
+  private final S3Service s3Service;
 
   @Override
   @Transactional(readOnly = true)
@@ -101,10 +103,27 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     Page<DesignResDTO.GalleryItemDTO> resultPage =
         designRepository.searchGallery(
             categories, sortType, currentDistrict, lat, lon, seed, userId, pageable);
+// DB에 저장된 keyName(imageUrl)을 presigned GET URL로 변환해서 내려주기
+      List<DesignResDTO.GalleryItemDTO> converted =
+              resultPage.getContent().stream()
+                      .map(
+                              item -> {
+                                  String raw = item.getImageUrl();
 
+                                  // 이미 완성 URL(https://...)이면 그대로 사용 (시드/더미 데이터가 URL일 수 있어서 안전장치)
+                                  if (raw != null && (raw.startsWith("http://") || raw.startsWith("https://"))) {
+                                      return item;
+                                  }
+
+                                  // keyName이면 presigned GET URL 생성
+                                  String presigned = (raw == null || raw.isBlank()) ? raw : s3Service.createPresignedDownloadUrl(raw);
+
+                                  return DesignResDTO.GalleryItemDTO.withImageUrl(item, presigned);
+                              })
+                      .toList();
     return DesignResDTO.GalleryListDTO.builder()
         .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
-        .designs(resultPage.getContent())
+        .designs(converted)
         .totalPage(resultPage.getTotalPages())
         .totalElements(resultPage.getTotalElements())
         .isFirst(resultPage.isFirst())
