@@ -55,7 +55,8 @@ public enum Style {
   ANNIVERSARY("기념일"),
   CHRISTMAS("크리스마스"),
   GRADUATION("졸업"),
-  OPENING("개업");
+  OPENING("개업"),
+  PARTY("파티");
 
   private final String label;
 }
