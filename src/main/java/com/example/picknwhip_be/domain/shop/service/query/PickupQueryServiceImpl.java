@@ -11,7 +11,6 @@ import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopBusinessHourRepository;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
-
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,9 +31,10 @@ public class PickupQueryServiceImpl implements PickupQueryService {
   private final ShopBusinessHourRepository businessHourRepository;
   private final OrderRepository orderRepository;
   private final PickupConverter pickupConverter;
-    // kstClock만 주입받도록 명시 (기존 clock Bean 영향 없음)
-    @Qualifier("kstClock")
-    private final Clock clock;
+
+  // kstClock만 주입받도록 명시 (기존 clock Bean 영향 없음)
+  @Qualifier("kstClock")
+  private final Clock clock;
 
   /** 월간 캘린더 조회 (날짜별 휴무 여부) */
   @Override
