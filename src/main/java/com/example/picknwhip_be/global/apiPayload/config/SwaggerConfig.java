@@ -36,7 +36,8 @@ public class SwaggerConfig {
                     .scheme("bearer")
                     .bearerFormat("JWT"));
 
-    Server prodServer = new Server().url("https://www.picknwhip.shop").description("운영 서버 (HTTPS)");
+    Server prodServer =
+        new Server().url("https://www.api.picknwhip.shop").description("운영 서버 (HTTPS)");
     Server localServer = new Server().url("http://localhost:8080").description("로컬 개발 서버");
 
     return new OpenAPI()
