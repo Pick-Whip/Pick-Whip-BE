@@ -47,9 +47,19 @@ public class CustomConverter {
 
   public static CustomResDTO.GetDesignOptionDTO toDesignOptionDTO(
       Long shopId, List<ShopCakeSize> shopCakeSizes, List<CustomOption> customOptions) {
+
+    List<CustomResDTO.CakeSizeDTO> cakeSizeDetails =
+        shopCakeSizes.stream()
+            .map(
+                size ->
+                    CustomResDTO.CakeSizeDTO.builder()
+                        .id(size.getId())
+                        .name(size.getSizeName())
+                        .build())
+            .toList();
     return CustomResDTO.GetDesignOptionDTO.builder()
         .shopId(shopId)
-        .cakeSizes(shopCakeSizes.stream().map(ShopCakeSize::getSizeName).toList())
+        .cakeSizes(cakeSizeDetails)
         .customOptions(
             customOptions.stream()
                 .map(
