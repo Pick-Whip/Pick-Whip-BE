@@ -33,6 +33,7 @@ public class CustomResDTO {
   public static class GetDraftDetailDTO {
     private Long draftId;
     private Long shopCakeSizeId;
+    private Long designId;
     private LocalDateTime pickupDatetime;
     private String letteringText;
     private LetteringLineCount letteringLineCount;

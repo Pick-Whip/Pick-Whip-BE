@@ -21,6 +21,7 @@ public class CustomReqDTO {
               type = "string")
           @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
           LocalDateTime pickupDatetime,
+      Long designId,
       String letteringText,
       LetteringLineCount letteringLineCount,
       LetteringAlignment letteringAlignment,
