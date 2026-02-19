@@ -12,14 +12,18 @@ import com.example.picknwhip_be.domain.favorite.repository.FavoriteDesignReposit
 import com.example.picknwhip_be.domain.shop.exception.ShopException;
 import com.example.picknwhip_be.domain.shop.exception.code.ShopErrorCode;
 import com.example.picknwhip_be.domain.shop.repository.ShopRepository;
+import com.example.picknwhip_be.global.infra.kakao.client.KakaoLocalClient;
+import com.example.picknwhip_be.global.infra.kakao.dto.KakaoCoord2RegionResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
   private final DesignGalleryRepository designRepository;
   private final FavoriteDesignRepository favoriteDesignRepository;
   private final ShopRepository shopRepository;
+  private final KakaoLocalClient kakaoLocalClient;
 
   @Override
   @Transactional(readOnly = true)
@@ -95,7 +100,9 @@ public class DesignQueryServiceImpl implements DesignQueryService {
 
     List<Style> categories = parseCategory(categoryStr);
     validateSortType(sortType);
-    String currentDistrict = reverseGeocode(lat, lon);
+    RegionResult region = resolveRegion(lat, lon);
+    String currentDistrict = region.district(); // 예: "마포구"
+    String currentRegionText = region.currentText(); // 예: "현재 위치: 서울시 마포구"
 
     Pageable pageable = PageRequest.of(page, 4);
     Page<DesignResDTO.GalleryItemDTO> resultPage =
@@ -103,7 +110,7 @@ public class DesignQueryServiceImpl implements DesignQueryService {
             categories, sortType, currentDistrict, lat, lon, seed, userId, pageable);
 
     return DesignResDTO.GalleryListDTO.builder()
-        .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
+        .currentRegion(currentRegionText)
         .designs(resultPage.getContent())
         .totalPage(resultPage.getTotalPages())
         .totalElements(resultPage.getTotalElements())
@@ -111,6 +118,43 @@ public class DesignQueryServiceImpl implements DesignQueryService {
         .isLast(resultPage.isLast())
         .build();
   }
+
+  // 좌표 -> "시/구" 텍스트 + district(구) 추출
+  private RegionResult resolveRegion(Double lat, Double lon) {
+    try {
+      KakaoCoord2RegionResponse.Document doc = kakaoLocalClient.coordToRegion(lat, lon);
+      if (doc == null) {
+        return new RegionResult(null, "현재 위치: 전체"); // fallback
+      }
+
+      String region1 = shortenRegion1(doc.region_1depth_name()); // "서울특별시" -> "서울시"
+      String region2 = doc.region_2depth_name(); // "마포구"
+
+      String district = (region2 == null || region2.isBlank()) ? null : region2;
+
+      String text =
+          (district == null)
+              ? "현재 위치: " + (region1 != null ? region1 : "전체")
+              : "현재 위치: " + (region1 != null ? region1 + " " + district : district);
+
+      return new RegionResult(district, text);
+
+    } catch (Exception e) {
+      log.warn("Kakao reverse-geocode failed. lat={}, lon={}, reason={}", lat, lon, e.getMessage());
+      // 홈이 죽지 않게 fallback
+      return new RegionResult(null, "현재 위치: 전체");
+    }
+  }
+
+  private String shortenRegion1(String region1) {
+    if (region1 == null) return null;
+    if (region1.startsWith("서울")) return "서울시";
+    if (region1.endsWith("특별시")) return region1.replace("특별시", "시");
+    if (region1.endsWith("광역시")) return region1.replace("광역시", "시");
+    return region1;
+  }
+
+  private record RegionResult(String district, String currentText) {}
 
   private void validateCoordinate(Double lat, Double lon) {
     if (lat == null || lon == null) {
