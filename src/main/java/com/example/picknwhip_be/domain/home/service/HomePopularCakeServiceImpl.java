@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.home.service;
 
+import com.example.picknwhip_be.domain.S3.service.S3Service;
 import com.example.picknwhip_be.domain.favorite.service.DesignMyPickCheckerService;
 import com.example.picknwhip_be.domain.home.dto.res.PopularCakeResDTO;
 import com.example.picknwhip_be.domain.home.repository.PopularCakeRankingRepository;
@@ -20,6 +21,7 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
 
   private final PopularCakeRankingRepository rankingRepository;
   private final DesignMyPickCheckerService designMyPickChecker;
+  private final S3Service s3Service;
 
   @Override
   @Transactional(readOnly = true)
@@ -31,6 +33,19 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
       log.warn("인기 케이크 랭킹 데이터가 비어있습니다. 스케줄러가 아직 실행되지 않았을 수 있습니다.");
       return Collections.emptyList();
     }
+
+    List<PopularCakeResDTO> presignedConverted =
+              cachedRankings.stream()
+                      .map(
+                              dto -> {
+                                  String raw = dto.getCakeImageUrl();
+                                  if (raw == null || raw.isBlank() || isHttpUrl(raw)) {
+                                      return dto;
+                                  }
+                                  String presigned = s3Service.createPresignedDownloadUrl(raw);
+                                  return dto.toBuilder().cakeImageUrl(presigned).build();
+                              })
+                      .toList();
 
     List<Long> designIds = cachedRankings.stream().map(PopularCakeResDTO::getDesignId).toList();
     Set<Long> pickedDesignIds = new HashSet<>();
@@ -47,4 +62,7 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
         .map(dto -> dto.toBuilder().isMyPick(pickedDesignIds.contains(dto.getDesignId())).build())
         .collect(Collectors.toList());
   }
+    private boolean isHttpUrl(String value) {
+        return value.startsWith("http://") || value.startsWith("https://");
+    }
 }

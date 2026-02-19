@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.home.service;
 
+import com.example.picknwhip_be.domain.S3.service.S3Service;
 import com.example.picknwhip_be.domain.design.entity.DesignGallery;
 import com.example.picknwhip_be.domain.design.entity.mapping.DesignOption;
 import com.example.picknwhip_be.domain.design.enums.Style;
@@ -24,6 +25,8 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
 
   private final PopularDesignRankingRepository rankingRepository;
   private final DesignMyPickCheckerService designMyPickChecker;
+
+  private final S3Service s3Service;
 
   @Override
   @Transactional(readOnly = true)
@@ -89,13 +92,19 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         letteringOption = align + line;
       }
     }
+      // 디자인 이미지 (DB key) -> presigned GET URL 변환
+      String rawImage = d.getImageUrl();
+      String imageUrl =
+              (rawImage == null || rawImage.isBlank() || isHttpUrl(rawImage))
+                      ? rawImage
+                      : s3Service.createPresignedDownloadUrl(rawImage);
 
     return PopularDesignResDTO.builder()
         .ranking(ranking.getRanking())
         .designId(d.getId())
         .shopName(ranking.getShop().getShopName())
         .cakeName(d.getDesignName())
-        .imageUrl(d.getImageUrl())
+        .imageUrl(imageUrl)
         .designSpec(designSpec.trim())
         .flavorSpec(flavorSpec)
         .letteringPhrase(d.getLetteringText())
@@ -123,4 +132,7 @@ public class HomePopularDesignServiceImpl implements HomePopularDesignService {
         .findFirst()
         .orElse("선택 안함");
   }
+    private boolean isHttpUrl(String value) {
+        return value.startsWith("http://") || value.startsWith("https://");
+    }
 }
