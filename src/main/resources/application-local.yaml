@@ -9,6 +9,9 @@ spring:
           kakao:
             redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
 
+kakao:
+  rest-api-key: ${KAKAO_CLIENT_ID}
+
 logging:
   level:
     org.springframework.security.oauth2: DEBUG
