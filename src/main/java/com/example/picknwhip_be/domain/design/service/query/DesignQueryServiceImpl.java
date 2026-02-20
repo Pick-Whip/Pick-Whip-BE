@@ -40,7 +40,15 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     List<DesignGallery> designs =
         favoriteDesigns.stream().map(FavoriteDesign::getDesignGallery).toList();
 
-    return DesignConverter.toDesignListDTO(designs);
+    DesignResDTO.GetDesignListDTO result = DesignConverter.toDesignListDTO(designs);
+    List<DesignResDTO.DesignPreviewDTO> converted =
+        result.getDesigns().stream()
+            .map(
+                item ->
+                    DesignResDTO.DesignPreviewDTO.withImageUrl(
+                        item, resolveImageUrl(item.getImageUrl())))
+            .toList();
+    return DesignResDTO.GetDesignListDTO.builder().designs(converted).build();
   }
 
   @Override
@@ -57,7 +65,15 @@ public class DesignQueryServiceImpl implements DesignQueryService {
       throw new DesignException(DesignErrorCode.DESIGN_NOT_REGISTER);
     }
 
-    return DesignConverter.toDesignListDTO(designs);
+    DesignResDTO.GetDesignListDTO result = DesignConverter.toDesignListDTO(designs);
+    List<DesignResDTO.DesignPreviewDTO> converted =
+        result.getDesigns().stream()
+            .map(
+                item ->
+                    DesignResDTO.DesignPreviewDTO.withImageUrl(
+                        item, resolveImageUrl(item.getImageUrl())))
+            .toList();
+    return DesignResDTO.GetDesignListDTO.builder().designs(converted).build();
   }
 
   @Override
@@ -69,7 +85,9 @@ public class DesignQueryServiceImpl implements DesignQueryService {
             .findDesignGalleryById(designId)
             .orElseThrow(() -> new DesignException(DesignErrorCode.DESIGN_NOT_FOUND));
 
-    return DesignConverter.toDesignDetailDTO(design);
+    DesignResDTO.GetDesignDetailDTO result = DesignConverter.toDesignDetailDTO(design);
+    return DesignResDTO.GetDesignDetailDTO.withImageUrl(
+        result, resolveImageUrl(result.getImageUrl()));
   }
 
   @Override
@@ -103,26 +121,12 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     Page<DesignResDTO.GalleryItemDTO> resultPage =
         designRepository.searchGallery(
             categories, sortType, currentDistrict, lat, lon, seed, userId, pageable);
-    // DB에 저장된 keyName(imageUrl)을 presigned GET URL로 변환해서 내려주기
     List<DesignResDTO.GalleryItemDTO> converted =
         resultPage.getContent().stream()
             .map(
-                item -> {
-                  String raw = item.getImageUrl();
-
-                  // 이미 완성 URL(https://...)이면 그대로 사용 (시드/더미 데이터가 URL일 수 있어서 안전장치)
-                  if (raw != null && (raw.startsWith("http://") || raw.startsWith("https://"))) {
-                    return item;
-                  }
-
-                  // keyName이면 presigned GET URL 생성
-                  String presigned =
-                      (raw == null || raw.isBlank())
-                          ? raw
-                          : s3Service.createPresignedDownloadUrl(raw);
-
-                  return DesignResDTO.GalleryItemDTO.withImageUrl(item, presigned);
-                })
+                item ->
+                    DesignResDTO.GalleryItemDTO.withImageUrl(
+                        item, resolveImageUrl(item.getImageUrl())))
             .toList();
     return DesignResDTO.GalleryListDTO.builder()
         .currentRegion("서울시 " + (currentDistrict != null ? currentDistrict : "전체"))
@@ -166,5 +170,15 @@ public class DesignQueryServiceImpl implements DesignQueryService {
     if (lat >= 37.54 && lat <= 37.57 && lon >= 126.90 && lon <= 126.95) return "마포구";
     if (lat >= 37.48 && lat <= 37.52 && lon >= 127.01 && lon <= 127.05) return "강남구";
     return null;
+  }
+
+  private String resolveImageUrl(String rawImageUrl) {
+    if (rawImageUrl == null || rawImageUrl.isBlank()) {
+      return rawImageUrl;
+    }
+    if (rawImageUrl.startsWith("http://") || rawImageUrl.startsWith("https://")) {
+      return rawImageUrl;
+    }
+    return s3Service.createPresignedDownloadUrl(rawImageUrl);
   }
 }

@@ -12,7 +12,7 @@ DELETE FROM popular_design_rankings;
 -- 2. 디자인 1~4 정보 보강 (R__seed_local_design.sql 에서 이미 생성됨)
 -- 랭킹용 lettering/image_url 업데이트
 UPDATE design_gallery
-SET image_url               = 'https://cdn.picknwhip.com/designs/simple_flower.jpg',
+SET image_url               = 'd1.png',
     lettering_text          = 'Love You',
     lettering_line_count    = 'ONE_LINE',
     lettering_alignment     = 'CENTER'
@@ -25,7 +25,7 @@ SET lettering_text          = 'Happy Birthday',
 WHERE id = 3;
 
 UPDATE design_gallery
-SET image_url               = 'https://cdn.picknwhip.com/designs/vintage_flower.jpg',
+SET image_url               = 'd2.png',
     lettering_text          = 'Congratulations',
     lettering_line_count    = 'THREE_LINE',
     lettering_alignment     = 'CENTER'
