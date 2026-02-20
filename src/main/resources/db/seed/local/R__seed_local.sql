@@ -69,7 +69,7 @@ INSERT INTO shops (
       (1, 2, '마포 스윗 케이크', '02-1234-5678', '서울 마포구 양화로 160', '마포구',
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.5, 30000, 80000,
-       'https://picknwhip.s3.ap-northeast-2.amazonaws.com/profile/bf5104c9-e4cc-4a11-a612-2cebc8211b68/store1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260218T164642Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIA4WJPWFJSK45ATAUL%2F20260218%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=9f4c43d2f1fef0a05ed4ef1b5ef25f1bace39ed6d2a33975581fe00934201f2e','ACTIVE', 'VERIFIED', '홍대 근처 감성 케이크샵입니다.',
+       'shop1.jpg','ACTIVE', 'VERIFIED', '홍대 근처 감성 케이크샵입니다.',
        3, 0, '매장 앞 공영주차장 이용 가능',
        '온라인 결제 시 주문 확정 후 3일 이내 취소 가능',
        '주문 후 변경은 픽업 2일 전까지 가능합니다.\n생과일 케이크는 당일 소비를 권장합니다.\n알러지가 있으신 경우 주문 시 꼭 알려주세요.',
@@ -79,7 +79,7 @@ INSERT INTO shops (
       (2, 3, '강남 스윗 케이크', '02-555-5555', '서울 강남구 강남대로 396', '강남구',
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.8, 45000, 90000,
-       'https://picknwhip.s3.ap-northeast-2.amazonaws.com/profile/6137e612-5632-43d3-83ad-e8d99b05bef2/store2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260218T164805Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIA4WJPWFJSK45ATAUL%2F20260218%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=55e9f35f7ee4e64532c6b96a763c6b1eb9c7761a017e840d1da8f9b92f332366','ACTIVE', 'VERIFIED', '강남역 최고의 케이크 맛집',
+       'shop2.png','ACTIVE', 'VERIFIED', '강남역 최고의 케이크 맛집',
        2, 1, '인근 유료 주차장 이용',
        '카드 결제만 가능합니다.',
        '픽업 당일 환불 불가',
@@ -89,7 +89,7 @@ INSERT INTO shops (
       (3, 2, '랭킹 테스트용 케이크샵', '010-5555-5555', '서울시 성수동', '성동구',
        ST_GeomFromText('POINT(37.5565 126.9241)', 4326),
        4.8, 15000, 50000,
-       'https://picknwhip.s3.ap-northeast-2.amazonaws.com/profile/11a7ccba-7dfc-4484-b125-7ef83ff9b1a7/store3.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260218T164832Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIA4WJPWFJSK45ATAUL%2F20260218%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=67b1c0b2d59a7d1da3aa82634381f59346ddc911f7a40b579d47b37b7d50842a','ACTIVE', 'VERIFIED', '인기 랭킹 테스트를 위한 매장입니다.',
+       'shop3.jpg','ACTIVE', 'VERIFIED', '인기 랭킹 테스트를 위한 매장입니다.',
        0, 0, NULL, NULL, NULL, NULL,
        '랭킹샵', NOW(6))
     AS new
