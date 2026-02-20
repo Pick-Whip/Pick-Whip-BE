@@ -24,6 +24,16 @@ public class DesignResDTO {
     private int price;
     private List<String> keywords;
     private String imageUrl;
+
+    public static DesignPreviewDTO withImageUrl(DesignPreviewDTO src, String newImageUrl) {
+      DesignPreviewDTO dto = new DesignPreviewDTO();
+      dto.designId = src.designId;
+      dto.cakeName = src.cakeName;
+      dto.price = src.price;
+      dto.keywords = src.keywords;
+      dto.imageUrl = newImageUrl;
+      return dto;
+    }
   }
 
   @Builder
@@ -55,6 +65,25 @@ public class DesignResDTO {
 
     private List<CustomResDTO.Topping> toppings;
     private List<CustomResDTO.Option> options;
+
+    public static GetDesignDetailDTO withImageUrl(GetDesignDetailDTO src, String newImageUrl) {
+      GetDesignDetailDTO dto = new GetDesignDetailDTO();
+      dto.cakeName = src.cakeName;
+      dto.cakeSize = src.cakeSize;
+      dto.price = src.price;
+      dto.imageUrl = newImageUrl;
+      dto.allergyInfo = src.allergyInfo;
+      dto.description = src.description;
+      dto.letteringText = src.letteringText;
+      dto.letteringLineCount = src.letteringLineCount;
+      dto.letteringAlignment = src.letteringAlignment;
+      dto.letteringColor = src.letteringColor;
+      dto.availOptions = src.availOptions;
+      dto.keywords = src.keywords;
+      dto.toppings = src.toppings;
+      dto.options = src.options;
+      return dto;
+    }
   }
 
   @Getter
