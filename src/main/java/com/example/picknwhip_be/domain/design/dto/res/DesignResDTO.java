@@ -120,6 +120,19 @@ public class DesignResDTO {
       this.isMyPick = (pickId != null); // pickId가 있으면 true
     }
 
+    public static GalleryItemDTO withImageUrl(GalleryItemDTO src, String newImageUrl) {
+      GalleryItemDTO dto = new GalleryItemDTO();
+      dto.designId = src.designId;
+      dto.shopId = src.shopId;
+      dto.imageUrl = newImageUrl;
+      dto.shopName = src.shopName;
+      dto.simpleAddress = src.simpleAddress;
+      dto.minPrice = src.minPrice;
+      dto.avgRating = src.avgRating;
+      dto.isMyPick = src.isMyPick;
+      return dto;
+    }
+
     // 주소 파싱 유틸리티 메서드
     private String parseSimpleAddress(String fullAddress) {
       if (fullAddress == null) return "";

@@ -1,5 +1,6 @@
 package com.example.picknwhip_be.domain.shop.converter;
 
+import com.example.picknwhip_be.domain.S3.service.S3Service;
 import com.example.picknwhip_be.domain.shop.dto.ShopResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopDetailResDTO;
 import com.example.picknwhip_be.domain.shop.dto.res.ShopPreviewResDTO;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class ShopConverter {
 
   private final ObjectMapper objectMapper;
+  private final S3Service s3Service;
 
   private List<String> parseTags(String rawTags) {
     if (rawTags == null || rawTags.isBlank()) {
@@ -36,13 +38,27 @@ public class ShopConverter {
     }
   }
 
+  private String toImageUrlOrPresigned(String raw) {
+    if (raw == null || raw.isBlank()) {
+      return raw;
+    }
+
+    // 이미 완성 URL(https://...)이면 그대로 반환 (시드/더미가 URL일 수 있음)
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      return raw;
+    }
+
+    // DB에 keyName 저장된 경우 presigned GET URL 생성
+    return s3Service.createPresignedDownloadUrl(raw);
+  }
+
   public ShopPreviewResDTO toPreviewDto(ShopRepository.ShopPreviewInfo info) {
     Double distanceInKm = (info.getDistance() != null) ? info.getDistance() / 1000.0 : 0.0;
 
     return ShopPreviewResDTO.builder()
         .shopId(info.getShopId())
         .shopName(info.getShopName())
-        .shopImageUrl(info.getShopImageUrl())
+        .shopImageUrl(toImageUrlOrPresigned(info.getShopImageUrl()))
         .averageRating(info.getAverageRating())
         .minPrice(info.getMinPrice())
         .maxPrice(info.getMaxPrice())
@@ -60,7 +76,7 @@ public class ShopConverter {
     return ShopDetailResDTO.builder()
         .shopId(info.getShopId())
         .shopName(info.getShopName())
-        .shopImageUrl(info.getShopImageUrl())
+        .shopImageUrl(toImageUrlOrPresigned(info.getShopImageUrl()))
         .averageRating(info.getAverageRating())
         .reviewCount(info.getReviewCount())
         .distanceKm(distanceKm)
