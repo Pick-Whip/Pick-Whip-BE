@@ -65,15 +65,15 @@ INSERT INTO custom_options (id, shop_id, option_name, category, additional_price
                                                                                                       (199, 11, '네모', 'SHAPE',15000 ,null),
                                                                                                       (200, 11, '하트', 'SHAPE',15000 ,null),
 
-                                                                                                      (201, 11, '레드벨벳', 'SHEET',15000,null),
-                                                                                                      (202, 11, '바닐라', 'SHEET',15000 ,null),
-                                                                                                      (203, 11, '딸기', 'SHEET',15000 ,null),
-                                                                                                      (204, 11, '초콜릿', 'SHEET',15000 ,null),
+                                                                                                      (201, 11, '레드벨벳', 'SHEET',15000,'#8B0000'),
+                                                                                                      (202, 11, '바닐라', 'SHEET',15000 ,'#F4C998'),
+                                                                                                      (203, 11, '딸기', 'SHEET',15000 ,'#FCE2E9'),
+                                                                                                      (204, 11, '초콜릿', 'SHEET',15000 ,'#A15004'),
 
-                                                                                                      (205, 11, '생크림', 'CREAM',15000 ,null),
-                                                                                                      (206, 11, '크림치즈', 'CREAM',15000 ,null),
-                                                                                                      (207, 11, '초코크림', 'CREAM',15000,null),
-                                                                                                      (208, 11, '딸기크림', 'CREAM',15000 ,null),
+                                                                                                      (205, 11, '생크림', 'CREAM',15000 ,'#EAF9FF'),
+                                                                                                      (206, 11, '크림치즈', 'CREAM',15000 ,'#FAFEDA'),
+                                                                                                      (207, 11, '초코크림', 'CREAM',15000,'#A15004'),
+                                                                                                      (208, 11, '딸기크림', 'CREAM',15000 ,'#FCE2E9'),
 
 
 
@@ -136,10 +136,10 @@ INSERT INTO design_gallery (
     allergy_info, image_url, lettering_text, lettering_line_count,
     lettering_alignment, lettering_color
 ) VALUES
-      (11, 11, 12, '광화문 핑크 하트', 45000, '사랑스러운 핑크색 하트 케이크', '우유, 밀', 'https://example.com/11.jpg', '수고했어', 'ONE_LINE', 'CENTER', '#000000'),
-      (12, 12, 14, '단짠 카라멜 폭탄', 48000, '솔티드 카라멜', '우유, 밀', 'https://example.com/12.jpg', 'HBD', 'TWO_LINE', 'CENTER', '#FFFFFF'),
-      (13, 13, 15, '얼그레이 갸또', 55000, '진한 얼그레이', '우유, 밀', 'https://example.com/13.jpg', '사랑해', 'ONE_LINE', 'CURVE_UP', '#FF0000'),
-      (14, 14, 17, '플라자 블랙', 95000, '프리미엄 블랙 케이크', '우유, 견과류', 'https://example.com/14.jpg', 'Congrats', 'ONE_LINE', 'CURVE_UP_DOWN', '#FFD700');
+      (11, 11, 12, '광화문 핑크 하트', 45000, '사랑스러운 핑크색 하트 케이크', '우유, 밀', 'd1.png', '수고했어', 'ONE_LINE', 'CENTER', '#000000'),
+      (12, 12, 14, '단짠 카라멜 폭탄', 48000, '솔티드 카라멜', '우유, 밀', 'd2.png', 'HBD', 'TWO_LINE', 'CENTER', '#FFFFFF'),
+      (13, 13, 15, '얼그레이 갸또', 55000, '진한 얼그레이', '우유, 밀', 'd3.png', '사랑해', 'ONE_LINE', 'CURVE_UP', '#FF0000'),
+      (14, 14, 17, '플라자 블랙', 95000, '프리미엄 블랙 케이크', '우유, 견과류', 'd4.png', 'Congrats', 'ONE_LINE', 'CURVE_UP_DOWN', '#FFD700');
 
 /* ======================================================
    7. 갤러리 디자인에 적용된 찐 옵션 (design_options)
