@@ -34,36 +34,36 @@ public class HomePopularCakeServiceImpl implements HomePopularCakeService {
       return Collections.emptyList();
     }
 
-      List<PopularCakeResDTO> presignedConverted =
-              cachedRankings.stream()
-                      .map(
-                              dto -> {
-                                  String raw = dto.getCakeImageUrl();
-                                  if (raw == null || raw.isBlank() || isHttpUrl(raw)) {
-                                      return dto;
-                                  }
-                                  String presigned = s3Service.createPresignedDownloadUrl(raw);
-                                  return dto.toBuilder().cakeImageUrl(presigned).build();
-                              })
-                      .toList();
+    List<PopularCakeResDTO> presignedConverted =
+        cachedRankings.stream()
+            .map(
+                dto -> {
+                  String raw = dto.getCakeImageUrl();
+                  if (raw == null || raw.isBlank() || isHttpUrl(raw)) {
+                    return dto;
+                  }
+                  String presigned = s3Service.createPresignedDownloadUrl(raw);
+                  return dto.toBuilder().cakeImageUrl(presigned).build();
+                })
+            .toList();
 
-      // designIds도 변환된 리스트 기준으로 추출 (일관성)
-      List<Long> designIds = presignedConverted.stream().map(PopularCakeResDTO::getDesignId).toList();
-      Set<Long> pickedDesignIds = new HashSet<>();
+    // designIds도 변환된 리스트 기준으로 추출 (일관성)
+    List<Long> designIds = presignedConverted.stream().map(PopularCakeResDTO::getDesignId).toList();
+    Set<Long> pickedDesignIds = new HashSet<>();
 
-      if (userId != null && !designIds.isEmpty()) {
-          pickedDesignIds.addAll(designMyPickChecker.findPickedDesignIds(userId, designIds));
-      }
+    if (userId != null && !designIds.isEmpty()) {
+      pickedDesignIds.addAll(designMyPickChecker.findPickedDesignIds(userId, designIds));
+    }
 
-      // 반환도 presignedConverted 기준으로
-      if (pickedDesignIds.isEmpty()) {
-          return List.copyOf(presignedConverted);
-      }
+    // 반환도 presignedConverted 기준으로
+    if (pickedDesignIds.isEmpty()) {
+      return List.copyOf(presignedConverted);
+    }
 
-      // MyPick 반영도 presignedConverted 기준으로
-      return presignedConverted.stream()
-              .map(dto -> dto.toBuilder().isMyPick(pickedDesignIds.contains(dto.getDesignId())).build())
-              .collect(Collectors.toList());
+    // MyPick 반영도 presignedConverted 기준으로
+    return presignedConverted.stream()
+        .map(dto -> dto.toBuilder().isMyPick(pickedDesignIds.contains(dto.getDesignId())).build())
+        .collect(Collectors.toList());
   }
 
   private boolean isHttpUrl(String value) {
